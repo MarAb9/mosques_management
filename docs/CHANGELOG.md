@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## Phase 3 - Config and Environment Cleanup
+
+### Added
+
+- **Root `.gitignore`** — protects `.env`, `vendor/`, `uploads/mosques/*`, `*.sql`, backups, logs, cache, OS/IDE files from accidental commits.
+- **`includes/config.example.php`** — safe config template with placeholder credentials. Developers copy this to `config.php` and fill in local values.
+- **`docs/LOCAL_SETUP.md`** — full local setup guide covering Docker and local PHP/XAMPP paths, Composer install, DB import, and secret avoidance.
+- **`docs/DEPLOYMENT_FREEHOST.md`** — Freehost deployment guide covering what to upload, DB configuration, upload handling, vendor management, and security hardening.
+- **`uploads/.gitkeep`** and **`uploads/mosques/.gitkeep`** — directory placeholders so folder structure is preserved in fresh clones.
+
+### Changed
+
+- **`.env.example`** — added documentation header clarifying values are local Docker defaults only.
+
+### Removed from Git tracking (files remain on disk)
+
+- `vendor/` — 749 Composer dependency files (install via `composer install`).
+- `uploads/mosques/*` — 228 uploaded mosque images (user-generated content).
+- `ezyro_40059332_mosques_berkane.sql` — SQL dump containing credentials and personal data.
+- `includes/config.php` — application config with database credentials.
+
+### Not changed
+
+- No files deleted from disk.
+- No database schema changes.
+- No project structure refactor.
+- No business logic changes.
+- No UI changes.
+
 ## Phase 2 - Security Foundation
 
 - Added centralized CSRF helpers and protected the touched write forms/actions.
