@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.table th {
+    background-color: #f1f1f1;
+    font-weight: bold;
+}
+
+.alert {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-weight: bold;
+}
+
+/* تخصيصات للواجهة العربية */
+.navbar-brand, .card-title, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+}
+
+/* تنسيق الجداول */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* تنسيق الأزرار */
+.btn {
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 500;
+}
+
+.active-tab-title {
+    font-weight: bold;
+    color: #0d6efd;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    padding-left: 15px;
+    border-left: 1px solid #dee2e6;
+    margin-left: 10px;
+}
+
+.nav-tabs {
+    align-items: center;
+    border-bottom: none;
+}
+
+    #clearSearch {
+    transition: opacity 0.2s ease;
+}
+/* Search container */
+.input-group {
+    border-radius: 50px !important;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+/* Input field */
+#liveSearch {
+    border-right: none;
+    border-left: none;
+    padding: 0.75rem 1rem;
+    background-color: #fff;
+}
+
+#liveSearch:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+    outline: none;
+}
+
+/* Search icon in prepend */
+.input-group-text {
+    background-color: #fff !important;
+    border-right: none !important;
+    padding: 0 1.25rem;
+}
+
+/* Clear button */
+#clearSearch {
+    border-left: none;
+    border-right: none;
+    background-color: #fff;
+    padding: 0 1rem;
+    transition: all 0.2s ease;
+}
+
+#clearSearch:hover {
+    color: #dc3545 !important;
+}
+
+/* Search button */
+#searchButton {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    padding: 0 1.5rem;
+    transition: all 0.2s ease;
+}
+
+#searchButton:hover {
+    background-color: #0b5ed7;
+}
+
+/* Table row animations */
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+/* No results message */
+#noResultsMessage {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .input-group {
+        max-width: 100% !important;
+    }
+    
+    #liveSearch {
+        padding: 0.65rem 0.75rem;
+    }
+    
+    .input-group-text {
+        padding: 0 0.75rem;
+    }
+    
+    #searchButton {
+        padding: 0 1rem;
+    }
+}
+
+/*---------- Custom Background Colors ----------*/
+.bg-coral       { background-color: #FF6B6B !important; }
+.bg-teal        { background-color: #4ECDC4 !important; }
+.bg-skyblue     { background-color: #45B7D1 !important; }
+.bg-lavender    { background-color: #A37EBA !important; }
+.bg-mint        { background-color: #3CB371 !important; }
+.bg-peach       { background-color: #FFA07A !important; }
+.bg-gold        { background-color: #FFD700 !important; }
+.bg-indigo      { background-color: #6A5ACD !important; }
+.bg-rose        { background-color: #FF66B2 !important; }
+.bg-slategray   { background-color: #708090 !important; }
+
+/*---------- Custom Text Colors ----------*/
+.text-coral     { color: #FF6B6B !important; }
+.text-teal      { color: #4ECDC4 !important; }
+.text-skyblue   { color: #45B7D1 !important; }
+.text-lavender  { color: #A37EBA !important; }
+.text-mint      { color: #3CB371 !important; }
+.text-peach     { color: #FFA07A !important; }
+.text-gold      { color: #FFD700 !important; }
+.text-indigo    { color: #6A5ACD !important; }
+.text-rose      { color: #FF66B2 !important; }
+.text-slategray { color: #708090 !important; }
+
+.form-control[type="file"] {
+    padding: 0.375rem 0.75rem;
+}
+
+.form-control[type="file"]::file-selector-button {
+    padding: 0.375rem 0.75rem;
+    margin-right: 0.5rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.form-control[type="file"]::file-selector-button:hover {
+    background-color: #e9ecef;
+}

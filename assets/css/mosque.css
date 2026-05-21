@@ -1,0 +1,190 @@
+/* Custom CSS for enhanced UI */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        --success-gradient: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        --info-gradient: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+        --warning-gradient: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+        --danger-gradient: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+    }
+    
+    .bg-primary-gradient {
+        background: var(--primary-gradient);
+    }
+    
+    .bg-success-gradient {
+        background: var(--success-gradient);
+    }
+    
+    .bg-info-gradient {
+        background: var(--info-gradient);
+    }
+    
+    .bg-warning-gradient {
+        background: var(--warning-gradient);
+    }
+    
+    .bg-danger-gradient {
+        background: var(--danger-gradient);
+    }
+    
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    .glass-search {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 0.375rem;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(78, 115, 223, 0.05);
+    }
+    
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        border: 1px solid #ced4da;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 36px;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+    
+    
+    /* Animation classes */
+    @keyframes pulse-glow {
+        0% { box-shadow: 0 0 0 0 rgba(78, 115, 223, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(78, 115, 223, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(78, 115, 223, 0); }
+    }
+    
+    .pulse-glow {
+        animation: pulse-glow 2s infinite;
+    }
+/* Mobile Responsive Styles - Table Version */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .table-responsive {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Keep table structure but make it scrollable */
+    .table {
+        min-width: 800px; /* Ensure table doesn't get too compressed */
+        font-size: 0.875rem;
+    }
+    
+    .table thead {
+        display: table-header-group;
+    }
+    
+    .table tbody tr {
+        display: table-row;
+        margin-bottom: 0;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+    }
+    
+    .table tbody td {
+        display: table-cell;
+        padding: 0.75rem 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table tbody td:before {
+        display: none; /* Remove the mobile card labels */
+    }
+    
+    /* Dashboard cards stacking */
+    .row.g-4 .col-md-3 {
+        margin-bottom: 1rem;
+    }
+    
+    /* Search form adjustments */
+    .col-md-5, .col-md-2, .col-md-3 {
+        margin-bottom: 1rem;
+    }
+    
+    /* Button adjustments */
+    .btn-group .btn {
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Modal adjustments */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    /* Reduce padding for mobile */
+    .table td, .table th {
+        padding: 0.5rem 0.3rem;
+    }
+    
+    /* Make action buttons smaller */
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    /* Adjust icons size */
+    .fa-lg {
+        font-size: 1rem;
+    }
+    
+    /* Ensure select2 is responsive */
+    .select2-container {
+        width: 100% !important;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 768px) {
+    .table {
+        min-width: 900px; /* Slightly wider for very small screens */
+        font-size: 0.8rem;
+    }
+    
+    .table td, .table th {
+        padding: 0.4rem 0.2rem;
+    }
+    
+    /* Hide less important columns on very small screens */
+    .mobile-hidden {
+        display: none !important;
+    }
+    
+    /* Compact action buttons */
+    .d-flex.gap-2 {
+        gap: 0.25rem !important;
+    }
+    
+    .btn-icon {
+        width: 1.8rem;
+        height: 1.8rem;
+    }
+}
