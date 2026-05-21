@@ -460,6 +460,7 @@ function renderMosqueRow($row, $animationDelay) {
     
     $actionButtons = '';
     if ($isAdmin) {
+        $deleteToken = htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8');
         $actionButtons = '
         <a href="edit_mosque.php?id='.$row['registration_number'].'" 
             class="btn btn-sm btn-icon btn-primary rounded-circle"
@@ -468,14 +469,17 @@ function renderMosqueRow($row, $animationDelay) {
             title="تعديل">
                 <i class="fas fa-pen"></i>
             </a>
-        <a href="delete_mosque.php?id='.$row['registration_number'].'" 
-            class="btn btn-sm btn-icon btn-danger rounded-circle"
-            data-bs-toggle="tooltip" 
-            data-bs-placement="top" 
-            title="حذف"
-            onclick="return confirm(\'هل أنت متأكد من حذف هذا المسجد؟\')">
-                <i class="fas fa-trash-alt"></i>
-            </a>';
+        <form method="POST" action="delete_mosque.php" class="d-inline" onsubmit="return confirm(\'هل أنت متأكد من حذف هذا المسجد؟\')">
+            <input type="hidden" name="csrf_token" value="'.$deleteToken.'">
+            <input type="hidden" name="id" value="'.$row['registration_number'].'">
+            <button type="submit"
+                class="btn btn-sm btn-icon btn-danger rounded-circle"
+                data-bs-toggle="tooltip" 
+                data-bs-placement="top" 
+                title="حذف">
+                    <i class="fas fa-trash-alt"></i>
+            </button>
+        </form>';
     }
     
     return '
@@ -711,7 +715,7 @@ function renderLocationCell($row) {
 <script>
     //Global variable
     const IS_ADMIN = <?= $_SESSION['role'] == 'admin' ? 'true' : 'false' ?>;
-    const CSRF_TOKEN = '<?= $_SESSION['csrf_token'] ?? '' ?>';
+    const CSRF_TOKEN = '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>';
 
     
     // Bulk delete handler
@@ -727,7 +731,7 @@ document.getElementById('deleteSelected')?.addEventListener('click', function() 
         const tokenInput = document.createElement('input');
         tokenInput.type = 'hidden';
         tokenInput.name = 'csrf_token';
-        tokenInput.value = '<?= $_SESSION['csrf_token'] ?>';
+        tokenInput.value = CSRF_TOKEN;
         form.appendChild(tokenInput);
         
         ids.forEach(id => {

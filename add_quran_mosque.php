@@ -5,15 +5,10 @@ require_once 'includes/auth_check.php';
 checkAuth();
 
 
-if (canCreateMosque()) {
+if (!canCreateMosque()) {
     http_response_code(403);
     die("غير مصرح باضافة مساجد التحفيظ");
 }
-// Generate CSRF token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 // Get enum values for dropdowns
 $stmt = $pdo->query("
     SELECT 
@@ -55,12 +50,7 @@ $mosques = $pdo->query("
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate CSRF token
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        $_SESSION['error'] = "Invalid CSRF token";
-        header("Location: add_quran_mosque.php");
-        exit();
-    }
+    verify_csrf_token('add_quran_mosque.php');
 
     try {
         $pdo->beginTransaction();
@@ -117,8 +107,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
         
     } catch (Exception $e) {
-        $pdo->rollBack();
-        $_SESSION['error'] = 'حدث خطأ أثناء إضافة مسجد التحفيظ: ' . $e->getMessage();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log("Quran program create error: " . $e->getMessage());
+        $_SESSION['error'] = 'حدث خطأ أثناء إضافة مسجد التحفيظ. يرجى المحاولة لاحقاً';
     }
 }
 
@@ -364,7 +357,7 @@ require_once 'includes/header.php';
                 
                 <div class="card-body p-4">
                     <form method="post" action="add_quran_mosque.php" id="quranForm">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <?= csrf_field() ?>
                         
                         <!-- Progress Steps -->
                         <div class="step-progress mb-5">

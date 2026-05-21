@@ -3,9 +3,6 @@ require_once 'includes/config.php';
 require_once 'includes/auth_check.php';
 
 checkAuth();
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
 require_once 'includes/header.php';
 
 function buildQueryString($newParams = []) {
@@ -441,6 +438,7 @@ function getProgramStats($programId, $pdo) {
                                         
                                         $QuranactionButtons = '';
                                         if ($isAdmin) {
+                                            $deleteToken = htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8');
                                             $QuranactionButtons = '
                                             <a href="edit_quran_mosque.php?id='.$row['id'].'" 
                                                 class="btn btn-sm btn-icon btn-primary rounded-circle"
@@ -449,14 +447,17 @@ function getProgramStats($programId, $pdo) {
                                                 title="تعديل">
                                                     <i class="fas fa-pen"></i>
                                                 </a>
-                                            <a href="delete_quran_mosque.php?id='.$row['id'].'"
-                                                class="btn btn-sm btn-icon btn-danger rounded-circle"
-                                                data-bs-toggle="tooltip" 
-                                                data-bs-placement="top" 
-                                                title="حذف"
-                                                onclick="return confirm(\'هل أنت متأكد من حذف هذا المسجد؟\')">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>';
+                                            <form method="POST" action="delete_quran_mosque.php" class="d-inline" onsubmit="return confirm(\'هل أنت متأكد من حذف هذا المسجد؟\')">
+                                                <input type="hidden" name="csrf_token" value="'.$deleteToken.'">
+                                                <input type="hidden" name="id" value="'.$row['id'].'">
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-icon btn-danger rounded-circle"
+                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-placement="top" 
+                                                    title="حذف">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>';
                                         }
                                     return '
                                     <tr class="animate__animated animate__fadeInUp" style="animation-delay: '.$animationDelay.'s">
@@ -907,7 +908,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const csrfInput = document.createElement('input');
                 csrfInput.type = 'hidden';
                 csrfInput.name = 'csrf_token';
-                csrfInput.value = '<?= $_SESSION['csrf_token'] ?>';
+                csrfInput.value = '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>';
                 form.appendChild(csrfInput);
                 
                 selectedIds.forEach(id => {

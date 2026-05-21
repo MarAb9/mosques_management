@@ -1,5 +1,8 @@
 <?php
 require_once '../includes/config.php';
+require_once '../includes/auth_check.php';
+checkAuth();
+
 header('Content-Type: application/json');
 
 try {
@@ -29,8 +32,9 @@ try {
     ]);
     
 } catch (PDOException $e) {
+    error_log("Mosque stats error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'message' => 'Database error: ' . $e->getMessage()
+        'message' => 'Failed to load statistics'
     ]);
 }

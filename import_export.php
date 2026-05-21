@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['import_file'])) {
         http_response_code(403);
         die("غير مصرح باستيراد البيانات");
     }
+    verify_csrf_token();
+
     try {
         $file = $_FILES['import_file']['tmp_name'];
         $spreadsheet = IOFactory::load($file);
@@ -106,8 +108,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['import_file'])) {
         if ($duplicateCount > 0) $message .= " (تم تجاهل $duplicateCount مسجد مكرر)";
         $_SESSION['success'] = $message;
     } catch (Exception $e) {
-        $pdo->rollBack();
-        $_SESSION['error'] = "حدث خطأ أثناء استيراد البيانات: " . $e->getMessage();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log("Import error: " . $e->getMessage());
+        $_SESSION['error'] = "حدث خطأ أثناء استيراد البيانات. يرجى التحقق من الملف والمحاولة لاحقاً";
     }
     
     header("Location: import_export.php");
@@ -235,7 +240,8 @@ if (isset($_GET['export'])) {
         $writer->save('php://output');
         exit();
     } catch (Exception $e) {
-        $_SESSION['error'] = "حدث خطأ أثناء تصدير البيانات: " . $e->getMessage();
+        error_log("Export error: " . $e->getMessage());
+        $_SESSION['error'] = "حدث خطأ أثناء تصدير البيانات. يرجى المحاولة لاحقاً";
         header("Location: import_export.php");
         exit();
     }
@@ -278,6 +284,7 @@ require_once 'includes/header.php';
                                 <i class="fas fa-file-import text-primary me-2"></i>استيراد البيانات
                             </h5>
                             <form method="POST" action="" enctype="multipart/form-data" class="row g-3">
+                                <?= csrf_field() ?>
                                 <!-- KEEP YOUR EXISTING IMPORT FORM -->
                                 <div class="col-md-8">
                                     <label for="import_file" class="form-label">اختر ملف Excel</label>

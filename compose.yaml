@@ -36,6 +36,19 @@ services:
       retries: 12
       start_period: 30s
 
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    ports:
+      - "${PHPMYADMIN_PORT:-8081}:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USER:-mosques}
+      PMA_PASSWORD: ${DB_PASS:-mosques_password}
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   db_data:
   vendor_data:

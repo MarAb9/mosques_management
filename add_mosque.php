@@ -19,6 +19,8 @@ $uploadDir = 'uploads/mosques/';
 $maxFileSize = 2 * 1024 * 1024; // 2MB
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    verify_csrf_token();
+
     try {
         // Process form data
         $formData = processMosqueFormData($_POST);
@@ -87,8 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
     } catch (PDOException $e) {
-        $errors['database'] = "حدث خطأ في النظام: " . $e->getMessage();
         error_log("Database error: " . $e->getMessage());
+        $errors['database'] = "حدث خطأ في النظام. يرجى المحاولة لاحقاً";
     }
 }
 
@@ -109,6 +111,7 @@ require_once 'includes/header.php';
     <?php endif; ?>
 
     <form method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data">
+        <?= csrf_field() ?>
         <div class="row g-4">
             <!-- Mosque Basic Information -->
             <div class="col-md-6">
