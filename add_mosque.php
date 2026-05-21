@@ -79,8 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-$stmt->execute(array_values($formData));
-
                 $stmt->execute(array_values($formData));
                 
                 $_SESSION['success'] = "تمت إضافة المسجد بنجاح";
