@@ -88,4 +88,40 @@ return function (Router $router): void {
     $router->post('import_export.php', [\App\Controllers\ImportExportController::class, 'import'], [
         \App\Middleware\Authenticate::class,
     ]);
+
+    // ── Quran programs ───────────────────────────────────────────────────
+    $router->get('quran_mosques.php', [\App\Controllers\QuranProgramController::class, 'index'], [
+        \App\Middleware\Authenticate::class,
+    ]);
+    $router->get('add_quran_mosque.php', [\App\Controllers\QuranProgramController::class, 'create'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\CanCreateQuranProgram::class,
+    ]);
+    $router->post('add_quran_mosque.php', [\App\Controllers\QuranProgramController::class, 'store'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\CanCreateQuranProgram::class,
+        \App\Middleware\VerifyCsrfQuranAdd::class,
+    ]);
+    $router->get('edit_quran_mosque.php', [\App\Controllers\QuranProgramController::class, 'edit'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\CanEditQuranProgram::class,
+    ]);
+    // CSRF for the edit POST is checked in the controller: the legacy
+    // failure redirect includes the dynamic ?id= of the edited program.
+    $router->post('edit_quran_mosque.php', [\App\Controllers\QuranProgramController::class, 'update'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\CanEditQuranProgram::class,
+    ]);
+    $router->post('delete_quran_mosque.php', [\App\Controllers\QuranProgramController::class, 'destroy'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\CanDeleteQuranProgram::class,
+        \App\Middleware\VerifyCsrfQuranList::class,
+    ]);
+    $router->get('delete_quran_mosque.php', [\App\Controllers\QuranProgramController::class, 'destroyMethodNotAllowed'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\CanDeleteQuranProgram::class,
+    ]);
+    $router->get('ajax/get_quran_mosque_details.php', [\App\Controllers\Ajax\QuranAjaxController::class, 'details'], [
+        \App\Middleware\Authenticate::class,
+    ]);
 };
