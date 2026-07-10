@@ -338,6 +338,45 @@ final class MosqueRepository
             ->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    public function countByStatusNot(string $status): int
+    {
+        $stmt = $this->db->pdo()->prepare('SELECT COUNT(*) FROM mosques WHERE status != ?');
+        $stmt->execute([$status]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function countByAdminType(string $adminType): int
+    {
+        $stmt = $this->db->pdo()->prepare('SELECT COUNT(*) FROM mosques WHERE admin_type = ?');
+        $stmt->execute([$adminType]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function countGuidanceMosques(): int
+    {
+        return (int) $this->db->pdo()
+            ->query("SELECT COUNT(*) FROM mosques WHERE guidance_program = 'نعم'")
+            ->fetchColumn();
+    }
+
+    /**
+     * Latest mosques for the dashboard table (legacy index.php query).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function latest(int $limit = 5): array
+    {
+        return $this->db->pdo()->query("
+            SELECT m.*, YEAR(m.construction_date) AS construction_year_only, gi.display_name AS guide_imam_display
+            FROM mosques m
+            LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id
+            ORDER BY m.registration_number DESC
+            LIMIT {$limit}
+        ")->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     /** @return list<array<string, mixed>> */
     public function statusStats(): array
     {
@@ -364,6 +403,88 @@ final class MosqueRepository
             GROUP BY community
             ORDER BY count DESC
         ")->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // ── CRUD (legacy add/edit/delete pages) ──────────────────────────────
+
+    /**
+     * Column order shared by insert and update — identical to the legacy
+     * INSERT/UPDATE statements (and to the key order produced by
+     * MosqueFormService::processFormData()).
+     */
+    private const WRITE_COLUMNS = [
+        'mosque_name', 'address', 'construction_date', 'national_code', 'status',
+        'friday_prayer', 'community', 'funding_source', 'imam_name', 'imam_registration',
+        'imam_phone', 'preacher_name', 'preacher_registration', 'preacher_phone',
+        'muezzin_name', 'muezzin_registration', 'muezzin_phone', 'quran_memorization',
+        'literacy_program', 'guidance_program', 'guide_imam', 'notes',
+        'administrative_attachment', 'admin_type', 'pashalik', 'circle', 'leadership',
+        'main_image', 'latitude', 'longitude', 'guide_imam_id',
+    ];
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function find(int|string $registrationNumber): ?array
+    {
+        $stmt = $this->db->pdo()->prepare('SELECT * FROM mosques WHERE registration_number = ?');
+        $stmt->execute([$registrationNumber]);
+        $mosque = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $mosque === false ? null : $mosque;
+    }
+
+    public function nationalCodeExists(string $nationalCode): bool
+    {
+        $stmt = $this->db->pdo()->prepare('SELECT registration_number FROM mosques WHERE national_code = ?');
+        $stmt->execute([$nationalCode]);
+
+        return $stmt->fetch() !== false;
+    }
+
+    /**
+     * @param array<string, mixed> $data output of MosqueFormService::processFormData()
+     */
+    public function insert(array $data): void
+    {
+        $columns = implode(', ', self::WRITE_COLUMNS);
+        $placeholders = rtrim(str_repeat('?, ', count(self::WRITE_COLUMNS)), ', ');
+
+        $stmt = $this->db->pdo()->prepare("INSERT INTO mosques ({$columns}) VALUES ({$placeholders})");
+        $stmt->execute($this->writeParams($data));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function update(int|string $registrationNumber, array $data): void
+    {
+        $set = implode(",\n                    ", array_map(fn (string $c): string => "{$c} = ?", self::WRITE_COLUMNS));
+
+        $stmt = $this->db->pdo()->prepare("UPDATE mosques SET {$set} WHERE registration_number = ?");
+
+        $params = $this->writeParams($data);
+        $params[] = $registrationNumber;
+        $stmt->execute($params);
+    }
+
+    /**
+     * @param list<mixed> $registrationNumbers
+     */
+    public function deleteByRegistrationNumbers(array $registrationNumbers): void
+    {
+        $placeholders = rtrim(str_repeat('?,', count($registrationNumbers)), ',');
+        $stmt = $this->db->pdo()->prepare("DELETE FROM mosques WHERE registration_number IN ({$placeholders})");
+        $stmt->execute(array_values($registrationNumbers));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return list<mixed>
+     */
+    private function writeParams(array $data): array
+    {
+        return array_map(static fn (string $column) => $data[$column] ?? null, self::WRITE_COLUMNS);
     }
 
     // ── Shared ────────────────────────────────────────────────────────────

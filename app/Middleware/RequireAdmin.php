@@ -15,16 +15,19 @@ use Closure;
  * legacy canCreateMosque()/canEditMosque()/canDeleteMosque()/canImportData()
  * helpers, which all restrict to role 'admin'.
  */
-final class RequireAdmin implements MiddlewareInterface
+class RequireAdmin implements MiddlewareInterface
 {
-    public function __construct(private readonly Session $session)
+    /** Overridden by permission subclasses to keep the legacy 403 texts. */
+    protected string $message = 'غير مصرح بالوصول إلى هذه الصفحة';
+
+    public function __construct(protected readonly Session $session)
     {
     }
 
     public function handle(Request $request, Closure $next): Response
     {
         if ($this->session->role() !== 'admin') {
-            throw new HttpException(403, 'غير مصرح بالوصول إلى هذه الصفحة');
+            throw new HttpException(403, $this->message);
         }
 
         return $next($request);

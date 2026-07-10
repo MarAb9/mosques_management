@@ -17,9 +17,9 @@ use Closure;
  * verify_csrf_token(): posted 'csrf_token' must hash_equals the
  * session token. Non-POST requests pass through.
  */
-final class VerifyCsrf implements MiddlewareInterface
+class VerifyCsrf implements MiddlewareInterface
 {
-    public function __construct(private readonly Session $session)
+    public function __construct(protected readonly Session $session)
     {
     }
 
@@ -29,10 +29,20 @@ final class VerifyCsrf implements MiddlewareInterface
             $posted = $request->post('csrf_token', '');
 
             if (!is_string($posted) || !hash_equals($this->session->csrfToken(), $posted)) {
-                throw new HttpException(403, 'طلب غير صالح');
+                throw new HttpException(403, 'طلب غير صالح', $this->failureRedirect());
             }
         }
 
         return $next($request);
+    }
+
+    /**
+     * Where to send the user on token failure. Null renders the 403 page
+     * (legacy verify_csrf_token() with no argument); subclasses return a
+     * list-page URL to reproduce verify_csrf_token('mosques.php') behavior.
+     */
+    protected function failureRedirect(): ?string
+    {
+        return null;
     }
 }
