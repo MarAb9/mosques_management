@@ -17,6 +17,13 @@ final class QuranProgramRepository
     {
     }
 
+    public function countAll(): int
+    {
+        return (int) $this->db->pdo()
+            ->query('SELECT COUNT(*) FROM quran_memorization_programs')
+            ->fetchColumn();
+    }
+
     /**
      * Programs linked to a mosque (by national code), as returned by the
      * legacy mosque-details endpoint.
