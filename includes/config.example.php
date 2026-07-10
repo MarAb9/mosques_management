@@ -5,7 +5,8 @@
  * Copy this file to config.php in the same directory:
  *     cp includes/config.example.php includes/config.php
  *
- * Then replace the placeholder values below with your real database credentials.
+ * Then replace the placeholder values in db.php defaults or set environment
+ * variables for your real database credentials.
  * NEVER commit config.php to version control.
  */
 
@@ -38,23 +39,13 @@ function appEnv($name, $default = '') {
     return $value === false || $value === '' ? $default : $value;
 }
 
-// ─── Replace these placeholder values with your real credentials ───
-define('DB_HOST', appEnv('DB_HOST', '127.0.0.1'));
-define('DB_PORT', appEnv('DB_PORT', '3306'));
-define('DB_USER', appEnv('DB_USER', 'your_db_user'));
-define('DB_PASS', appEnv('DB_PASS', 'your_db_password'));
-define('DB_NAME', appEnv('DB_NAME', 'your_db_name'));
+// Database connection — extracted to db.php
+require_once __DIR__ . '/db.php';
 
-// إنشاء اتصال بقاعدة البيانات
-try {
-    $dsn = "mysql:host=".DB_HOST.";port=".DB_PORT.";dbname=".DB_NAME.";charset=utf8mb4";
-    $pdo = new PDO($dsn, DB_USER, DB_PASS);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    error_log("Database connection error: " . $e->getMessage());
-    http_response_code(500);
-    die("حدث خطأ في الاتصال بقاعدة البيانات");
-}
+// Shared helpers
+require_once __DIR__ . '/flash.php';
+require_once __DIR__ . '/redirect.php';
+require_once __DIR__ . '/helpers.php';
 
 // التحقق من تسجيل الدخول
 function checkAuth() {
