@@ -30,10 +30,14 @@ final class Response
         return new self($body, $status, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
 
+    /**
+     * Default json_encode flags (unicode escaped) — byte-compatible with
+     * the legacy endpoints' output.
+     */
     public static function json(mixed $data, int $status = 200): self
     {
         return new self(
-            (string) json_encode($data, JSON_UNESCAPED_UNICODE),
+            (string) json_encode($data),
             $status,
             ['Content-Type' => 'application/json']
         );

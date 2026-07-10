@@ -20,4 +20,18 @@ return function (Router $router): void {
         \App\Middleware\Guest::class,
     ]);
     $router->get('logout.php', [\App\Controllers\Auth\LoginController::class, 'logout']);
+
+    // ── Mosque list + AJAX ───────────────────────────────────────────────
+    $router->get('mosques.php', [\App\Controllers\MosqueController::class, 'index'], [
+        \App\Middleware\Authenticate::class,
+    ]);
+    $router->get('ajax/search_mosques.php', [\App\Controllers\Ajax\MosqueAjaxController::class, 'search'], [
+        \App\Middleware\Authenticate::class,
+    ]);
+    $router->get('ajax/get_mosque_details.php', [\App\Controllers\Ajax\MosqueAjaxController::class, 'details'], [
+        \App\Middleware\Authenticate::class,
+    ]);
+    $router->get('ajax/get_mosque_stats.php', [\App\Controllers\Ajax\MosqueAjaxController::class, 'stats'], [
+        \App\Middleware\Authenticate::class,
+    ]);
 };
