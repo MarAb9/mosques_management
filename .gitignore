@@ -40,10 +40,14 @@ uploads/mosques/*
 # ---------------------------------------------------------------------------
 # Logs, cache, temp files
 # ---------------------------------------------------------------------------
-logs/
+/logs/
 *.log
-cache/
+/cache/
 tmp/
+storage/logs/*
+!storage/logs/.gitkeep
+storage/cache/*
+!storage/cache/.gitkeep
 
 # ---------------------------------------------------------------------------
 # OS files
