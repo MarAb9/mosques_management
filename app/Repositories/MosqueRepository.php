@@ -487,6 +487,90 @@ final class MosqueRepository
         return array_map(static fn (string $column) => $data[$column] ?? null, self::WRITE_COLUMNS);
     }
 
+    // ── Map page + endpoint (legacy mosque_maps.php, get_mosques_for_map) ─
+
+    public function countWithCoordinates(): int
+    {
+        $stmt = $this->db->pdo()->prepare('SELECT COUNT(*) FROM mosques WHERE latitude IS NOT NULL AND longitude IS NOT NULL');
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function withCoordinatesPaginated(int $start, int $limit): array
+    {
+        $stmt = $this->db->pdo()->prepare('
+        SELECT m.registration_number, m.mosque_name, m.national_code, m.address, m.imam_name, m.status,
+               m.friday_prayer, m.community, COALESCE(gi.display_name, m.guide_imam) AS guide_imam, m.latitude, m.longitude
+        FROM mosques m
+        LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id
+        WHERE m.latitude IS NOT NULL AND m.longitude IS NOT NULL
+        ORDER BY m.mosque_name
+        LIMIT ?, ?
+    ');
+        $stmt->bindParam(1, $start, PDO::PARAM_INT);
+        $stmt->bindParam(2, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * All coordinate-bearing mosques for map search (legacy full payload).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function allWithCoordinates(): array
+    {
+        $stmt = $this->db->pdo()->prepare('
+        SELECT m.registration_number, m.mosque_name, m.national_code, m.address, m.imam_name, m.status,
+               m.friday_prayer, m.community, COALESCE(gi.display_name, m.guide_imam) AS guide_imam, m.latitude, m.longitude
+        FROM mosques m
+        LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id
+        WHERE m.latitude IS NOT NULL AND m.longitude IS NOT NULL
+        ORDER BY m.mosque_name
+    ');
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Map filter dropdown variant: also excludes the placeholder value.
+     *
+     * @return list<string>
+     */
+    public function distinctCommunitiesForMap(): array
+    {
+        $stmt = $this->db->pdo()->prepare("
+        SELECT DISTINCT community
+        FROM mosques
+        WHERE community IS NOT NULL AND community != '' AND community != 'غير محدد'
+        ORDER BY community
+    ");
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Payload of the map AJAX endpoint (no join — legacy shape).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function coordinatesForMapEndpoint(): array
+    {
+        $stmt = $this->db->pdo()->prepare('SELECT registration_number, mosque_name, address, imam_name, status, friday_prayer, latitude, longitude
+            FROM mosques
+            WHERE latitude IS NOT NULL AND longitude IS NOT NULL');
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // ── Import/Export (legacy import_export.php) ─────────────────────────
 
     /**

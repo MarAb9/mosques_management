@@ -124,4 +124,12 @@ return function (Router $router): void {
     $router->get('ajax/get_quran_mosque_details.php', [\App\Controllers\Ajax\QuranAjaxController::class, 'details'], [
         \App\Middleware\Authenticate::class,
     ]);
+
+    // ── Map ──────────────────────────────────────────────────────────────
+    $router->get('mosque_maps.php', [\App\Controllers\MapController::class, 'index'], [
+        \App\Middleware\Authenticate::class,
+    ]);
+    $router->get('ajax/get_mosques_for_map.php', [\App\Controllers\Ajax\MapAjaxController::class, 'mosques'], [
+        \App\Middleware\Authenticate::class,
+    ]);
 };
