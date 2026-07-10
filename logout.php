@@ -1,9 +1,5 @@
 <?php
-require_once 'includes/config.php';
 
-session_unset();
-session_destroy();
-
-header("Location: login.php");
-exit();
-?>
+/** Legacy URL shim — dispatches to App\Controllers\Auth\LoginController. */
+$app = require __DIR__ . '/bootstrap/app.php';
+$app->handle('logout.php');

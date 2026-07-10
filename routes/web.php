@@ -12,5 +12,12 @@ use App\Core\Router;
  * this table is still served by its legacy PHP file.
  */
 return function (Router $router): void {
-    // Routes are registered per migrated module.
+    // ── Authentication ───────────────────────────────────────────────────
+    $router->get('login.php', [\App\Controllers\Auth\LoginController::class, 'show'], [
+        \App\Middleware\Guest::class,
+    ]);
+    $router->post('login.php', [\App\Controllers\Auth\LoginController::class, 'login'], [
+        \App\Middleware\Guest::class,
+    ]);
+    $router->get('logout.php', [\App\Controllers\Auth\LoginController::class, 'logout']);
 };
