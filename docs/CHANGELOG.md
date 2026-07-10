@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## Guide Imams Normalization + Word Export
+
+### Added
+
+- **`guide_imams` table** (migration `database/migrations/002_create_guide_imams.sql`, already applied) — reference table of guide imams with `display_name` and Arabic-normalized `display_name_normalized`. `mosques.guide_imam_id` links each mosque to it; the legacy free-text `mosques.guide_imam` column is kept and used as fallback via `COALESCE`.
+- **`normalizeArabic()`** in `includes/mosque_functions.php` — strips diacritics, unifies Alef forms and Teh Marbuta for consistent Arabic matching/sorting.
+- **Guide imam dropdown** on add/edit mosque forms (replaces free-text input).
+- **Word export** (`import_export.php?export=1&format=word`) — PHPWord-generated RTL document listing mosques without GPS location, grouped by guide imam. New Composer dependency `phpoffice/phpword`.
+- **Export filters** — `no_location=1` (mosques missing coordinates) and `group_by_guide=1` (order by guide imam).
+- **`database/migrations/`** — records of schema changes applied on top of the baseline dump (001 unique national code, 002 guide imams).
+- **Test scripts** — `test_phase4.php`, `test_integration.php`, `test_guide_imams.php` (CLI, run inside the app container), `test_http.sh` (HTTP smoke tests), `audit_schema.php` (schema inspection).
+
+### Changed
+
+- Mosque list, search AJAX, details AJAX, dashboard, map page, and Excel export now `LEFT JOIN guide_imams` and display `COALESCE(gi.display_name, m.guide_imam)`.
+- Guide imam filters accept either a numeric `guide_imams.id` or a name string (normalized LIKE match) for backward compatibility with old URLs.
+
+## Phase 4.1 - Extract Shared Helpers
+
+### Added
+
+- **`includes/db.php`** — extracted PDO connection logic from `config.php`. Defines DB constants and creates global `$pdo`. Safe error handling with `error_log()`.
+- **`includes/flash.php`** — flash message helpers (`set_flash`, `get_flash`, `has_flash`, `clear_flash`, `flash_message`). Uses same `$_SESSION` keys as existing code.
+- **`includes/redirect.php`** — redirect helpers (`redirect_to`, `redirect_with_flash`). Wraps existing `header(Location)+exit` pattern.
+- **`includes/helpers.php`** — output and utility helpers (`e()`, `safe_trim()`, `selected()`, `checked()`). Complements domain-specific helpers in `mosque_functions.php`.
+
+### Changed
+
+- **`includes/config.php`** — now delegates DB connection to `db.php` and loads all helper files via `require_once`. Session bootstrap, `appEnv()`, `checkAuth()`, and CSRF loading remain in place. Full backward compatibility preserved.
+- **`includes/config.example.php`** — updated to match new `config.php` structure.
+
+### Not changed
+
+- No public routes moved or renamed.
+- No database schema changes.
+- No UI redesign.
+- No business logic changes.
+- No Arabic RTL text changes.
+
 ## Phase 3 - Config and Environment Cleanup
 
 ### Added

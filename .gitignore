@@ -22,6 +22,7 @@ vendor/
 # Database dumps and backups
 # ---------------------------------------------------------------------------
 *.sql
+!database/migrations/*.sql
 backups/
 *.zip
 *.rar

@@ -121,7 +121,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     leadership = ?,
                     main_image = ?,
                     latitude = ?,
-                    longitude = ?
+                    longitude = ?,
+                    guide_imam_id = ?
                     WHERE registration_number = ?");
                 
                 $params = array_values($formData);
@@ -489,9 +490,17 @@ require_once 'includes/header.php';
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label for="guide_imam" class="form-label">الإمام المرشد</label>
-                                    <input type="text" class="form-control" id="guide_imam" name="guide_imam" 
-                                           value="<?= $formData['guide_imam'] ?? '' ?>">
+                                    <label for="guide_imam_id" class="form-label">الإمام المرشد</label>
+                                    <select class="form-select" id="guide_imam_id" name="guide_imam_id">
+                                        <option value="">-- اختر الإمام المرشد --</option>
+                                        <?php
+                                        $guideImams = $pdo->query("SELECT id, display_name FROM guide_imams ORDER BY display_name_normalized")->fetchAll(PDO::FETCH_ASSOC);
+                                        foreach ($guideImams as $imam) {
+                                            $selected = (isset($formData['guide_imam_id']) && $formData['guide_imam_id'] == $imam['id']) ? 'selected' : '';
+                                            echo "<option value=\"" . $imam['id'] . "\" $selected>" . htmlspecialchars($imam['display_name']) . "</option>";
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
                             </div>
                             

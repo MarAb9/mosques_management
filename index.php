@@ -380,10 +380,11 @@ require_once 'includes/header.php';
                             </thead>
                             <tbody>
                                 <?php
-                                $stmt = $pdo->query("SELECT *,YEAR(construction_date) AS construction_year_only
-                                                        FROM mosques 
-                                                        ORDER BY registration_number DESC 
-                                                        LIMIT 5");
+                                $stmt = $pdo->query("SELECT m.*, YEAR(m.construction_date) AS construction_year_only, gi.display_name AS guide_imam_display
+                                                         FROM mosques m
+                                                         LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id
+                                                         ORDER BY m.registration_number DESC 
+                                                         LIMIT 5");
                                 while ($row = $stmt->fetch()) {
                                     echo "<tr class='animate__animated animate__fadeIn'>
                                         <td class='text-center fw-bold'>{$row['registration_number']}</td>
@@ -443,7 +444,7 @@ require_once 'includes/header.php';
                                                     </span>
                                                 </div>
                                                 <div>
-                                                    <div class='fw-bold'>{$row['guide_imam']}</div>
+                                                    <div class='fw-bold'>" . ($row['guide_imam_display'] ?: $row['guide_imam']) . "</div>
                                                 </div>
                                             </div>
                                         </td>

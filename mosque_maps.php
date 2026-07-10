@@ -18,11 +18,12 @@ try {
 
     // Get paginated mosques with coordinates (for display)
     $stmt = $pdo->prepare("
-        SELECT registration_number, mosque_name, national_code, address, imam_name, status, 
-               friday_prayer, community, guide_imam, latitude, longitude 
-        FROM mosques 
-        WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-        ORDER BY mosque_name 
+        SELECT m.registration_number, m.mosque_name, m.national_code, m.address, m.imam_name, m.status, 
+               m.friday_prayer, m.community, COALESCE(gi.display_name, m.guide_imam) AS guide_imam, m.latitude, m.longitude 
+        FROM mosques m
+        LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id
+        WHERE m.latitude IS NOT NULL AND m.longitude IS NOT NULL
+        ORDER BY m.mosque_name 
         LIMIT ?, ?
     ");
     $stmt->bindParam(1, $start, PDO::PARAM_INT);
@@ -32,11 +33,12 @@ try {
 
     // Get ALL mosques with coordinates for search functionality
     $allMosquesStmt = $pdo->prepare("
-        SELECT registration_number, mosque_name, national_code, address, imam_name, status, 
-               friday_prayer, community, guide_imam, latitude, longitude 
-        FROM mosques 
-        WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-        ORDER BY mosque_name
+        SELECT m.registration_number, m.mosque_name, m.national_code, m.address, m.imam_name, m.status, 
+               m.friday_prayer, m.community, COALESCE(gi.display_name, m.guide_imam) AS guide_imam, m.latitude, m.longitude 
+        FROM mosques m
+        LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id
+        WHERE m.latitude IS NOT NULL AND m.longitude IS NOT NULL
+        ORDER BY m.mosque_name
     ");
     $allMosquesStmt->execute();
     $allMosques = $allMosquesStmt->fetchAll(PDO::FETCH_ASSOC);

@@ -47,11 +47,12 @@ try {
             m.quran_memorization,
             m.literacy_program,
             m.guidance_program,
-            m.guide_imam,
+            COALESCE(gi.display_name, m.guide_imam) AS guide_imam,
             m.notes,
             m.administrative_attachment,
             m.main_image
         FROM mosques m
+        LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id
         WHERE m.national_code = ? OR m.registration_number = ?
     ");
     $stmt->execute([$id, $id]);

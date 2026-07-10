@@ -29,8 +29,11 @@ $order = isset($_GET['order']) && strtolower($_GET['order']) == 'asc'
     : 'DESC';
 
 // Base query without LIMIT for counting
-$sql = "SELECT * FROM mosques WHERE 1=1";
-$countSql = "SELECT COUNT(*) FROM mosques WHERE 1=1";
+$sql = "SELECT m.*, gi.display_name AS guide_imam_display 
+        FROM mosques m 
+        LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id 
+        WHERE 1=1";
+$countSql = "SELECT COUNT(*) FROM mosques m WHERE 1=1";
 $params = [];
 
 if (isset($_GET['national_code']) && !empty($_GET['national_code'])) {
@@ -100,21 +103,18 @@ if (isset($_GET['friday_prayer']) && !empty($_GET['friday_prayer'])) {
 // Add guide_imam filter
 
 if (isset($_GET['guide_imam']) && !empty($_GET['guide_imam'])) {
-    // Remove any count in parentheses if present
-    $guideName = preg_replace('/\s*\(\d+\)$/', '', $_GET['guide_imam']);
-    $names = explode(' ', trim($guideName), 2);
-    
-    if (count($names) == 2) {
-        // Search for both name orders
-        $sql .= " AND (guide_imam LIKE ? OR guide_imam LIKE ?)";
-        $countSql .= " AND (guide_imam LIKE ? OR guide_imam LIKE ?)";
-        $params[] = "%{$names[0]}%{$names[1]}%"; // First Last
-        $params[] = "%{$names[1]}%{$names[0]}%"; // Last First
+    $guideFilter = trim($_GET['guide_imam']);
+    if (is_numeric($guideFilter)) {
+        $sql .= " AND m.guide_imam_id = ?";
+        $countSql .= " AND m.guide_imam_id = ?";
+        $params[] = (int)$guideFilter;
     } else {
-        // Single name search
-        $sql .= " AND guide_imam LIKE ?";
-        $countSql .= " AND guide_imam LIKE ?";
-        $params[] = "%{$guideName}%";
+        // Remove any count in parentheses if present
+        $guideName = preg_replace('/\s*\(\d+\)$/', '', $guideFilter);
+        $normalizedSearch = normalizeArabic($guideName);
+        $sql .= " AND m.guide_imam_id IN (SELECT id FROM guide_imams WHERE display_name_normalized LIKE ?)";
+        $countSql .= " AND m.guide_imam_id IN (SELECT id FROM guide_imams WHERE display_name_normalized LIKE ?)";
+        $params[] = "%{$normalizedSearch}%";
     }
 }
 // Add sorting
@@ -329,58 +329,23 @@ function sortableHeader($title, $sortKey) {
                                             <select name="guide_imam" class="form-select select2" onchange="this.form.submit()">
                                                 <option value="">الإمام المرشد</option>
                                                 <?php
-                                                // Get all unique guide imams with their mosque counts
+                                                // Get all guide imams with their mosque counts
                                                 $guideImams = $pdo->query("
-                                                    SELECT guide_imam, COUNT(*) as mosque_count 
-                                                    FROM mosques 
-                                                    WHERE guide_imam IS NOT NULL AND guide_imam != ''
-                                                    GROUP BY guide_imam
-                                                    ORDER BY guide_imam
+                                                    SELECT gi.id, gi.display_name, COUNT(m.registration_number) as mosque_count 
+                                                    FROM guide_imams gi
+                                                    LEFT JOIN mosques m ON gi.id = m.guide_imam_id
+                                                    GROUP BY gi.id
+                                                    ORDER BY gi.display_name_normalized
                                                 ")->fetchAll(PDO::FETCH_ASSOC);
                                                 
-                                                // Create a normalized list of names to avoid duplicates
-                                                $normalizedNames = [];
-                                                foreach ($guideImams as $imam) {
-                                                    $name = trim($imam['guide_imam']);
-                                                    $names = explode(' ', $name, 2);
-                                                    
-                                                    if (count($names) == 2) {
-                                                        // Create both possible name orders
-                                                        $normalized1 = $names[0] . ' ' . $names[1];
-                                                        $normalized2 = $names[1] . ' ' . $names[0];
-                                                        
-                                                        // Check if either variation already exists
-                                                        if (!isset($normalizedNames[$normalized1]) && !isset($normalizedNames[$normalized2])) {
-                                                            $normalizedNames[$normalized1] = [
-                                                                'display' => $normalized1,
-                                                                'count' => $imam['mosque_count']
-                                                            ];
-                                                        } else {
-                                                            // If a variation exists, merge the counts
-                                                            $existingKey = isset($normalizedNames[$normalized1]) ? $normalized1 : $normalized2;
-                                                            $normalizedNames[$existingKey]['count'] += $imam['mosque_count'];
-                                                        }
-                                                    } else {
-                                                        // Single name
-                                                        $normalizedNames[$name] = [
-                                                            'display' => $name,
-                                                            'count' => $imam['mosque_count']
-                                                        ];
-                                                    }
-                                                }
-                                                
-                                                // Sort the normalized names alphabetically
-                                                ksort($normalizedNames);
-                                                
-                                                // Get current selection (without count)
-                                                $currentSelection = isset($_GET['guide_imam']) ? 
-                                                    preg_replace('/\s*\(\d+\)$/', '', $_GET['guide_imam']) : '';
+                                                // Get current selection
+                                                $currentSelection = $_GET['guide_imam'] ?? '';
                                                 
                                                 // Output the options
-                                                foreach ($normalizedNames as $nameData) {
-                                                    $selected = (trim($currentSelection) === trim($nameData['display'])) ? 'selected' : '';
-                                                    echo "<option value=\"" . htmlspecialchars($nameData['display']) . "\" $selected>" . 
-                                                        htmlspecialchars($nameData['display']) . " ({$nameData['count']})</option>";
+                                                foreach ($guideImams as $imam) {
+                                                    $selected = ($currentSelection === (string)$imam['id'] || $currentSelection === $imam['display_name']) ? 'selected' : '';
+                                                    echo "<option value=\"" . $imam['id'] . "\" $selected>" . 
+                                                        htmlspecialchars($imam['display_name']) . " ({$imam['mosque_count']})</option>";
                                                 }
                                                 ?>
                                             </select>
@@ -522,7 +487,7 @@ function renderMosqueRow($row, $animationDelay) {
         <td>
             <div class="d-flex align-items-center">
                 <i class="fas fa-user-tie fs-4 text-warning me-2"></i>
-                <span>'.$row['guide_imam'].'</span>
+                <span>'.($row['guide_imam_display'] ?: $row['guide_imam']).'</span>
             </div>
         </td>
         <td><span class="badge bg-info">'.$row['community'].'</span></td>

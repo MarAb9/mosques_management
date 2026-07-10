@@ -91,7 +91,26 @@ function validateGPS($coordinate) {
     return null;
 }
 
+function normalizeArabic($text) {
+    if (empty($text)) return '';
+    $text = trim($text);
+    $text = preg_replace('/\s+/', ' ', $text);
+    
+    // Arabic diacritics in PHP PCRE format
+    $diacritics = '/[\x{064b}-\x{065f}\x{0670}]/u';
+    $text = preg_replace($diacritics, '', $text);
+    
+    // Normalize Alefs
+    $text = preg_replace('/[أإآ]/u', 'ا', $text);
+    
+    // Normalize Teh Marbuta
+    $text = preg_replace('/ة/u', 'ه', $text);
+    
+    return $text;
+}
+
 function processMosqueFormData($postData, $existingImage = null) {
+    global $pdo;
     $adminType = sanitizeInput($postData['admin_type'] ?? '');
     $community = '';
     $administrativeAttachment = '';
@@ -101,6 +120,14 @@ function processMosqueFormData($postData, $existingImage = null) {
         $administrativeAttachment = sanitizeInput($postData['administrative_attachment'] ?? '');
     } elseif ($adminType == 'circle') {
         $community = sanitizeInput($postData['circle_community'] ?? '');
+    }
+
+    $guideImamId = !empty($postData['guide_imam_id']) ? (int)$postData['guide_imam_id'] : null;
+    $guideImamName = '';
+    if ($guideImamId && isset($pdo)) {
+        $stmt = $pdo->prepare("SELECT display_name FROM guide_imams WHERE id = ?");
+        $stmt->execute([$guideImamId]);
+        $guideImamName = $stmt->fetchColumn() ?: '';
     }
 
     return [
@@ -124,7 +151,7 @@ function processMosqueFormData($postData, $existingImage = null) {
         'quran_memorization' => sanitizeInput($postData['quran_memorization'] ?? 'نعم'),
         'literacy_program' => sanitizeInput($postData['literacy_program'] ?? 'نعم'),
         'guidance_program' => sanitizeInput($postData['guidance_program'] ?? 'نعم'),
-        'guide_imam' => sanitizeInput($postData['guide_imam'] ?? ''),
+        'guide_imam' => $guideImamName,
         'notes' => sanitizeInput($postData['notes'] ?? ''),
         'administrative_attachment' => $administrativeAttachment,
         'admin_type' => $adminType,
@@ -134,7 +161,8 @@ function processMosqueFormData($postData, $existingImage = null) {
         'main_image' => $existingImage,
         //GPS COORDINATES
         'latitude' => validateGPS($postData['latitude'] ?? ''),
-        'longitude' => validateGPS($postData['longitude'] ?? '')
+        'longitude' => validateGPS($postData['longitude'] ?? ''),
+        'guide_imam_id' => $guideImamId
     ];
 }
 
