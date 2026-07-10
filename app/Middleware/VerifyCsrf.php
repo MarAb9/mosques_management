@@ -26,14 +26,24 @@ class VerifyCsrf implements MiddlewareInterface
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->method() === 'POST') {
-            $posted = $request->post('csrf_token', '');
-
-            if (!is_string($posted) || !hash_equals($this->session->csrfToken(), $posted)) {
-                throw new HttpException(403, 'طلب غير صالح', $this->failureRedirect());
-            }
+            $this->assertValid($request);
         }
 
         return $next($request);
+    }
+
+    /**
+     * Validate the posted token or fail like the legacy helper. Public so
+     * controllers with legacy check ordering (permission before CSRF, or
+     * CSRF only when a file is present) can invoke it explicitly.
+     */
+    public function assertValid(Request $request): void
+    {
+        $posted = $request->post('csrf_token', '');
+
+        if (!is_string($posted) || !hash_equals($this->session->csrfToken(), $posted)) {
+            throw new HttpException(403, 'طلب غير صالح', $this->failureRedirect());
+        }
     }
 
     /**

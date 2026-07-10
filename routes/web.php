@@ -78,4 +78,14 @@ return function (Router $router): void {
         \App\Middleware\Authenticate::class,
         \App\Middleware\CanBulkDeleteMosques::class,
     ]);
+
+    // ── Import / Export ──────────────────────────────────────────────────
+    // GET serves both the page and ?export=1 downloads; POST is the Excel
+    // import (permission + CSRF checked inside with legacy ordering).
+    $router->get('import_export.php', [\App\Controllers\ImportExportController::class, 'handle'], [
+        \App\Middleware\Authenticate::class,
+    ]);
+    $router->post('import_export.php', [\App\Controllers\ImportExportController::class, 'import'], [
+        \App\Middleware\Authenticate::class,
+    ]);
 };

@@ -487,6 +487,120 @@ final class MosqueRepository
         return array_map(static fn (string $column) => $data[$column] ?? null, self::WRITE_COLUMNS);
     }
 
+    // ── Import/Export (legacy import_export.php) ─────────────────────────
+
+    /**
+     * Rows for Excel/Word export with the legacy filter set.
+     *
+     * @param array<string, mixed> $query raw GET parameters
+     * @return list<array<string, mixed>>
+     */
+    public function findForExport(array $query): array
+    {
+        $where = [];
+        $params = [];
+
+        $filters = [
+            'status',
+            'friday_prayer',
+            'community',
+            'literacy_program',
+            'guidance_program',
+            'guide_imam',
+            'quran_memorization',
+        ];
+
+        foreach ($filters as $filter) {
+            if (!empty($query[$filter])) {
+                // Special handling for guide_imam to match either id or name
+                if ($filter == 'guide_imam') {
+                    $guideFilter = trim((string) $query['guide_imam']);
+                    if (is_numeric($guideFilter)) {
+                        $where[] = 'm.guide_imam_id = ?';
+                        $params[] = (int) $guideFilter;
+                    } else {
+                        // fallback to name string matching for backward compatibility
+                        $guideName = (string) preg_replace('/\s*\(\d+\)$/', '', $guideFilter);
+                        $where[] = 'm.guide_imam_id IN (SELECT id FROM guide_imams WHERE display_name_normalized LIKE ?)';
+                        $params[] = '%' . Arabic::normalize($guideName) . '%';
+                    }
+                } else {
+                    $where[] = "m.{$filter} = ?";
+                    $params[] = $query[$filter];
+                }
+            }
+        }
+
+        // Filter for undetermined location
+        if (isset($query['no_location']) && $query['no_location'] == '1') {
+            $where[] = "(m.latitude IS NULL OR m.longitude IS NULL OR m.latitude = '' OR m.longitude = '')";
+        }
+
+        $orderBy = 'm.registration_number';
+        if (isset($query['group_by_guide']) && $query['group_by_guide'] == '1') {
+            $where[] = 'm.guide_imam_id IS NOT NULL';
+            $orderBy = 'gi.display_name_normalized, m.registration_number';
+        }
+
+        $sql = 'SELECT m.*, gi.display_name AS guide_imam_display FROM mosques m LEFT JOIN guide_imams gi ON m.guide_imam_id = gi.id';
+        if (!empty($where)) {
+            $sql .= ' WHERE ' . implode(' AND ', $where);
+        }
+        $sql .= ' ORDER BY ' . $orderBy;
+
+        $stmt = $this->db->pdo()->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Distinct column values for the export filter dropdowns
+     * (legacy variant: excludes NULL but keeps empty strings).
+     *
+     * @return list<string>
+     */
+    public function distinctColumnForExport(string $column): array
+    {
+        $allowed = ['status', 'friday_prayer', 'community', 'literacy_program', 'guidance_program'];
+        if (!in_array($column, $allowed, true)) {
+            throw new \InvalidArgumentException("Column not allowed: {$column}");
+        }
+
+        return $this->db->pdo()
+            ->query("SELECT DISTINCT {$column} FROM mosques WHERE {$column} IS NOT NULL ORDER BY {$column}")
+            ->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Insert one imported spreadsheet row
+     * (legacy named-parameter INSERT, same column set).
+     *
+     * @param array<string, mixed> $data
+     */
+    public function insertFromImport(array $data): void
+    {
+        $stmt = $this->db->pdo()->prepare('INSERT INTO mosques (
+            mosque_name, address, construction_date,
+            national_code, status, friday_prayer, community, funding_source,
+            imam_name, imam_registration, imam_phone, preacher_name,
+            preacher_registration, preacher_phone, muezzin_name,
+            muezzin_registration, muezzin_phone, quran_memorization,
+            literacy_program, guidance_program, guide_imam, notes,
+            admin_type, pashalik, administrative_attachment, circle, leadership
+        ) VALUES (
+            :mosque_name, :address, :construction_date,
+            :national_code, :status, :friday_prayer, :community, :funding_source,
+            :imam_name, :imam_registration, :imam_phone, :preacher_name,
+            :preacher_registration, :preacher_phone, :muezzin_name,
+            :muezzin_registration, :muezzin_phone, :quran_memorization,
+            :literacy_program, :guidance_program, :guide_imam, :notes,
+            :admin_type, :pashalik, :administrative_attachment, :circle, :leadership
+        )');
+
+        $stmt->execute($data);
+    }
+
     // ── Shared ────────────────────────────────────────────────────────────
 
     /**
