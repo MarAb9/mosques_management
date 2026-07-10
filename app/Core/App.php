@@ -177,5 +177,6 @@ final class App
         require_once $this->basePath . '/includes/flash.php';
         require_once $this->basePath . '/includes/redirect.php';
         require_once $this->basePath . '/includes/helpers.php';
+        require_once $this->basePath . '/includes/auth_check.php';
     }
 }
