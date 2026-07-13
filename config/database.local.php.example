@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * Optional shared-hosting/local override.
+ * Copy to database.local.php and replace the placeholders.
+ * This file is ignored by Git.
+ */
+return [
+    'host' => 'sql.example-host.test',
+    'port' => '3306',
+    'user' => 'database_user',
+    'pass' => 'database_password',
+    'name' => 'database_name',
+];
