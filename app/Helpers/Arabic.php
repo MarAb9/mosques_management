@@ -8,9 +8,7 @@ namespace App\Helpers;
  * Arabic text helpers.
  *
  * Canonical implementation of the normalization used for guide-imam
- * matching. The legacy global function normalizeArabic() in
- * includes/mosque_functions.php keeps its own copy until its last
- * legacy consumer is migrated (see cleanup phase).
+ * matching and sorting.
  */
 final class Arabic
 {

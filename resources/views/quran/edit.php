@@ -245,7 +245,7 @@
 
                 <div class="card-body p-4">
                     <form method="post" action="edit_quran_mosque.php?id=<?= $programId ?>" id="quranForm">
-                        <?= csrf_field() ?>
+                        <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
 
                         <!-- Progress Steps -->
                         <div class="step-progress mb-5">

@@ -4,6 +4,50 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## MVC Phases 11-12 - Public Boundary and Final Cleanup
+
+### Changed
+
+- Made `public/` the Apache document root and moved all physical legacy URL
+  shims, AJAX shims, static assets, and upload storage beneath it without
+  changing public URLs.
+- Added root/upload access controls: disabled directory listing, enabled
+  front-controller fallback, and denied script execution in uploaded content.
+- MVC views now receive CSRF/role state through the base controller and escape
+  dynamic output through `App\Core\View`; the kernel no longer loads global
+  helper functions or exports PDO globally.
+- Added ignored `config/database.local.php` overrides for shared hosts and
+  corrected the minimum PHP requirement to 8.1.
+- Upgraded PhpSpreadsheet from 4.3.1 to 5.8.1 to clear six published security
+  advisories, including the critical user-controlled filename issue.
+- Removed the persistent Composer vendor overlay that could keep stale,
+  vulnerable packages active after an otherwise successful image rebuild;
+  Docker now persists only uploads and application storage.
+- Replaced local/deployment documentation with the final public/private
+  directory layout and current test commands.
+
+### Removed
+
+- Removed the remaining tracked `includes/` compatibility files and the
+  duplicate root `index.php` entry point.
+
+## MVC Phase 10 - Utilities and Legacy Cleanup
+
+### Changed
+
+- Moved the schema-audit and coordinate-fix utilities from the public root to
+  `scripts/`; both now boot through the MVC application and reject web access.
+- Consolidated the HTTP smoke script under `tests/` and ported the guide-imam
+  normalization/data checks to `App\Helpers\Arabic`.
+
+### Removed
+
+- Removed superseded legacy authentication, layout, and mosque form helper
+  includes after confirming all runtime consumers use controllers, services,
+  repositories, middleware, and MVC views.
+- Removed obsolete pre-MVC test scripts replaced by the current focused test
+  suite, plus the generated `clean.xlsx` artifact.
+
 ## Guide Imams Normalization + Word Export
 
 ### Added

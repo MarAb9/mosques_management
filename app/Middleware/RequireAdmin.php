@@ -10,14 +10,10 @@ use App\Core\Session;
 use App\Exceptions\HttpException;
 use Closure;
 
-/**
- * Admin-only routes (create/edit/delete/import) — same policy as the
- * legacy canCreateMosque()/canEditMosque()/canDeleteMosque()/canImportData()
- * helpers, which all restrict to role 'admin'.
- */
+/** Admin-only policy shared by create, edit, delete, and import routes. */
 class RequireAdmin implements MiddlewareInterface
 {
-    /** Overridden by permission subclasses to keep the legacy 403 texts. */
+    /** Overridden by permission subclasses for feature-specific 403 text. */
     protected string $message = 'غير مصرح بالوصول إلى هذه الصفحة';
 
     public function __construct(protected readonly Session $session)

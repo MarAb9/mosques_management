@@ -7,10 +7,8 @@ namespace App\Core;
 /**
  * Session abstraction.
  *
- * Starts the session with exactly the same cookie policy as the legacy
- * includes/config.php bootstrap (lifetime 0, path /, secure on HTTPS,
- * httponly, SameSite=Lax) and uses the same session keys, so sessions
- * created by legacy pages remain valid on migrated pages and vice versa.
+ * Starts the session with hardened cookie settings: lifetime 0, path /,
+ * secure on HTTPS, HttpOnly, and SameSite=Lax.
  */
 final class Session
 {
@@ -98,7 +96,7 @@ final class Session
         return $message === null ? null : (string) $message;
     }
 
-    // ── CSRF (same key as legacy includes/csrf.php) ──────────────────────
+    // ── CSRF ─────────────────────────────────────────────────────────────
 
     public function csrfToken(): string
     {

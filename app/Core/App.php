@@ -53,7 +53,6 @@ final class App
 
         $app->errors->register();
         $app->session->start();
-        $app->loadLegacyHelpers();
 
         $routes = require $basePath . '/routes/web.php';
         $routes($app->router);
@@ -166,17 +165,4 @@ final class App
         return $pipeline;
     }
 
-    /**
-     * Load the legacy function helpers (single source of truth during the
-     * migration). Legacy pages load the same files through
-     * includes/config.php; require_once makes both paths safe.
-     */
-    private function loadLegacyHelpers(): void
-    {
-        require_once $this->basePath . '/includes/csrf.php';
-        require_once $this->basePath . '/includes/flash.php';
-        require_once $this->basePath . '/includes/redirect.php';
-        require_once $this->basePath . '/includes/helpers.php';
-        require_once $this->basePath . '/includes/auth_check.php';
-    }
 }

@@ -1,3 +1,6 @@
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+
 # Route requests through the front controller when the file does not
 # physically exist. Physical legacy shims and static assets are served
 # directly, so the app works even where mod_rewrite is unavailable.
@@ -5,7 +8,7 @@
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L]
+    RewriteRule ^ index.php [L,QSA]
 </IfModule>
 
 # Never execute PHP inside the uploads folder.

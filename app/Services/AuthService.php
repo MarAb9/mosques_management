@@ -10,8 +10,7 @@ use App\Repositories\UserRepository;
 /**
  * Authentication business logic.
  *
- * Mirrors the legacy includes/auth.php flow exactly: password_verify,
- * session ID regeneration on success, and the same session keys.
+ * Verifies credentials, regenerates the session ID, and stores auth state.
  */
 final class AuthService
 {

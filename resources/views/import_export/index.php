@@ -41,7 +41,7 @@
                                 <i class="fas fa-file-import text-primary me-2"></i>استيراد البيانات
                             </h5>
                             <form method="POST" action="" enctype="multipart/form-data" class="row g-3">
-                                <?= csrf_field() ?>
+                                <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
                                 <!-- KEEP YOUR EXISTING IMPORT FORM -->
                                 <div class="col-md-8">
                                     <label for="import_file" class="form-label">اختر ملف Excel</label>

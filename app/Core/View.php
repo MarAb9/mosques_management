@@ -44,6 +44,12 @@ final class View
         return $this->renderFile($this->path($view), $data);
     }
 
+    /** Escape a value for safe HTML output. */
+    public function e(mixed $value): string
+    {
+        return htmlspecialchars((string) ($value ?? ''), ENT_QUOTES, 'UTF-8');
+    }
+
     private function path(string $view): string
     {
         $relative = str_replace('.', '/', $view) . '.php';

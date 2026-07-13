@@ -132,4 +132,30 @@ return function (Router $router): void {
     $router->get('ajax/get_mosques_for_map.php', [\App\Controllers\Ajax\MapAjaxController::class, 'mosques'], [
         \App\Middleware\Authenticate::class,
     ]);
+
+    // Optional extensionless routes through public/index.php. Physical .php
+    // shims remain the compatibility contract for hosts without mod_rewrite.
+    foreach ([
+        'index.php',
+        'login.php',
+        'logout.php',
+        'mosques.php',
+        'add_mosque.php',
+        'edit_mosque.php',
+        'delete_mosque.php',
+        'bulk_delete_mosques.php',
+        'import_export.php',
+        'quran_mosques.php',
+        'add_quran_mosque.php',
+        'edit_quran_mosque.php',
+        'delete_quran_mosque.php',
+        'mosque_maps.php',
+        'ajax/search_mosques.php',
+        'ajax/get_mosque_details.php',
+        'ajax/get_mosque_stats.php',
+        'ajax/get_quran_mosque_details.php',
+        'ajax/get_mosques_for_map.php',
+    ] as $legacyPath) {
+        $router->alias(substr($legacyPath, 0, -4), $legacyPath);
+    }
 };

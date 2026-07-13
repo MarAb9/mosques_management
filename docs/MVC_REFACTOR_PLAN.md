@@ -27,6 +27,19 @@ Verification baseline (all green at branch start):
 - `php test_guide_imams.php` — 9/9 normalization/data checks.
 - `test_http.sh` (adapted to `localhost:8085`) — login, all pages 200, logout, auth redirect 302.
 
+### Refactor progress
+
+- Phases 1-12 are complete. Every application route dispatches through the MVC
+  kernel, all public entry points and static files live under `public/`, and
+  Apache exposes only that directory.
+- Maintenance utilities are CLI-only under `scripts/`; active regression
+  coverage is consolidated under `tests/`.
+- MVC views receive session/authorization data through the base controller and
+  escape output through `App\Core\View`; the tracked legacy `includes/`
+  compatibility layer has been removed.
+- Local/shared-host credentials use the ignored
+  `config/database.local.php` override.
+
 ## 2. Route Inventory
 
 Every public URL must keep working. "Target" names the controller action each URL
@@ -124,7 +137,6 @@ resources/views/          # layouts/, components/, auth/, mosques/, quran/,
 storage/logs/             # error log target (gitignored)
 scripts/                  # fix_coordinates.php and future maintenance scripts
 tests/                    # existing smoke scripts moved here + new ones
-includes/                 # legacy compatibility layer, shrinks over time
 ```
 
 ## 6. Migration Strategy (behavior-preserving)
@@ -145,9 +157,9 @@ Key rules:
    provable duplicates.
 5. **Views are moved, not redesigned.** Arabic text, DOM IDs, classes, and inline JS
    hooks stay byte-compatible wherever possible (JS in `assets/js/*` depends on them).
-6. Shared hosting without `.env`: config layer reads env vars with the same
-   defaults/fallback chain as today (`appEnv()` semantics), and `includes/config.php`
-   keeps working during migration.
+6. Shared hosting without environment variables uses the ignored
+   `config/database.local.php` override; public files remain separated from
+   private application code.
 
 Module order (each = one commit, app runnable after each):
 
@@ -173,5 +185,5 @@ Module order (each = one commit, app runnable after each):
 | Upload path breakage on docroot flip | `config/uploads.php` absolute path from one source of truth; flip commit tested with upload/replace/remove |
 | Session/CSRF regressions | Session bootstrap centralized in one middleware with identical cookie params; CSRF token key unchanged (`$_SESSION['csrf_token']`) |
 | Shared-hosting incompatibility (no rewrite, no .env) | physical shims, env fallbacks, `public/` contents deployable flat into `htdocs` |
-| Legacy include side effects double-run | `includes/config.php` becomes a delegating wrapper to the new bootstrap once modules migrate |
+| Legacy include side effects double-run | Resolved: public entry points load only `bootstrap/app.php`; tracked legacy includes were removed |
 | View drift breaking JS selectors | views moved verbatim; HTTP smoke diffs page sizes/markers per module |

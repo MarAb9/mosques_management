@@ -19,7 +19,7 @@ foreach ($pageParamNames as $param) {
     <ul class="pagination justify-content-center">
 <?php if ($currentPage > 1): ?>
         <li class="page-item">
-            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage - 1 ?><?= e($queryString) ?>" aria-label="Previous">
+            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage - 1 ?><?= $view->e($queryString) ?>" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -29,21 +29,21 @@ $startPage = max(1, $currentPage - 2);
 $endPage = min($totalPages, $currentPage + 2);
 
 if ($startPage > 1): ?>
-        <li class="page-item"><a class="page-link" href="<?= $baseUrl ?>?page=1<?= e($queryString) ?>">1</a></li>
+        <li class="page-item"><a class="page-link" href="<?= $baseUrl ?>?page=1<?= $view->e($queryString) ?>">1</a></li>
     <?php if ($startPage > 2): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
 <?php endif; ?>
 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
         <li class="page-item <?= $currentPage == $i ? 'active' : '' ?>">
-            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $i ?><?= e($queryString) ?>"><?= $i ?></a>
+            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $i ?><?= $view->e($queryString) ?>"><?= $i ?></a>
         </li>
 <?php endfor; ?>
 <?php if ($endPage < $totalPages): ?>
     <?php if ($endPage < $totalPages - 1): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
-        <li class="page-item"><a class="page-link" href="<?= $baseUrl ?>?page=<?= $totalPages ?><?= e($queryString) ?>"><?= $totalPages ?></a></li>
+        <li class="page-item"><a class="page-link" href="<?= $baseUrl ?>?page=<?= $totalPages ?><?= $view->e($queryString) ?>"><?= $totalPages ?></a></li>
 <?php endif; ?>
 <?php if ($currentPage < $totalPages): ?>
         <li class="page-item">
-            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage + 1 ?><?= e($queryString) ?>" aria-label="Next">
+            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage + 1 ?><?= $view->e($queryString) ?>" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>

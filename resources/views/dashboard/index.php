@@ -350,10 +350,10 @@
                             <tbody>
                                 <?php foreach ($latestMosques as $row): ?>
                                 <tr class='animate__animated animate__fadeIn'>
-                                    <td class='text-center fw-bold'><?= e($row['registration_number']) ?></td>
+                                    <td class='text-center fw-bold'><?= $view->e($row['registration_number']) ?></td>
                                     <td class='text-center'>
                                         <span class='badge bg-primary bg-opacity-10 text-primary'>
-                                            <?= e($row['national_code']) ?>
+                                            <?= $view->e($row['national_code']) ?>
                                         </span>
                                     </td>
                                     <td>
@@ -364,19 +364,19 @@
                                                 </span>
                                             </div>
                                             <div>
-                                                <div class='fw-bold'><?= e($row['mosque_name']) ?></div>
+                                                <div class='fw-bold'><?= $view->e($row['mosque_name']) ?></div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td><?= e($row['community']) ?></td>
+                                    <td><?= $view->e($row['community']) ?></td>
                                     <td>
                                         <div class='d-flex align-items-center'>
                                             <i class='fas fa-map-marker-alt text-danger me-2'></i>
-                                            <span><?= e($row['address']) ?></span>
+                                            <span><?= $view->e($row['address']) ?></span>
                                         </div>
                                     </td>
                                     <td class='text-center'>
-                                        <span class='badge bg-light text-dark'><?= e($row['construction_year_only']) ?></span>
+                                        <span class='badge bg-light text-dark'><?= $view->e($row['construction_year_only']) ?></span>
                                     </td>
                                     <td class='text-center'>
                                     <?php if ($row['friday_prayer'] == 'نعم'): ?>
@@ -393,7 +393,7 @@
                                                 </span>
                                             </div>
                                             <div>
-                                                <div class='fw-bold'><?= e($row['imam_name']) ?></div>
+                                                <div class='fw-bold'><?= $view->e($row['imam_name']) ?></div>
                                             </div>
                                         </div>
                                     </td>
@@ -405,7 +405,7 @@
                                                 </span>
                                             </div>
                                             <div>
-                                                <div class='fw-bold'><?= e($row['guide_imam_display'] ?: $row['guide_imam']) ?></div>
+                                                <div class='fw-bold'><?= $view->e($row['guide_imam_display'] ?: $row['guide_imam']) ?></div>
                                             </div>
                                         </div>
                                     </td>

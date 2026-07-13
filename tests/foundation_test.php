@@ -26,18 +26,17 @@ $check('App boots and is a singleton', $app === App\Core\App::instance());
 $check('Config loads app.php', is_string($app->config->get('app.name')));
 $check('Config dot access with default', $app->config->get('nope.nope', 'x') === 'x');
 $check('Config env DB defaults', $app->config->get('database.name') !== null);
+$check('Upload path resolves below the public root', str_ends_with(
+    str_replace('\\', '/', (string) $app->config->get('uploads.mosques_dir')),
+    '/public/uploads/mosques'
+));
 
-// Database connects and matches legacy row counts
-$pdo = $app->database->pdo();
-$check('Database connects', $pdo instanceof PDO);
-$count = (int) $pdo->query('SELECT COUNT(*) FROM mosques')->fetchColumn();
+// Database connects and matches application row counts
+$connection = $app->database->pdo();
+$check('Database connects', $connection instanceof PDO);
+$count = (int) $connection->query('SELECT COUNT(*) FROM mosques')->fetchColumn();
 $check("Mosques readable via new Database ($count rows)", $count > 0);
-$check('Global $pdo exported for legacy helpers', isset($GLOBALS['pdo']) && $GLOBALS['pdo'] instanceof PDO);
-
-// Legacy helper functions are loaded by the kernel
-foreach (['csrf_token', 'csrf_field', 'verify_csrf_token', 'set_flash', 'redirect_to', 'e', 'selected'] as $fn) {
-    $check("Legacy helper $fn() available", function_exists($fn));
-}
+$check('Database connection stays encapsulated', !isset($GLOBALS['pdo']));
 
 // Session facade uses the same keys
 $app->session->flash('success', 'test');
@@ -70,10 +69,10 @@ try {
 // View renderer
 $tmpViews = sys_get_temp_dir() . '/views_' . uniqid();
 mkdir($tmpViews . '/layouts', 0777, true);
-file_put_contents($tmpViews . '/hello.php', 'Hello <?= e($name) ?>');
+file_put_contents($tmpViews . '/hello.php', 'Hello <?= $view->e($name) ?>');
 file_put_contents($tmpViews . '/layouts/wrap.php', '[<?= $content ?>]');
 $view = new App\Core\View($tmpViews);
-$check('View renders with data + e()', $view->render('hello', ['name' => '<x>']) === 'Hello &lt;x&gt;');
+$check('View renders with escaped data', $view->render('hello', ['name' => '<x>']) === 'Hello &lt;x&gt;');
 $check('View renders inside layout', $view->render('hello', ['name' => 'a'], 'layouts.wrap') === '[Hello a]');
 
 // Middleware pipeline via a fake dispatch

@@ -2,16 +2,25 @@
 
 declare(strict_types=1);
 
+use App\Core\Config;
+
 $basePath = dirname(__DIR__);
+$publicPath = Config::env('PUBLIC_PATH');
+
+if ($publicPath === '') {
+    $serverDocumentRoot = (string) ($_SERVER['DOCUMENT_ROOT'] ?? '');
+    $publicPath = $serverDocumentRoot !== '' ? $serverDocumentRoot : $basePath . '/public';
+}
+
+$publicPath = rtrim(str_replace('\\', '/', $publicPath), '/');
 
 /*
- * Upload paths. The web root is the repository root until the final
- * docroot flip to public/; the 'dir' below is the single source of truth
- * used by the upload service, so the flip only changes this file.
+ * Upload paths. Only public/ is web-accessible; uploaded mosque images live
+ * below that document root while application code remains private.
  */
 return [
     // Absolute filesystem directory where mosque images are stored.
-    'mosques_dir' => $basePath . '/uploads/mosques',
+    'mosques_dir' => $publicPath . '/uploads/mosques',
 
     // URL prefix stored in the database and used in <img src> (unchanged).
     'mosques_url' => 'uploads/mosques',

@@ -28,8 +28,8 @@ final class LoginController extends Controller
 
     public function login(Request $request): Response
     {
-        // Same trigger condition as legacy includes/auth.php: the submit
-        // button is named "login"; a POST without it just renders the page.
+        // The submit button is named "login"; a POST without it renders the
+        // page without attempting authentication.
         if ($request->post('login') === null) {
             return $this->loginPage();
         }

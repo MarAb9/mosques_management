@@ -1,0 +1,7 @@
+Options -Indexes
+
+# Uploaded content must remain static even if a future validation regression
+# allows a script-like extension through.
+<FilesMatch "\.(php|php[0-9]*|phtml|phar)$">
+    Require all denied
+</FilesMatch>

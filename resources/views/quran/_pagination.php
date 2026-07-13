@@ -18,7 +18,7 @@ if (!empty($filteredParams)) {
     <ul class="pagination justify-content-center" style="z-index: 1; position: relative;">
 <?php if ($currentPage > 1): ?>
         <li class="page-item">
-            <a class="page-link" href="quran_mosques.php?page=<?= $currentPage - 1 ?><?= e($queryString) ?>" aria-label="Previous" style="text-decoration: none;">
+            <a class="page-link" href="quran_mosques.php?page=<?= $currentPage - 1 ?><?= $view->e($queryString) ?>" aria-label="Previous" style="text-decoration: none;">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -32,21 +32,21 @@ $startPage = max(1, $currentPage - 2);
 $endPage = min($totalPages, $currentPage + 2);
 
 if ($startPage > 1): ?>
-        <li class="page-item"><a class="page-link" href="quran_mosques.php?page=1<?= e($queryString) ?>" style="text-decoration: none;">1</a></li>
+        <li class="page-item"><a class="page-link" href="quran_mosques.php?page=1<?= $view->e($queryString) ?>" style="text-decoration: none;">1</a></li>
     <?php if ($startPage > 2): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
 <?php endif; ?>
 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
         <li class="page-item <?= $currentPage == $i ? 'active' : '' ?>">
-            <a class="page-link" href="quran_mosques.php?page=<?= $i ?><?= e($queryString) ?>" style="text-decoration: none;"><?= $i ?></a>
+            <a class="page-link" href="quran_mosques.php?page=<?= $i ?><?= $view->e($queryString) ?>" style="text-decoration: none;"><?= $i ?></a>
         </li>
 <?php endfor; ?>
 <?php if ($endPage < $totalPages): ?>
     <?php if ($endPage < $totalPages - 1): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
-        <li class="page-item"><a class="page-link" href="quran_mosques.php?page=<?= $totalPages ?><?= e($queryString) ?>" style="text-decoration: none;"><?= $totalPages ?></a></li>
+        <li class="page-item"><a class="page-link" href="quran_mosques.php?page=<?= $totalPages ?><?= $view->e($queryString) ?>" style="text-decoration: none;"><?= $totalPages ?></a></li>
 <?php endif; ?>
 <?php if ($currentPage < $totalPages): ?>
         <li class="page-item">
-            <a class="page-link" href="quran_mosques.php?page=<?= $currentPage + 1 ?><?= e($queryString) ?>" aria-label="Next" style="text-decoration: none;">
+            <a class="page-link" href="quran_mosques.php?page=<?= $currentPage + 1 ?><?= $view->e($queryString) ?>" aria-label="Next" style="text-decoration: none;">
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>

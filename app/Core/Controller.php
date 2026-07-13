@@ -20,6 +20,13 @@ abstract class Controller
      */
     protected function render(string $view, array $data = [], ?string $layout = 'layouts.main'): Response
     {
+        if ($layout !== null) {
+            $data += [
+                'csrfToken' => $this->session->csrfToken(),
+                'isAdmin' => $this->session->role() === 'admin',
+            ];
+        }
+
         return Response::html($this->view->render($view, $data, $layout));
     }
 

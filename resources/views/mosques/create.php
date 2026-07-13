@@ -19,7 +19,7 @@
     <?php endif; ?>
 
     <form method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data">
-        <?= csrf_field() ?>
+        <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
         <div class="row g-4">
             <!-- Mosque Basic Information -->
             <div class="col-md-6">

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة مساجد إقليم بركان</title>
-    <meta name="csrf-token" content="<?php echo htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="csrf-token" content="<?= $view->e($csrfToken) ?>">
 
     <!-- Preload important resources -->
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" as="style">
@@ -55,7 +55,7 @@
                             قائمة المساجد
                         </a>
                     </li>
-                    <?php if (canCreateMosque()): ?>
+                    <?php if ($isAdmin): ?>
                     <li class="nav-item">
                         <a class="nav-link hvr-underline-from-center" href="add_mosque.php">
                             <i class="fas fa-plus-circle"></i>
@@ -65,8 +65,8 @@
                      <?php endif ?>
                     <li class="nav-item">
                         <a class="nav-link hvr-underline-from-center" href="import_export.php">
-                            <i class="fas fa-<?= canImportData() ? 'exchange-alt' : 'file-export' ?>"></i>
-                            <?= canImportData() ? 'استيراد/تصدير' : 'تصدير البيانات' ?>
+                            <i class="fas fa-<?= $isAdmin ? 'exchange-alt' : 'file-export' ?>"></i>
+                            <?= $isAdmin ? 'استيراد/تصدير' : 'تصدير البيانات' ?>
                         </a>
                     </li>
                     <li class="nav-item">

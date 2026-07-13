@@ -9,9 +9,11 @@
 .env.*
 !.env.example
 
-# Real config (use includes/config.example.php as template)
+# Legacy local config files may still contain real credentials.
 includes/config.php
 includes/config.local.php
+# Current private database override (copy config/database.local.php.example).
+config/*.local.php
 
 # ---------------------------------------------------------------------------
 # Composer dependencies (install via: composer install)
@@ -34,8 +36,8 @@ backups/
 # ---------------------------------------------------------------------------
 # Uploaded content (user-generated, not part of source)
 # ---------------------------------------------------------------------------
-uploads/mosques/*
-!uploads/mosques/.gitkeep
+public/uploads/mosques/*
+!public/uploads/mosques/.gitkeep
 
 # ---------------------------------------------------------------------------
 # Logs, cache, temp files
@@ -48,6 +50,7 @@ storage/logs/*
 !storage/logs/.gitkeep
 storage/cache/*
 !storage/cache/.gitkeep
+/clean.xlsx
 
 # ---------------------------------------------------------------------------
 # OS files

@@ -12,6 +12,7 @@ declare(strict_types=1);
  */
 
 const BASE = 'http://localhost';
+const PUBLIC_ROOT = '/var/www/html/public';
 const TEST_CODE_1 = 'TESTMVC001';
 const TEST_CODE_2 = 'TESTMVC002';
 
@@ -111,7 +112,7 @@ check('Phone digits only', $row['imam_phone'] === '0612345678');
 check('Notes sanitized at input', $row['notes'] === 'ملاحظات &lt;اختبار&gt;');
 check('GPS stored', abs((float) $row['latitude'] - 34.920917) < 0.0001);
 check('Image path stored', is_string($row['main_image']) && str_starts_with($row['main_image'], 'uploads/mosques/mosque_'));
-check('Image file exists', is_string($row['main_image']) && is_file('/var/www/html/' . $row['main_image']));
+check('Image file exists', is_string($row['main_image']) && is_file(PUBLIC_ROOT . '/' . $row['main_image']));
 $imagePath = $row['main_image'];
 $regId = $row['registration_number'];
 
@@ -160,7 +161,7 @@ check('Name updated', $row['mosque_name'] === 'مسجد الاختبار الم�
 check('Year updated', $row['construction_date'] === '2006-01-01');
 check('Image cleared in DB', $row['main_image'] === null);
 clearstatcache(); // the earlier is_file() cached a positive stat for this path
-check('Image file deleted from disk', !is_file('/var/www/html/' . $imagePath));
+check('Image file deleted from disk', !is_file(PUBLIC_ROOT . '/' . $imagePath));
 
 // ── Edit with unknown id redirects ───────────────────────────────────────
 $r = req('edit_mosque.php?id=99999999');

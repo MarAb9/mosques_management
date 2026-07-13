@@ -9,22 +9,22 @@ $statusIcon = ($row['status'] == 'مفتوح') ? 'fa-check-circle text-success' 
 ?>
     <tr class="animate__animated animate__fadeInUp" style="animation-delay: <?= $animationDelay ?>s">
         <td>
-            <input type="checkbox" name="selected_mosques[]" value="<?= e($row['registration_number']) ?>" class="form-check-input mosque-checkbox">
+            <input type="checkbox" name="selected_mosques[]" value="<?= $view->e($row['registration_number']) ?>" class="form-check-input mosque-checkbox">
         </td>
-        <td class="fw-bold text-muted"><?= e($row['registration_number']) ?></td>
+        <td class="fw-bold text-muted"><?= $view->e($row['registration_number']) ?></td>
         <td>
             <div class="d-flex align-items-center">
                 <i class="fas fa-mosque text-primary me-2"></i>
-                <span><?= e($row['mosque_name']) ?></span>
+                <span><?= $view->e($row['mosque_name']) ?></span>
             </div>
         </td>
         <td class="mobile-hidden">
             <div class="d-flex align-items-center">
                 <i class="fas fa-map-marker-alt text-danger me-2"></i>
-                <small class="text-muted"><?= e($row['address']) ?></small>
+                <small class="text-muted"><?= $view->e($row['address']) ?></small>
             </div>
         </td>
-        <td><span class="badge bg-light text-dark"><?= e($row['national_code']) ?></span></td>
+        <td><span class="badge bg-light text-dark"><?= $view->e($row['national_code']) ?></span></td>
         <td>
             <span class="d-flex justify-content-center" data-bs-toggle="tooltip" title="<?= $row['friday_prayer'] == 'نعم' ? 'يوجد صلاة جمعة' : 'لا يوجد صلاة جمعة' ?>">
                 <i class="fas <?= $fridayIcon ?> fa-lg"></i>
@@ -40,23 +40,23 @@ $statusIcon = ($row['status'] == 'مفتوح') ? 'fa-check-circle text-success' 
         <td>
             <div class="d-flex align-items-center">
                 <i class="fas fa-user fs-4 text-info me-2"></i>
-                <span><?= e($row['imam_name']) ?></span>
+                <span><?= $view->e($row['imam_name']) ?></span>
             </div>
         </td>
         <td>
             <div class="d-flex align-items-center">
                 <i class="fas fa-user-tie fs-4 text-warning me-2"></i>
-                <span><?= e($row['guide_imam_display'] ?: $row['guide_imam']) ?></span>
+                <span><?= $view->e($row['guide_imam_display'] ?: $row['guide_imam']) ?></span>
             </div>
         </td>
-        <td><span class="badge bg-info"><?= e($row['community']) ?></span></td>
+        <td><span class="badge bg-info"><?= $view->e($row['community']) ?></span></td>
         <!-- ADD THIS CELL FOR GPS LOCATION -->
         <td class="mobile-hidden">
             <?php if (!empty($row['latitude']) && !empty($row['longitude'])): ?>
         <button class="btn btn-sm btn-outline-primary view-on-map"
-                data-lat="<?= e($row['latitude']) ?>"
-                data-lng="<?= e($row['longitude']) ?>"
-                data-mosque="<?= e($row['mosque_name']) ?>"
+                data-lat="<?= $view->e($row['latitude']) ?>"
+                data-lng="<?= $view->e($row['longitude']) ?>"
+                data-mosque="<?= $view->e($row['mosque_name']) ?>"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 title="عرض على الخريطة">
@@ -72,7 +72,7 @@ $statusIcon = ($row['status'] == 'مفتوح') ? 'fa-check-circle text-success' 
                 <a href="#" class="btn btn-sm btn-icon btn-info rounded-circle view-mosque-btn"
                 data-bs-toggle="modal"
                 data-bs-target="#mosqueDetailsModal"
-                data-mosque-id="<?= e($row['registration_number']) ?>"
+                data-mosque-id="<?= $view->e($row['registration_number']) ?>"
                 data-bs-tooltip="tooltip"
                 data-bs-placement="top"
                 title="عرض التفاصيل">
@@ -81,7 +81,7 @@ $statusIcon = ($row['status'] == 'مفتوح') ? 'fa-check-circle text-success' 
 
                 <!-- EDIT/DELETE BUTTONS - ONLY FOR ADMIN -->
                 <?php if ($isAdmin): ?>
-        <a href="edit_mosque.php?id=<?= e($row['registration_number']) ?>"
+        <a href="edit_mosque.php?id=<?= $view->e($row['registration_number']) ?>"
             class="btn btn-sm btn-icon btn-primary rounded-circle"
             data-bs-toggle="tooltip"
             data-bs-placement="top"
@@ -89,8 +89,8 @@ $statusIcon = ($row['status'] == 'مفتوح') ? 'fa-check-circle text-success' 
                 <i class="fas fa-pen"></i>
             </a>
         <form method="POST" action="delete_mosque.php" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المسجد؟')">
-            <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
-            <input type="hidden" name="id" value="<?= e($row['registration_number']) ?>">
+            <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
+            <input type="hidden" name="id" value="<?= $view->e($row['registration_number']) ?>">
             <button type="submit"
                 class="btn btn-sm btn-icon btn-danger rounded-circle"
                 data-bs-toggle="tooltip"

@@ -10,8 +10,7 @@ use PDOException;
 /**
  * PDO connection factory.
  *
- * Builds the connection exactly like the legacy includes/db.php
- * (same DSN, charset, and error mode) so query behavior is identical.
+ * Builds the application's PDO connection with utf8mb4 and exception mode.
  */
 final class Database
 {
@@ -25,12 +24,6 @@ final class Database
     {
         if ($this->pdo instanceof PDO) {
             return $this->pdo;
-        }
-
-        // Reuse a connection opened by the legacy includes/config.php
-        // bootstrap if one exists (mixed legacy/new request paths).
-        if (isset($GLOBALS['pdo']) && $GLOBALS['pdo'] instanceof PDO) {
-            return $this->pdo = $GLOBALS['pdo'];
         }
 
         $dsn = sprintf(
@@ -52,9 +45,6 @@ final class Database
             http_response_code(500);
             die('حدث خطأ في الاتصال بقاعدة البيانات');
         }
-
-        // Legacy helpers (e.g. processMosqueFormData) expect a global $pdo.
-        $GLOBALS['pdo'] = $pdo;
 
         return $this->pdo = $pdo;
     }
