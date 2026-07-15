@@ -236,7 +236,7 @@ final class MosqueExportService
             }
         }
 
-        // Premium Styling Upgrade
+        // Institutional export styling
         $lastRow = $row - 1;
         $highestColumn = $sheet->getHighestColumn();
 

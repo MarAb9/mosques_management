@@ -47,3 +47,7 @@
 }
 
 @media (max-width: 430px) { .map-workspace #map { height: 25rem; } }
+
+.map-summary { display: flex; flex-wrap: wrap; gap: .55rem; margin-block: -0.45rem 1rem; }
+.map-summary span { display: inline-flex; align-items: baseline; gap: .3rem; padding: .45rem .7rem; color: var(--color-text-secondary); background: #fff; border: 1px solid var(--color-border-soft); border-radius: 999px; font-size: .75rem; }
+.map-summary strong { color: var(--color-brand-800); font-size: .9rem; }

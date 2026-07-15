@@ -1,7 +1,22 @@
 <?php
-$currentPage = basename((string) ($_SERVER['SCRIPT_NAME'] ?? 'index.php'));
+$requestPath = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+$requestPage = basename(rtrim($requestPath, '/'));
+$routeAliases = [
+    '' => 'index.php',
+    'mosques' => 'mosques.php',
+    'add_mosque' => 'add_mosque.php',
+    'edit_mosque' => 'edit_mosque.php',
+    'quran_mosques' => 'quran_mosques.php',
+    'add_quran_mosque' => 'add_quran_mosque.php',
+    'edit_quran_mosque' => 'edit_quran_mosque.php',
+    'mosque_maps' => 'mosque_maps.php',
+    'import_export' => 'import_export.php',
+    'data_quality' => 'data_quality.php',
+    'trash' => 'trash.php',
+];
+$currentPage = $routeAliases[$requestPage] ?? ($requestPage !== '' ? $requestPage : basename((string) ($_SERVER['SCRIPT_NAME'] ?? 'index.php')));
 $pageConfig = [
-    'index.php' => ['title' => 'لوحة القيادة', 'section' => 'نظرة تشغيلية', 'icon' => 'fa-gauge-high'],
+    'index.php' => ['title' => 'لوحة التحكم', 'section' => 'الرئيسية', 'icon' => 'fa-gauge-high'],
     'mosques.php' => ['title' => 'دليل المساجد', 'section' => 'إدارة المساجد', 'icon' => 'fa-mosque'],
     'add_mosque.php' => ['title' => 'إضافة مسجد', 'section' => 'إدارة المساجد', 'icon' => 'fa-circle-plus'],
     'edit_mosque.php' => ['title' => 'تعديل مسجد', 'section' => 'إدارة المساجد', 'icon' => 'fa-pen-to-square'],
@@ -13,7 +28,7 @@ $pageConfig = [
     'data_quality.php' => ['title' => 'جودة البيانات', 'section' => 'الحوكمة', 'icon' => 'fa-clipboard-check'],
     'trash.php' => ['title' => 'سلة المحذوفات', 'section' => 'الحوكمة', 'icon' => 'fa-trash-can-arrow-up'],
 ];
-$page = $pageConfig[$currentPage] ?? ['title' => 'نظام مساجد بركان', 'section' => 'الإدارة', 'icon' => 'fa-mosque'];
+$page = $pageConfig[$currentPage] ?? ['title' => 'نظام إدارة مساجد إقليم بركان', 'section' => 'الإدارة', 'icon' => 'fa-mosque'];
 $roleLabel = ($currentRole ?? '') === 'admin' ? 'مسؤول النظام' : 'مشاهدة واستعلام';
 $select2Pages = ['mosques.php', 'quran_mosques.php', 'add_quran_mosque.php', 'edit_quran_mosque.php'];
 $navActive = static fn (array $pages): string => in_array($currentPage, $pages, true) ? ' is-active' : '';
@@ -27,7 +42,7 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
     <link rel="icon" type="image/png" href="assets/images/logo.png">
     <meta name="csrf-token" content="<?= $view->e($csrfToken) ?>">
     <meta name="csp-nonce" content="<?= $view->e($cspNonce ?? '') ?>">
-    <title><?= $view->e($page['title']) ?> — نظام مساجد بركان</title>
+    <title><?= $view->e($page['title']) ?> — نظام إدارة مساجد إقليم بركان</title>
     <link rel="preload" href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css" as="style">
     <link rel="preload" href="assets/dist/app.min.css" as="style">
     <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css">
@@ -36,25 +51,25 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
     <link rel="stylesheet" href="assets/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="stylesheet" href="assets/dist/app.min.css">
 </head>
-<body data-page="<?= $view->e(pathinfo($currentPage, PATHINFO_FILENAME)) ?>" data-is-admin="<?= $isAdmin ? 'true' : 'false' ?>">
+<body data-page="<?= $view->e(pathinfo($currentPage, PATHINFO_FILENAME)) ?>" data-is-admin="<?= $isAdmin ? 'true' : 'false' ?>" data-can-edit="<?= ($canEditContent ?? $isAdmin) ? 'true' : 'false' ?>" data-can-delete="<?= ($canDeleteContent ?? $isAdmin) ? 'true' : 'false' ?>">
     <a class="skip-link" href="#main-content">الانتقال إلى المحتوى الرئيسي</a>
     <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
 
     <aside class="app-sidebar" id="appSidebar" aria-label="التنقل الرئيسي">
         <div class="sidebar-brand">
             <span class="sidebar-brand__mark" aria-hidden="true"><img src="assets/images/logo.png" width="34" height="34" alt=""></span>
-            <span class="sidebar-brand__text"><span class="sidebar-brand__title">نظام مساجد بركان</span><span class="sidebar-brand__subtitle">المجلس العلمي المحلي</span></span>
+            <span class="sidebar-brand__text"><span class="sidebar-brand__title">نظام إدارة مساجد إقليم بركان</span><span class="sidebar-brand__subtitle">المجلس العلمي المحلي بإقليم بركان</span></span>
             <button class="sidebar-collapse d-none d-lg-grid" type="button" id="sidebarCollapse" aria-label="طي الشريط الجانبي" aria-expanded="true"><i class="fas fa-angles-right" aria-hidden="true"></i></button>
             <button class="topbar-icon d-lg-none ms-auto" type="button" id="mobileNavClose" aria-label="إغلاق القائمة"><i class="fas fa-xmark" aria-hidden="true"></i></button>
         </div>
 
         <div class="sidebar-scroll">
-            <?php if ($canEditContent ?? $isAdmin): ?><a class="sidebar-quick-action" href="add_mosque.php"><i class="fas fa-plus" aria-hidden="true"></i><span>إضافة مسجد جديد</span></a><?php endif; ?>
+            <?php if ($canEditContent ?? $isAdmin): ?><a class="sidebar-quick-action" href="add_mosque.php"><i class="fas fa-plus" aria-hidden="true"></i><span>إضافة مسجد</span></a><?php endif; ?>
             <nav>
                 <section class="nav-group" aria-labelledby="nav-overview">
-                    <span class="nav-group__label" id="nav-overview">القيادة</span>
+                    <span class="nav-group__label" id="nav-overview">الرئيسية</span>
                     <ul class="sidebar-nav">
-                        <li><a class="sidebar-nav__link<?= $navActive(['index.php']) ?>" href="index.php"><i class="fas fa-gauge-high" aria-hidden="true"></i><span>لوحة القيادة</span></a></li>
+                        <li><a class="sidebar-nav__link<?= $navActive(['index.php']) ?>" href="index.php"><i class="fas fa-gauge-high" aria-hidden="true"></i><span>لوحة التحكم</span></a></li>
                         <li><a class="sidebar-nav__link<?= $navActive(['mosque_maps.php']) ?>" href="mosque_maps.php"><i class="fas fa-map-location-dot" aria-hidden="true"></i><span>الخريطة التشغيلية</span></a></li>
                     </ul>
                 </section>
@@ -82,7 +97,7 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
         <div class="sidebar-account">
             <div class="account-card">
                 <span class="account-avatar" aria-hidden="true"><i class="fas fa-user-shield"></i></span>
-                <span class="account-meta"><strong><?= $view->e($roleLabel) ?></strong><small>جلسة إدارية آمنة</small></span>
+                <span class="account-meta"><strong><?= $view->e($roleLabel) ?></strong></span>
                 <form method="POST" action="logout.php" id="logoutForm">
                     <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
                     <button class="logout-btn border-0" type="button" id="logoutButton" aria-label="تسجيل الخروج"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i></button>
@@ -96,17 +111,36 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
             <div class="d-flex align-items-center gap-3 min-w-0">
                 <button class="mobile-nav-toggle" type="button" id="mobileNavToggle" aria-label="فتح القائمة" aria-controls="appSidebar" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i></button>
                 <div class="topbar-title">
-                    <p class="topbar-breadcrumb"><span>نظام مساجد بركان</span><i class="fas fa-chevron-left" aria-hidden="true"></i><span><?= $view->e($page['section']) ?></span></p>
-                    <h1><i class="fas <?= $view->e($page['icon']) ?> me-2 text-muted" aria-hidden="true"></i><?= $view->e($page['title']) ?></h1>
+                    <strong>نظام إدارة مساجد إقليم بركان</strong>
+                    <small>المجلس العلمي المحلي بإقليم بركان</small>
                 </div>
             </div>
             <div class="topbar-actions">
-                <a class="topbar-icon d-none d-md-grid" href="mosques.php" aria-label="البحث في المساجد" title="البحث في المساجد"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></a>
+                <button class="topbar-icon" type="button" id="globalSearchToggle" aria-label="البحث في المساجد" aria-controls="globalSearchDialog" aria-haspopup="dialog" aria-expanded="false"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></button>
                 <span class="role-badge"><i class="fas fa-shield" aria-hidden="true"></i><span><?= $view->e($roleLabel) ?></span></span>
             </div>
         </header>
+        <dialog class="global-search" id="globalSearchDialog" aria-labelledby="globalSearchTitle">
+            <form class="global-search__surface" id="globalSearchForm" action="mosques.php" method="GET">
+                <div class="global-search__header">
+                    <div>
+                        <h2 id="globalSearchTitle">البحث في المساجد</h2>
+                        <p>الاسم، الرمز، رقم التسجيل، العنوان، الجماعة أو الإمام</p>
+                    </div>
+                    <button class="topbar-icon" type="button" id="globalSearchClose" aria-label="إغلاق البحث"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+                </div>
+                <label class="visually-hidden" for="globalSearchInput">عبارة البحث</label>
+                <div class="global-search__field">
+                    <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                    <input class="form-control" id="globalSearchInput" name="query" type="search" autocomplete="off" placeholder="ابحث في سجلات المساجد" aria-describedby="globalSearchStatus">
+                    <button class="btn btn-primary" type="submit">عرض النتائج</button>
+                </div>
+                <p class="global-search__status" id="globalSearchStatus" role="status" aria-live="polite">اكتب حرفين على الأقل لعرض النتائج.</p>
+                <ul class="global-search__results" id="globalSearchResults" aria-label="نتائج البحث المقترحة"></ul>
+            </form>
+        </dialog>
         <main class="app-content" id="main-content" tabindex="-1"><?= $content ?></main>
-        <footer class="footer-section"><span>نظام إدارة مساجد إقليم بركان</span><span aria-hidden="true"> · </span><span>&copy; <?= date('Y') ?> المجلس العلمي المحلي</span></footer>
+        <footer class="footer-section"><span>نظام إدارة مساجد إقليم بركان</span><span aria-hidden="true"> · </span><span>&copy; <?= date('Y') ?> المجلس العلمي المحلي بإقليم بركان</span></footer>
     </div>
 
     <?php if (in_array($currentPage, $select2Pages, true)): ?><script src="assets/vendor/jquery/jquery-3.6.0.min.js"></script><?php endif; ?>

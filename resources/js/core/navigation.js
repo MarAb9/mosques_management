@@ -35,11 +35,11 @@ export function initNavigation() {
     collapseButton?.addEventListener('click', () => {
         const collapsed = body.classList.toggle('sidebar-collapsed');
         collapseButton.setAttribute('aria-expanded', String(!collapsed));
-        try { localStorage.setItem('atlas-noor-sidebar', collapsed ? 'collapsed' : 'expanded'); } catch (_) {}
+        try { localStorage.setItem('mosques-management-sidebar', collapsed ? 'collapsed' : 'expanded'); } catch (_) {}
     });
 
     try {
-        if (localStorage.getItem('atlas-noor-sidebar') === 'collapsed' && matchMedia('(min-width: 992px)').matches) {
+        if (localStorage.getItem('mosques-management-sidebar') === 'collapsed' && matchMedia('(min-width: 992px)').matches) {
             body.classList.add('sidebar-collapsed');
             collapseButton?.setAttribute('aria-expanded', 'false');
         }

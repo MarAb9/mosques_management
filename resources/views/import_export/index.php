@@ -3,10 +3,10 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
 ?>
 <div class="import-workspace">
     <?= $view->partial('components.page_header', [
-        'kicker' => 'نقل البيانات الموثوق',
-        'title' => 'نظام استيراد وتصدير بيانات المساجد',
-        'subtitle' => 'راجع ملف Excel قبل إدخاله، صدّر التقارير المطلوبة، واحتفظ بصيغ Excel وWord المعتمدة دون تغيير.',
+        'title' => 'الاستيراد والتصدير',
+        'subtitle' => 'إدارة ملفات المساجد بصيغ Excel وWord.',
         'icon' => 'fa-arrow-right-arrow-left',
+        'illustration' => 'assets/images/institutional/import-export-3d.svg',
         'actionsHtml' => $actions,
     ]) ?>
 
@@ -16,18 +16,18 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
     <div class="row g-4">
         <div class="col-xl-7">
             <section class="data-panel h-100" aria-labelledby="importTitle">
-                <div class="data-panel__header"><div><span class="page-kicker">المرحلة الأولى</span><h2 id="importTitle">استيراد البيانات</h2></div><span class="status-badge text-info bg-info-subtle">Excel فقط</span></div>
+                <div class="data-panel__header"><h2 id="importTitle">استيراد البيانات</h2><span class="status-badge text-info bg-info-subtle">Excel</span></div>
                 <div class="data-panel__body">
                     <?php if ($canImport ?? $isAdmin): ?>
                     <form method="POST" action="" enctype="multipart/form-data" id="importPreviewForm">
                         <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
                         <label class="upload-zone d-block text-center" for="import_file" data-upload-zone>
-                            <span class="empty-state__icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span>
+                            <img class="upload-zone__image" src="assets/images/institutional/import-export-3d.svg" alt="" aria-hidden="true">
                             <strong class="d-block mt-3" data-upload-name>اختر ملف Excel أو اسحبه إلى هنا</strong>
                             <span class="text-muted small d-block mt-1">الصيغ المدعومة: XLSX وXLS</span>
                             <input type="file" class="form-control mt-3" id="import_file" name="import_file" accept=".xlsx,.xls" required>
                         </label>
-                        <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap mt-3"><small class="text-muted"><i class="fas fa-shield-halved me-1" aria-hidden="true"></i>لن تنفذ الكتابة قبل مراجعة المعاينة.</small><button type="submit" name="preview_import" value="1" class="btn btn-primary"><i class="fas fa-eye me-2" aria-hidden="true"></i>معاينة الملف</button></div>
+                        <div class="d-flex justify-content-end mt-3"><button type="submit" name="preview_import" value="1" class="btn btn-primary"><i class="fas fa-eye me-2" aria-hidden="true"></i>معاينة الملف</button></div>
                     </form>
                     <?php else: ?>
                     <div class="alert alert-info mb-0"><i class="fas fa-lock me-2" aria-hidden="true"></i><strong>الاستيراد متاح للمسؤولين فقط.</strong> ما زال بإمكانك استخدام خيارات التصدير المصرح بها.</div>
@@ -48,7 +48,7 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
 
         <div class="col-xl-5">
             <section class="data-panel h-100" aria-labelledby="exportTitle">
-                <div class="data-panel__header"><div><span class="page-kicker">تقارير جاهزة</span><h2 id="exportTitle">تصدير البيانات</h2></div><span class="status-badge text-success bg-success-subtle">Excel / Word</span></div>
+                <div class="data-panel__header"><h2 id="exportTitle">تصدير البيانات</h2><span class="status-badge text-success bg-success-subtle">Excel / Word</span></div>
                 <div class="data-panel__body quick-actions">
                     <a href="import_export.php?export=1" class="quick-action"><i class="fas fa-file-excel" aria-hidden="true"></i><span><strong class="d-block">جميع بيانات المساجد</strong><small class="text-muted">ملف Excel كامل</small></span></a>
                     <a href="import_export.php?export=1&amp;no_location=1&amp;group_by_guide=1" class="quick-action"><i class="fas fa-map-location-dot" aria-hidden="true"></i><span><strong class="d-block">مساجد بدون موقع</strong><small class="text-muted">Excel مجمع حسب الإمام المرشد</small></span></a>
@@ -61,7 +61,7 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
 
     <?php if (!empty($importPreview)): ?>
     <section class="data-panel mt-4" aria-labelledby="previewTitle">
-        <div class="data-panel__header"><div><span class="page-kicker">مراجعة قبل التنفيذ</span><h2 id="previewTitle">ملخص ملف الاستيراد</h2></div></div>
+        <div class="data-panel__header"><h2 id="previewTitle">ملخص ملف الاستيراد</h2></div>
         <div class="data-panel__body">
             <div class="metric-grid mb-4">
                 <?= $view->partial('components.metric_card', ['label' => 'إجمالي الصفوف', 'value' => number_format((int) ($importPreview['total_rows'] ?? 0)), 'icon' => 'fa-table-list']) ?>
@@ -82,7 +82,7 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
 </div>
 
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><div class="modal-header"><div><span class="page-kicker">تقرير حسب الحاجة</span><h2 class="modal-title h5 mb-0" id="filterModalLabel">خيارات التصدير المخصص</h2></div><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button></div>
+    <div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h2 class="modal-title h5 mb-0" id="filterModalLabel">خيارات التصدير</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button></div>
         <form id="exportForm" action="import_export.php" method="GET"><input type="hidden" name="export" value="1"><div class="modal-body"><div class="row g-3">
             <div class="col-md-6"><label for="exportStatus" class="form-label">حالة المسجد</label><select class="form-select" id="exportStatus" name="status"><option value="">الكل</option><?php foreach ($statuses as $status): ?><option value="<?= $view->e($status) ?>"><?= $view->e($status) ?></option><?php endforeach; ?></select></div>
             <div class="col-md-6"><label for="exportFriday" class="form-label">صلاة الجمعة</label><select class="form-select" id="exportFriday" name="friday_prayer"><option value="">الكل</option><?php foreach ($fridayPrayers as $prayer): ?><option value="<?= $view->e($prayer) ?>"><?= $view->e($prayer) ?></option><?php endforeach; ?></select></div>

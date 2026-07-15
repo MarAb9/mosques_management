@@ -1,17 +1,17 @@
 <div class="admin-workspace">
     <?= $view->partial('components.page_header', [
-        'kicker' => 'الاسترجاع الآمن',
-        'title' => 'سلة المساجد المحذوفة',
-        'subtitle' => 'راجع النسخ المؤرشفة واستعد السجل المناسب دون تغيير بقية بيانات النظام.',
+        'title' => 'سلة المحذوفات',
+        'subtitle' => count($deletedMosques) . ' سجل',
         'icon' => 'fa-trash-can-arrow-up',
+        'illustration' => 'assets/images/institutional/backup-shield-3d.svg',
     ]) ?>
 
     <?php if ($successMessage !== null): ?><div class="alert alert-success" role="status"><i class="fas fa-circle-check me-2" aria-hidden="true"></i><?= $view->e($successMessage) ?></div><?php endif; ?>
     <?php if ($errorMessage !== null): ?><div class="alert alert-danger" role="alert"><i class="fas fa-circle-exclamation me-2" aria-hidden="true"></i><?= $view->e($errorMessage) ?></div><?php endif; ?>
 
-    <div class="alert alert-warning d-flex gap-3 align-items-start"><i class="fas fa-shield-halved fs-4 mt-1" aria-hidden="true"></i><div><strong class="d-block">الاستعادة تعيد السجل إلى الدليل الرئيسي</strong><span>تحقق من الرمز الوطني واسم المسجد قبل التأكيد لتجنب التعارض مع سجل حالي.</span></div></div>
+    <div class="alert alert-warning"><i class="fas fa-shield-halved me-2" aria-hidden="true"></i>تأكد من هوية السجل قبل الاستعادة.</div>
 
-    <section class="data-panel" aria-labelledby="trashTitle">
+    <section class="data-panel" aria-label="السجلات المحذوفة">
         <div class="data-panel__header"><div><span class="page-kicker">الأرشيف القابل للاستعادة</span><h2 id="trashTitle"><?= count($deletedMosques) ?> سجلاً في السلة</h2></div></div>
         <?php if (empty($deletedMosques)): ?>
             <?= $view->partial('components.empty_state', ['icon' => 'fa-trash-can-arrow-up', 'title' => 'سلة المحذوفات فارغة', 'message' => 'لا توجد مساجد مؤرشفة وقابلة للاستعادة حالياً.']) ?>

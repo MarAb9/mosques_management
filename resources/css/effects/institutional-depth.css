@@ -1,0 +1,4 @@
+.institutional-pattern { position: absolute; inset: 0; pointer-events: none; opacity: .16; background-image: linear-gradient(30deg, transparent 47%, currentColor 48%, currentColor 50%, transparent 51%), linear-gradient(-30deg, transparent 47%, currentColor 48%, currentColor 50%, transparent 51%); background-size: 3.2rem 5.5rem; mask-image: linear-gradient(to left, #000, transparent 75%); }
+.reveal { opacity: 0; transform: translateY(10px); }
+.reveal.is-visible { opacity: 1; transform: translateY(0); transition: opacity var(--duration-slow) var(--ease-standard), transform var(--duration-slow) var(--ease-standard); }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }

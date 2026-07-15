@@ -1,8 +1,8 @@
-# Atlas Noor Design System
+# Institutional Design System
 
 ## Concept
 
-Atlas Noor is an Arabic RTL administrative visual system for the Local Scientific Council of Berkane. It combines deep emerald institutional surfaces, warm ivory reading areas, sandstone borders, restrained brass highlights, and geometric arch/zellij cues. Decoration frames the information hierarchy; it never competes with data or actions.
+The institutional interface is an Arabic RTL administrative visual system for the Local Scientific Council of Berkane. It combines deep emerald institutional surfaces, warm ivory reading areas, sandstone borders, restrained brass highlights, and geometric arch/zellij cues. Decoration frames the information hierarchy; it never competes with data or actions.
 
 ## Color roles
 
@@ -56,5 +56,5 @@ Print hides navigation, controls, dialogs, decorative scenes, and nonessential a
 
 ## Tailwind and Bootstrap coexistence
 
-Tailwind CSS 4.3.2 is compiled locally. Only Tailwind theme and utilities are imported; Preflight is omitted. The `tw` prefix produces utilities such as `tw:flex`, preventing collisions with Bootstrap. Bootstrap loads first, third-party component CSS follows, and the compiled Atlas Noor stylesheet loads last. Production/shared hosting receives only compiled files and does not require Node.js.
+Tailwind CSS 4.3.2 is compiled locally. Only Tailwind theme and utilities are imported; Preflight is omitted. The `tw` prefix produces utilities such as `tw:flex`, preventing collisions with Bootstrap. Bootstrap loads first, third-party component CSS follows, and the compiled institutional stylesheet loads last. Production/shared hosting receives only compiled files and does not require Node.js.
 

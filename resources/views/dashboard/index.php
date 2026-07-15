@@ -1,35 +1,18 @@
 <?php
-$roleTitle = $isAdmin ? 'مسؤول النظام' : 'مستخدم الاستعلام';
-$roleDescription = $isAdmin ? 'لديك صلاحية إدارة السجلات ومتابعة جودة البيانات والعمليات.' : 'يمكنك استعراض السجلات والخرائط دون تعديل البيانات.';
 $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
 ?>
 <div class="dashboard-page">
     <section class="dashboard-hero reveal" aria-labelledby="dashboardWelcome">
-        <div class="atlas-pattern" aria-hidden="true"></div>
         <div class="dashboard-hero__content">
-            <span class="page-kicker"><?= $isAdmin ? 'لوحة تحكم المسؤول' : 'لوحة الاستعلام' ?> · مركز القيادة · بركان</span>
-            <h1 id="dashboardWelcome" class="mt-2 mb-3">رؤية موحدة لخدمة مساجد الإقليم بثقة ووضوح</h1>
-            <p class="mb-0">تابع التغطية الجغرافية، برامج القرآن، جودة السجلات، وآخر العمليات من مساحة عمل واحدة مبنية على البيانات الفعلية للنظام.</p>
+            <h1 id="dashboardWelcome">لوحة التحكم</h1>
+            <p>متابعة المساجد والبرامج وجودة البيانات.</p>
             <div class="dashboard-hero__actions">
-                <a class="btn btn-light" href="mosques.php"><i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>استعراض دليل المساجد</a>
-                <a class="btn btn-outline-light" href="mosque_maps.php"><i class="fas fa-map-location-dot me-2" aria-hidden="true"></i>فتح الخريطة</a>
+                <a class="btn btn-light" href="mosques.php"><i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>دليل المساجد</a>
+                <a class="btn btn-outline-light" href="mosque_maps.php"><i class="fas fa-map-location-dot me-2" aria-hidden="true"></i>خريطة المساجد</a>
             </div>
         </div>
-        <div class="dashboard-hero__scene arch-scene decorative-scene" aria-hidden="true">
-            <span class="arch-scene__layer"></span><span class="arch-scene__layer"></span><span class="arch-scene__layer"></span>
-        </div>
+        <img class="dashboard-hero__image" src="assets/images/institutional/statistics-3d.svg" alt="" aria-hidden="true">
     </section>
-
-    <section class="data-panel reveal" aria-labelledby="roleSummary">
-        <div class="data-panel__body d-flex align-items-center justify-content-between gap-3 flex-wrap">
-            <div class="d-flex align-items-center gap-3">
-                <span class="metric-card__icon" aria-hidden="true"><i class="fas <?= $isAdmin ? 'fa-user-shield' : 'fa-eye' ?>"></i></span>
-                <div><span class="page-kicker">نطاق الجلسة الحالية</span><h2 class="h5 mb-1" id="roleSummary"><?= $view->e($roleTitle) ?></h2><p class="text-muted mb-0"><?= $view->e($roleDescription) ?></p></div>
-            </div>
-            <span class="role-badge"><i class="fas fa-shield-halved" aria-hidden="true"></i><span><?= $view->e($roleTitle) ?></span></span>
-        </div>
-    </section>
-
     <?php if ($isAdmin && ($qualityIssueCount > 0 || (int) $closedMosques > 0)): ?>
     <section class="alert alert-warning reveal d-flex align-items-start gap-3 mb-0" aria-labelledby="urgentTitle">
         <i class="fas fa-triangle-exclamation fs-4 mt-1" aria-hidden="true"></i>
@@ -38,13 +21,13 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
     <?php endif; ?>
 
     <section aria-labelledby="mainMetrics">
-        <div class="d-flex align-items-end justify-content-between gap-3 mb-3"><div><span class="page-kicker">المؤشرات الرئيسية</span><h2 class="h5 mb-0" id="mainMetrics">صورة الإقليم الآن</h2></div><small class="text-muted">بيانات مباشرة من قاعدة النظام</small></div>
+        <div class="section-heading"><h2 class="h5 mb-0" id="mainMetrics">المؤشرات الرئيسية</h2></div>
         <div class="metric-grid">
-            <?= $view->partial('components.metric_card', ['label' => 'إجمالي المساجد', 'value' => number_format((int) $totalMosques), 'countUp' => (int) $totalMosques, 'context' => 'جميع السجلات الحالية', 'icon' => 'fa-mosque', 'href' => 'mosques.php']) ?>
+            <?= $view->partial('components.metric_card', ['label' => 'إجمالي المساجد', 'value' => number_format((int) $totalMosques), 'countUp' => (int) $totalMosques, 'context' => 'جميع السجلات الحالية', 'icon' => 'fa-mosque', 'image' => 'assets/images/institutional/mosque-building-3d.svg', 'href' => 'mosques.php']) ?>
             <?= $view->partial('components.metric_card', ['label' => 'مساجد الجمعة', 'value' => number_format((int) $fridayMosques), 'countUp' => (int) $fridayMosques, 'context' => 'تقام بها صلاة الجمعة', 'icon' => 'fa-calendar-day', 'href' => 'mosques.php?friday_prayer=' . urlencode('نعم')]) ?>
             <?= $view->partial('components.metric_card', ['label' => 'المساجد المفتوحة', 'value' => number_format((int) $prayerMosques), 'countUp' => (int) $prayerMosques, 'context' => 'غير مصنفة كمغلقة', 'icon' => 'fa-door-open', 'href' => 'mosques.php?status=' . urlencode('مفتوح')]) ?>
             <?= $view->partial('components.metric_card', ['label' => 'المساجد المغلقة', 'value' => number_format((int) $closedMosques), 'countUp' => (int) $closedMosques, 'context' => 'تحتاج متابعة الحالة', 'icon' => 'fa-door-closed', 'href' => 'mosques.php?status=' . urlencode('مغلق'), 'variant' => 'danger']) ?>
-            <?= $view->partial('components.metric_card', ['label' => 'برامج القرآن', 'value' => number_format((int) $quranMosques), 'countUp' => (int) $quranMosques, 'context' => 'مساجد مسجلة في وحدة التحفيظ', 'icon' => 'fa-book-quran', 'href' => 'quran_mosques.php']) ?>
+            <?= $view->partial('components.metric_card', ['label' => 'برامج القرآن', 'value' => number_format((int) $quranMosques), 'countUp' => (int) $quranMosques, 'context' => 'مساجد مسجلة في وحدة التحفيظ', 'icon' => 'fa-book-quran', 'image' => 'assets/images/institutional/quran-book-3d.svg', 'href' => 'quran_mosques.php']) ?>
             <?= $view->partial('components.metric_card', ['label' => 'الوعظ والإرشاد', 'value' => number_format((int) $guidanceMosques), 'countUp' => (int) $guidanceMosques, 'context' => 'مساجد تغطيها البرامج', 'icon' => 'fa-hands-holding-circle']) ?>
             <?= $view->partial('components.metric_card', ['label' => 'المجال الحضري', 'value' => number_format((int) $pashalikMosques), 'countUp' => (int) $pashalikMosques, 'context' => 'مساجد الباشويات', 'icon' => 'fa-city']) ?>
             <?= $view->partial('components.metric_card', ['label' => 'المجال القروي', 'value' => number_format((int) $circleMosques), 'countUp' => (int) $circleMosques, 'context' => 'مساجد الدوائر', 'icon' => 'fa-tree-city']) ?>
@@ -53,7 +36,7 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
 
     <div class="dashboard-grid">
         <section class="data-panel reveal" aria-labelledby="coverageTitle">
-            <div class="data-panel__header"><div><span class="page-kicker">التغطية والجودة</span><h2 id="coverageTitle">جاهزية البيانات التشغيلية</h2></div><a class="btn btn-sm btn-outline-primary" href="data_quality.php">التفاصيل</a></div>
+            <div class="data-panel__header"><div><h2 id="coverageTitle">جاهزية البيانات التشغيلية</h2></div><a class="btn btn-sm btn-outline-primary" href="data_quality.php">التفاصيل</a></div>
             <div class="data-panel__body">
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2"><span class="fw-bold">التغطية الجغرافية</span><strong><?= $view->e($mapCoveragePercent) ?>%</strong></div>
@@ -73,7 +56,7 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
         </section>
 
         <aside class="data-panel reveal" aria-labelledby="quickActionsTitle">
-            <div class="data-panel__header"><div><span class="page-kicker">وصول مباشر</span><h2 id="quickActionsTitle">إجراءات سريعة</h2></div></div>
+            <div class="data-panel__header"><div><h2 id="quickActionsTitle">إجراءات سريعة</h2></div></div>
             <div class="data-panel__body quick-actions">
                 <?php if ($isAdmin): ?><a class="quick-action" href="add_mosque.php"><i class="fas fa-plus" aria-hidden="true"></i><span><strong class="d-block">إضافة مسجد</strong><small class="text-muted">إنشاء سجل جديد</small></span></a><?php endif; ?>
                 <a class="quick-action" href="mosque_maps.php"><i class="fas fa-map-location-dot" aria-hidden="true"></i><span><strong class="d-block">الخريطة</strong><small class="text-muted">فحص التغطية المكانية</small></span></a>
@@ -84,7 +67,7 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
     </div>
 
     <section class="data-panel reveal" aria-labelledby="latestTitle">
-        <div class="data-panel__header"><div><span class="page-kicker">أضيفت مؤخراً</span><h2 id="latestTitle">أحدث المساجد</h2></div><a class="btn btn-sm btn-outline-primary" href="mosques.php">عرض الدليل الكامل</a></div>
+        <div class="data-panel__header"><div><h2 id="latestTitle">أحدث المساجد</h2></div><a class="btn btn-sm btn-outline-primary" href="mosques.php">عرض الدليل</a></div>
         <?php if (empty($latestMosques)): ?>
             <?= $view->partial('components.empty_state', ['icon' => 'fa-mosque', 'title' => 'لا توجد مساجد مسجلة', 'message' => 'ستظهر أحدث السجلات هنا بعد إضافتها.']) ?>
         <?php else: ?>

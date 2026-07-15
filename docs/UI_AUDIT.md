@@ -1,7 +1,7 @@
-# Atlas Noor UI Audit
+# Institutional UI Audit
 
 Audit date: 2026-07-15  
-Branch: `redesign/atlas-noor-ui`  
+Branch: `fix/institutional-ui-polish`  
 Scope: presentation files only (`resources/views`, frontend assets, build documentation)
 
 ## Current application surface
@@ -36,7 +36,7 @@ The redesign moves visual rules to `resources/css`, behavior to `resources/js` o
 | Font Awesome | Keep | It is the only icon system in use and is self-hosted. |
 | jQuery | Keep conditionally | Select2 and the current Quran form interactions depend on it. |
 | Select2 | Keep, restyle | Mosque and Quran selectors rely on it. A replacement would expand scope and regression risk. |
-| SweetAlert2 | Keep, restyle | Used for destructive and logout confirmation; it receives Atlas Noor tokens. |
+| SweetAlert2 | Keep, restyle | Used for destructive and logout confirmation; it receives institutional tokens. |
 | Chart.js | Keep conditionally | Used by the mosque quick-statistics modal and loaded only where needed. |
 | Google Maps API | Keep conditionally | This is the map engine actually used by the current views and mosque form picker. |
 | Leaflet | Not loaded | Vendor files exist but no application code references Leaflet. Files remain untouched pending a separate dependency cleanup. |

@@ -5,16 +5,15 @@
  */
 ?>
 
-<!-- The HTML form remains the same, but add this before the closing body tag -->
+
  <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
-                <div><span class="page-kicker">إدارة المساجد</span><h1 class="h4 mt-1 mb-1"><i class="fas fa-pen-to-square me-2 text-muted" aria-hidden="true"></i>تعديل بيانات المسجد</h1><p class="text-muted mb-0">حدّث الحقول المطلوبة مع الحفاظ على الرمز والعلاقات الحالية للسجل.</p></div>
+                <div><h1 class="h4 mb-0"><i class="fas fa-pen-to-square me-2 text-muted" aria-hidden="true"></i>تعديل مسجد</h1></div><img class="page-title-box__image" src="assets/images/institutional/mosque-building-3d.svg" alt="" aria-hidden="true">
             </div>
         </div>
     </div>
-    <br>
     <?php if (!empty($errors['database'])): ?>
         <div class="alert alert-danger"><?= $view->e($errors['database']) ?></div>
     <?php endif; ?>
@@ -125,7 +124,7 @@
                             <small class="text-muted">مثال: -2.325653868551601</small>
                         </div>
                         <div class="col-12 mt-3">
-                            <div id="mapContainer" class="form-map-shell atlas-collapsed-section border rounded">
+                            <div id="mapContainer" class="form-map-shell is-collapsed-section border rounded">
                                 <div id="map" class="form-map-canvas"></div>
                             </div>
                             <button type="button" id="showMapBtn" class="btn btn-outline-primary btn-sm mt-2">
@@ -209,7 +208,7 @@
                         </div>
 
                         <!-- Pashalik Section -->
-                        <div id="pashalik_section" class="atlas-collapsed-section">
+                        <div id="pashalik_section" class="is-collapsed-section">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -238,7 +237,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row g-3" id="attachment_container" class="atlas-collapsed-section">
+                            <div class="row g-3 is-collapsed-section" id="attachment_container">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="administrative_attachment" class="form-label">الملحقة/المقاطعة الإدارية</label>
@@ -251,7 +250,7 @@
                         </div>
 
                         <!-- Circle Section -->
-                        <div id="circle_section" class="atlas-collapsed-section">
+                        <div id="circle_section" class="is-collapsed-section">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">

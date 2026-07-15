@@ -140,72 +140,69 @@ function setupDelegatedActions() {
 function setupListUxControls() {
     const body = document.body;
     const densityToggle = document.getElementById('densityToggle');
-    const density = localStorage.getItem('mosques.tableDensity') || 'comfortable';
-    if (density === 'compact') body.classList.add('table-density-compact');
+    const compact = localStorage.getItem('mosques.tableDensity') === 'compact';
+    body.classList.toggle('table-density-compact', compact);
+    densityToggle?.setAttribute('aria-pressed', compact ? 'true' : 'false');
 
-    densityToggle?.addEventListener('click', function() {
-        body.classList.toggle('table-density-compact');
-        localStorage.setItem('mosques.tableDensity', body.classList.contains('table-density-compact') ? 'compact' : 'comfortable');
-    });
+    if (densityToggle && densityToggle.dataset.densityInitialized !== 'true') {
+        densityToggle.dataset.densityInitialized = 'true';
+        densityToggle.addEventListener('click', function() {
+            body.classList.toggle('table-density-compact');
+            const isCompact = body.classList.contains('table-density-compact');
+            localStorage.setItem('mosques.tableDensity', isCompact ? 'compact' : 'comfortable');
+            densityToggle.setAttribute('aria-pressed', isCompact ? 'true' : 'false');
+        });
+    }
 
     document.querySelectorAll('.js-column-toggle').forEach(input => {
-        const key = `mosques.column.${input.value}`;
-        const saved = localStorage.getItem(key);
-        if (saved === 'hidden') input.checked = false;
-        applyColumnVisibility(Number(input.value), input.checked);
+        if (input.dataset.columnToggleInitialized === 'true') return;
+        input.dataset.columnToggleInitialized = 'true';
         input.addEventListener('change', function() {
-            localStorage.setItem(key, input.checked ? 'visible' : 'hidden');
-            applyColumnVisibility(Number(input.value), input.checked);
+            const columnName = String(input.value || '');
+            localStorage.setItem(`mosques.column.${columnName}`, input.checked ? 'visible' : 'hidden');
+            applyColumnVisibility(columnName, input.checked);
         });
     });
 
-    if (!document.getElementById('highContrastToggle')) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.id = 'highContrastToggle';
-        button.className = 'btn btn-dark btn-sm position-fixed top-0 start-0 m-2 shadow';
-        button.style.zIndex = '1050';
-        button.setAttribute('aria-pressed', localStorage.getItem('mosques.highContrast') === '1' ? 'true' : 'false');
-        button.innerHTML = '<i class="fas fa-adjust me-1" aria-hidden="true"></i> تباين';
-        document.body.appendChild(button);
-        if (localStorage.getItem('mosques.highContrast') === '1') document.body.classList.add('high-contrast');
-        button.addEventListener('click', () => {
-            document.body.classList.toggle('high-contrast');
-            const enabled = document.body.classList.contains('high-contrast');
-            localStorage.setItem('mosques.highContrast', enabled ? '1' : '0');
-            button.setAttribute('aria-pressed', enabled ? 'true' : 'false');
-        });
-    }
+    applySavedColumnVisibility();
 }
 
-function applyColumnVisibility(columnNumber, visible) {
-    if (!Number.isFinite(columnNumber) || columnNumber < 1) return;
-    document.querySelectorAll(`.app-table tr > *:nth-child(${columnNumber})`).forEach(cell => {
-        cell.classList.toggle('column-hidden', !visible);
+function applyColumnVisibility(columnName, visible) {
+    if (!columnName) return;
+    document.querySelectorAll('.app-table [data-column]').forEach(cell => {
+        if (cell.dataset.column === columnName) {
+            cell.classList.toggle('column-hidden', !visible);
+        }
     });
 }
+
+function applySavedColumnVisibility() {
+    document.querySelectorAll('.js-column-toggle').forEach(input => {
+        const columnName = String(input.value || '');
+        const saved = localStorage.getItem(`mosques.column.${columnName}`);
+        const visible = saved === 'visible' || (saved !== 'hidden' && input.checked);
+        input.checked = visible;
+        applyColumnVisibility(columnName, visible);
+    });
+}
+
+function getDirectoryColumnCount() {
+    return document.querySelectorAll('.directory-table thead th').length || 1;
+}
+
 // Quick stats modal
 function setupQuickStats() {
+    const quickStatsButton = document.getElementById('quickStatsButton');
     const quickStatsModal = document.getElementById('quickStatsModal');
-    if (!quickStatsModal || document.getElementById('quickStatsButton')) {
+    if (!quickStatsButton || !quickStatsModal || quickStatsModal.dataset.statsInitialized === 'true') {
         return;
     }
-
-    const quickStatsBtn = document.createElement('button');
-    quickStatsBtn.id = 'quickStatsButton';
-    quickStatsBtn.className = 'btn btn-info rounded-circle p-3 position-fixed bottom-0 start-0 m-4 shadow-lg pulse-glow';
-    quickStatsBtn.setAttribute('data-bs-toggle', 'modal');
-    quickStatsBtn.setAttribute('data-bs-target', '#quickStatsModal');
-    quickStatsBtn.innerHTML = '<i class="fas fa-chart-pie fs-4"></i>';
-    quickStatsBtn.setAttribute('title', 'عرض الإحصائيات السريعة');
-    document.body.appendChild(quickStatsBtn);
+    quickStatsModal.dataset.statsInitialized = 'true';
 
     quickStatsModal.addEventListener('shown.bs.modal', function() {
-        // Initialize charts when modal is shown
         fetchStatsData();
     });
 }
-
 
 function fetchStatsData() {
     // Show loading state
@@ -462,19 +459,18 @@ function handleSearchSubmit(event) {
 // Add this function to mosque.js
 function renderLocationCell(row) {
     if (row.latitude && row.longitude) {
+        const mosqueName = escapeHtml(row.mosque_name || 'المسجد');
         return `
-        <button class="btn btn-sm btn-outline-primary view-on-map"
+        <button type="button" class="row-action view-on-map"
                 data-lat="${escapeHtml(row.latitude)}"
                 data-lng="${escapeHtml(row.longitude)}"
-                data-mosque="${escapeHtml(row.mosque_name)}"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="عرض على الخريطة">
-            <i class="fas fa-map-marked-alt"></i>
+                data-mosque="${mosqueName}"
+                title="عرض على الخريطة"
+                aria-label="عرض ${mosqueName} على الخريطة">
+            <i class="fas fa-map-location-dot" aria-hidden="true"></i>
         </button>`;
-    } else {
-        return '<span class="text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="لم يتم تحديد الموقع">غير محدد</span>';
     }
+    return '<span class="text-muted">—</span>';
 }
 
 // Helper function to escape HTML
@@ -817,144 +813,107 @@ function fetchLiveSearchResults(searchTerm, page = 1) {
 }
 
 function showLoadingIndicator() {
-    const tbody = document.querySelector('tbody');
+    const tbody = document.querySelector('.directory-table tbody');
     if (!tbody) return;
     tbody.setAttribute('aria-busy', 'true');
     tbody.innerHTML = `
         <tr>
-            <td colspan="12" class="text-center py-4">
+            <td colspan="${getDirectoryColumnCount()}" class="text-center py-4">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">جاري التحميل...</span>
                 </div>
             </td>
         </tr>`;
+    updateBulkSelectionUI();
 }
 
 function updateTableWithResults(results) {
-    const tbody = document.querySelector('tbody');
+    const tbody = document.querySelector('.directory-table tbody');
     if (!tbody) return;
     tbody.setAttribute('aria-busy', 'false');
 
-    if (results.length === 0) {
+    if (!Array.isArray(results) || results.length === 0) {
         tbody.innerHTML = `
-            <tr class="animate__animated animate__fadeInUp">
-                <td colspan="12" class="text-center py-4 text-muted">
-                    <i class="fas fa-search me-2"></i>لا توجد نتائج مطابقة لبحثك
+            <tr>
+                <td colspan="${getDirectoryColumnCount()}" class="text-center py-4 text-muted">
+                    <i class="fas fa-search me-2" aria-hidden="true"></i>لا توجد نتائج مطابقة لبحثك
                 </td>
             </tr>`;
+        updateBulkSelectionUI();
         return;
     }
 
+    const canEdit = document.body.dataset.canEdit === 'true';
+    const canDelete = document.body.dataset.canDelete === 'true';
+    const csrfToken = escapeHtml(document.querySelector('meta[name="csrf-token"]')?.content || '');
     let html = '';
-    let animationDelay = 0;
 
-    // Use the global IS_ADMIN variable that was set in mosques.php
-    const isAdmin = document.body.dataset.isAdmin === 'true';
-
-    results.forEach(row => {
-        animationDelay += 0.05;
-        const fridayIcon = row.friday_prayer === 'نعم' ? 'fa-check-circle text-success' : 'fa-times-circle text-secondary';
-        const statusIcon = row.status === 'مفتوح' ? 'fa-check-circle text-success' : row.status ==='مغلق' ? 'fa-times-circle text-danger' :  'fa-times-circle text-warning';
-        const registrationNumber = escapeHtml(row.registration_number);
-        const registrationQuery = encodeURIComponent(String(row.registration_number ?? ''));
-        const mosqueName = escapeHtml(row.mosque_name);
-        const address = escapeHtml(row.address);
-        const nationalCode = escapeHtml(row.national_code);
-        const imamName = escapeHtml(row.imam_name);
-        const guideImam = escapeHtml(row.guide_imam_display || row.guide_imam);
-        const community = escapeHtml(row.community);
+    results.forEach((row, index) => {
+        const registrationValue = String(row.registration_number ?? '');
+        const registrationNumber = escapeHtml(registrationValue);
+        const registrationQuery = encodeURIComponent(registrationValue);
+        const mosqueName = escapeHtml(row.mosque_name || '—');
+        const address = escapeHtml(row.address || '—');
+        const nationalCode = escapeHtml(row.national_code || '—');
+        const fridayPrayer = escapeHtml(row.friday_prayer || '—');
+        const status = escapeHtml(row.status || 'غير محدد');
+        const imamName = escapeHtml(row.imam_name || '—');
+        const guideImam = escapeHtml(row.guide_imam_display || row.guide_imam || '—');
+        const community = escapeHtml(row.community || '—');
         const constructionYear = /^\d{4}/.test(String(row.construction_date || ''))
-            ? String(row.construction_date).slice(0, 4)
-            : 'غير محدد';
+            ? escapeHtml(String(row.construction_date).slice(0, 4))
+            : '—';
+        const statusClass = row.status === 'مفتوح'
+            ? 'text-success bg-success-subtle'
+            : (row.status === 'مغلق' ? 'text-danger bg-danger-subtle' : 'text-warning bg-warning-subtle');
+        const checkboxId = `mosque-result-${index}`;
 
-        // Admin action buttons - only show if user is admin
-        const adminButtons = isAdmin ? `
-            <a href="edit_mosque.php?id=${registrationQuery}"
-               class="btn btn-sm btn-icon btn-primary rounded-circle"
-               data-bs-toggle="tooltip"
-               data-bs-placement="top"
-               title="تعديل">
-                <i class="fas fa-pen"></i>
-            </a>
-            <form method="POST" action="delete_mosque.php" class="d-inline js-confirm-submit" data-confirm="هل أنت متأكد من حذف هذا المسجد؟">
-                <input type="hidden" name="csrf_token" value="${escapeHtml(document.querySelector('meta[name="csrf-token"]')?.content || '')}">
+        const selectionCell = canDelete ? `
+            <td data-column="selection">
+                <label class="visually-hidden" for="${checkboxId}">تحديد ${mosqueName}</label>
+                <input type="checkbox" id="${checkboxId}" name="selected_mosques[]" value="${registrationNumber}" class="form-check-input mosque-checkbox">
+            </td>` : '';
+        const editAction = canEdit ? `
+            <a class="row-action" href="edit_mosque.php?id=${registrationQuery}" aria-label="تعديل بيانات ${mosqueName}" title="تعديل">
+                <i class="fas fa-pen" aria-hidden="true"></i>
+            </a>` : '';
+        const deleteAction = canDelete ? `
+            <form method="POST" action="delete_mosque.php" class="js-confirm-submit" data-confirm="هل أنت متأكد من حذف هذا المسجد؟">
+                <input type="hidden" name="csrf_token" value="${csrfToken}">
                 <input type="hidden" name="id" value="${registrationNumber}">
-                <button type="submit" class="btn btn-sm btn-icon btn-danger rounded-circle"
-                    data-bs-toggle="tooltip" data-bs-placement="top" title="حذف" aria-label="حذف المسجد">
-                    <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                <button type="submit" class="row-action row-action--danger" aria-label="حذف ${mosqueName}" title="حذف">
+                    <i class="fas fa-trash" aria-hidden="true"></i>
                 </button>
-            </form>
-        ` : '';
+            </form>` : '';
 
         html += `
-        <tr class="animate__animated animate__fadeInUp">
-            <td>
-                <input type="checkbox" name="selected_mosques[]" value="${registrationNumber}" class="form-check-input mosque-checkbox">
-            </td>
-            <td class="fw-bold text-muted">${registrationNumber}</td>
-            <td>
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-mosque text-primary me-2"></i>
-                    <span>${mosqueName}</span>
-                </div>
-            </td>
-            <td class="mobile-hidden">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-map-marker-alt text-danger me-2"></i>
-                    <small class="text-muted">${address}</small>
-                </div>
-            </td>
-            <td><span class="badge bg-light text-dark">${nationalCode}</span></td>
-            <td>
-                <span class="d-flex justify-content-center" data-bs-toggle="tooltip" title="${row.friday_prayer == 'نعم' ? 'يوجد صلاة جمعة' : 'لا يوجد صلاة جمعة'}">
-                    <i class="fas ${fridayIcon} fa-lg"></i>
-                </span>
-            </td>
-            <td>
-                <span class="d-flex justify-content-center" data-bs-toggle="tooltip" title="${row.status == 'مفتوح' ? 'مسجد مفتوح' :row.status =='مغلق' ? 'مسجد مغلق' : 'مسجد مفتوح بدون ترخيص'}">
-                    <i class="fas ${statusIcon} fa-lg"></i>
-                </span>
-            </td>
-            <td class="mobile-hidden">
-            <span class="badge bg-info">
-                ${constructionYear}
-            </span>
-            </td>
-            <td>
-                <div class="d-flex align-items-center">
-                <i class="fas fa-user fs-4 text-info me-2"></i>
-                <span>${imamName}</span>
-                </div>
-            </td>
-            <td>
-                <div class="d-flex align-items-center">
-                <i class="fas fa-user-tie fs-4 text-warning me-2"></i>
-                <span>${guideImam}</span>
-                </div>
-            </td>
-            <td><span class="badge bg-info">${community}</span></td>
-            <td class="mobile-hidden">
-                ${renderLocationCell(row)}
-            </td>
-            <td>
-                <div class="d-flex gap-2">
-                    <a href="#"
-                       class="btn btn-sm btn-icon btn-info rounded-circle view-mosque-btn"
-                       data-bs-toggle="modal"
-                       data-bs-target="#mosqueDetailsModal"
-                       data-mosque-id="${registrationNumber}"
-                       data-bs-tooltip="tooltip"
-                       data-bs-placement="top"
-                       title="عرض التفاصيل">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    ${adminButtons}
+        <tr class="mosque-table-row">
+            ${selectionCell}
+            <td data-column="registration" class="text-muted">${registrationNumber}</td>
+            <td data-column="name"><strong class="record-name"><i class="fas fa-mosque" aria-hidden="true"></i>${mosqueName}</strong></td>
+            <td data-column="address"><span class="record-address">${address}</span></td>
+            <td data-column="national"><span class="badge bg-light text-dark">${nationalCode}</span></td>
+            <td data-column="friday">${fridayPrayer}</td>
+            <td data-column="status"><span class="status-badge ${statusClass}">${status}</span></td>
+            <td data-column="construction">${constructionYear}</td>
+            <td data-column="imam">${imamName}</td>
+            <td data-column="guide">${guideImam}</td>
+            <td data-column="community">${community}</td>
+            <td data-column="location">${renderLocationCell(row)}</td>
+            <td data-column="actions">
+                <div class="record-actions">
+                    <button type="button" class="row-action view-mosque-btn" data-bs-toggle="modal" data-bs-target="#mosqueDetailsModal" data-mosque-id="${registrationNumber}" aria-label="عرض تفاصيل ${mosqueName}" title="عرض">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </button>
+                    ${editAction}
+                    ${deleteAction}
                 </div>
             </td>
         </tr>`;
     });
 
     tbody.innerHTML = html;
+    applySavedColumnVisibility();
     initializeTooltips();
     setupMosqueDetailsModal();
     setupBulkSelection();
@@ -962,18 +921,19 @@ function updateTableWithResults(results) {
 }
 
 function showSearchError(message) {
-    const tbody = document.querySelector('tbody');
+    const tbody = document.querySelector('.directory-table tbody');
     if (!tbody) return;
     tbody.setAttribute('aria-busy', 'false');
     tbody.innerHTML = `
-        <tr class="animate__animated animate__shakeX">
-            <td colspan="12" class="text-center py-4 text-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i>${escapeHtml(message)}
+        <tr>
+            <td colspan="${getDirectoryColumnCount()}" class="text-center py-4 text-danger">
+                <i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>${escapeHtml(message)}
                 <button class="btn btn-sm btn-outline-danger ms-2 js-retry-live-search">
-                    <i class="fas fa-sync-alt me-1"></i>إعادة المحاولة
+                    <i class="fas fa-sync-alt me-1" aria-hidden="true"></i>إعادة المحاولة
                 </button>
             </td>
         </tr>`;
+    updateBulkSelectionUI();
 }
 
 function retryLiveSearch() {
@@ -993,7 +953,7 @@ function updatePaginationForLiveSearch(total, currentPage, totalPages) {
         const tableResponsive = document.querySelector('.table-responsive');
         if (tableResponsive) {
             const newPagination = document.createElement('div');
-            newPagination.className = 'mt-4 animate__animated animate__fadeIn';
+            newPagination.className = 'mt-4';
             newPagination.innerHTML = createPaginationHTML(currentPage, totalPages);
             tableResponsive.insertAdjacentElement('afterend', newPagination);
         }
@@ -1109,7 +1069,7 @@ function loadMosqueDetails(mosqueId) {
     const modalBody = document.getElementById('modal-body-content');
 
     modalBody.innerHTML = `
-        <div class="text-center py-5 animate__animated animate__fadeIn">
+        <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">جاري التحميل...</span>
             </div>
@@ -1193,7 +1153,7 @@ function formatMosqueDetails(mosque) {
             : '';
 
     return `
-    <div class="row animate__animated animate__fadeIn print-container">
+    <div class="row print-container">
         <div class="col-12">${imageDisplay}</div>
 
         <div class="col-lg-6">
@@ -1289,7 +1249,7 @@ function initializeModalTabs() {
 function showModalError(message) {
     const safeMessage = escapeHtml(message);
     document.getElementById('modal-body-content').innerHTML = `
-        <div class="alert alert-danger d-flex align-items-center animate__animated animate__shakeX">
+        <div class="alert alert-danger d-flex align-items-center">
             <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
             <div>
                 <h5 class="alert-heading mb-2">خطأ في تحميل البيانات</h5>
@@ -1308,79 +1268,53 @@ function retryLastRequest() {
 }
 
 // Bulk selection
-// Bulk selection
+function updateBulkSelectionUI() {
+    const selectAll = document.getElementById('selectAll');
+    const deleteBtn = document.getElementById('deleteSelected');
+    const selectedCount = document.getElementById('selectedCount');
+    const bulkSelectionBar = document.getElementById('bulkSelectionBar');
+    const checkboxes = [...document.querySelectorAll('.mosque-checkbox')];
+    const checked = checkboxes.filter(checkbox => checkbox.checked);
+    const count = checked.length;
+
+    if (selectedCount) selectedCount.textContent = String(count);
+    if (deleteBtn) deleteBtn.disabled = count === 0;
+    if (bulkSelectionBar) bulkSelectionBar.hidden = count === 0;
+    if (selectAll) {
+        selectAll.checked = checkboxes.length > 0 && count === checkboxes.length;
+        selectAll.indeterminate = count > 0 && count < checkboxes.length;
+    }
+    checkboxes.forEach(checkbox => {
+        checkbox.closest('tr')?.classList.toggle('is-selected', checkbox.checked);
+    });
+}
+
 function setupBulkSelection() {
     const selectAll = document.getElementById('selectAll');
     const checkboxes = document.querySelectorAll('.mosque-checkbox');
-    const deleteBtn = document.getElementById('deleteSelected');
-    const selectedCount = document.getElementById('selectedCount');
 
-    // Only setup if elements exist
-    if (!selectAll || !deleteBtn || !selectedCount) {
+    if (!selectAll) {
+        updateBulkSelectionUI();
         return;
     }
-
-    const updateSelectionUI = () => {
-        const currentCheckboxes = [...document.querySelectorAll('.mosque-checkbox')];
-        const count = currentCheckboxes.filter(checkbox => checkbox.checked).length;
-        selectedCount.textContent = count;
-        deleteBtn.disabled = count === 0;
-        selectAll.checked = currentCheckboxes.length > 0 && count === currentCheckboxes.length;
-    };
 
     if (selectAll.dataset.bulkSelectionInitialized !== 'true') {
         selectAll.dataset.bulkSelectionInitialized = 'true';
         selectAll.addEventListener('change', function() {
-            document.querySelectorAll('.mosque-checkbox').forEach(checkbox => checkbox.checked = this.checked);
-            updateSelectionUI();
+            document.querySelectorAll('.mosque-checkbox').forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBulkSelectionUI();
         });
     }
 
     checkboxes.forEach(checkbox => {
         if (checkbox.dataset.bulkSelectionInitialized === 'true') return;
         checkbox.dataset.bulkSelectionInitialized = 'true';
-        checkbox.addEventListener('change', function() {
-            updateSelectionUI();
-        });
+        checkbox.addEventListener('change', updateBulkSelectionUI);
     });
 
-    if (deleteBtn.dataset.bulkSelectionInitialized !== 'true') {
-        deleteBtn.dataset.bulkSelectionInitialized = 'true';
-        deleteBtn.addEventListener('click', function() {
-        const selected = [...document.querySelectorAll('.mosque-checkbox')]
-            .filter(checkbox => checkbox.checked)
-            .map(checkbox => checkbox.value);
-
-        if (selected.length > 0 && confirm(`هل أنت متأكد من حذف ${selected.length} مسجد(اً)؟`)) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'delete_mosque.php';
-
-            // Get CSRF token from meta tag
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (csrfToken) {
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = 'csrf_token';
-                csrfInput.value = csrfToken;
-                form.appendChild(csrfInput);
-            }
-
-            selected.forEach(id => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'selected_mosques[]';
-                input.value = id;
-                form.appendChild(input);
-            });
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-        });
-    }
-
-    updateSelectionUI();
+    updateBulkSelectionUI();
 }
 
 // Initialize tooltips
@@ -1470,11 +1404,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileSearch = document.getElementById('liveSearch');
     if (mobileSearch && mobileSearch.dataset.mobileSearchInitialized !== 'true') {
         mobileSearch.dataset.mobileSearchInitialized = 'true';
-        mobileSearch.addEventListener('input', function() {
-            if (window.innerWidth < 768) {
-                this.style.fontSize = '16px';
-            }
-        });
+        mobileSearch.classList.add('mobile-search-input');
     }
 
 });
@@ -1499,7 +1429,7 @@ function setupCopyValueButtons() {
 document.addEventListener('DOMContentLoaded', setupCopyValueButtons);
 
 
-// Atlas Noor: external bulk-action bootstrap (formerly embedded in the view).
+// Mosque directory: external bulk-action bootstrap (formerly embedded in the view).
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('deleteSelected')?.addEventListener('click', () => {
         const ids = [...document.querySelectorAll('.mosque-checkbox:checked')].map((checkbox) => checkbox.value);
