@@ -1,34 +1,39 @@
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-        <div>
-            <h1 class="h3 mb-1">سجل التدقيق</h1>
-            <p class="text-muted mb-0">آخر العمليات الإدارية المسجلة في النظام.</p>
-        </div>
-        <form class="d-flex gap-2" method="get" action="audit.php">
-            <input class="form-control" name="q" value="<?= $view->e($q) ?>" placeholder="بحث في السجل">
-            <button class="btn btn-primary">بحث</button>
-        </form>
-    </div>
-    <div class="card border-0 shadow-sm">
+<?php
+$actions = '<form class="d-flex gap-2" method="get" action="audit.php" role="search"><label class="visually-hidden" for="auditSearch">بحث في سجل التدقيق</label><input class="form-control" id="auditSearch" name="q" value="' . $view->e($q) . '" placeholder="عملية، مستخدم، أو مسار"><button class="btn btn-primary"><i class="fas fa-search me-1" aria-hidden="true"></i>بحث</button></form>';
+?>
+<div class="admin-workspace">
+    <?= $view->partial('components.page_header', [
+        'kicker' => 'المساءلة والتتبع',
+        'title' => 'سجل التدقيق',
+        'subtitle' => 'سياق منظم لآخر العمليات الإدارية ونتائجها والمسارات التي نفذتها.',
+        'icon' => 'fa-clock-rotate-left',
+        'actionsHtml' => $actions,
+    ]) ?>
+
+    <?php if ($q !== ''): ?><div class="alert alert-info d-flex justify-content-between align-items-center gap-3"><span><i class="fas fa-filter me-2" aria-hidden="true"></i>النتائج المطابقة لـ «<?= $view->e($q) ?>»</span><a class="btn btn-sm btn-outline-info" href="audit.php">مسح البحث</a></div><?php endif; ?>
+
+    <section class="data-panel" aria-labelledby="auditEventsTitle">
+        <div class="data-panel__header"><div><span class="page-kicker">آخر العمليات</span><h2 id="auditEventsTitle"><?= count($events) ?> حدثاً معروضاً</h2></div><span class="role-badge"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>سجل للقراءة فقط</span></span></div>
+        <?php if (empty($events)): ?>
+            <?= $view->partial('components.empty_state', ['icon' => 'fa-magnifying-glass', 'title' => 'لا توجد أحداث مطابقة', 'message' => 'غيّر عبارة البحث أو اعرض سجل العمليات الكامل.']) ?>
+        <?php else: ?>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 app-table app-table--compact">
-                <thead><tr><th>الوقت</th><th>العملية</th><th>النتيجة</th><th>المستخدم</th><th>المسار</th><th>السياق</th></tr></thead>
+            <table class="table app-table audit-table align-middle mb-0">
+                <thead><tr><th>الوقت</th><th>العملية</th><th>النتيجة</th><th>الفاعل</th><th>المسار</th><th>السياق</th></tr></thead>
                 <tbody>
-                <?php if (empty($events)): ?>
-                    <tr><td colspan="6" class="text-center text-muted py-5">لا توجد أحداث مطابقة.</td></tr>
-                <?php endif; ?>
-                <?php foreach ($events as $event): ?>
+                <?php foreach ($events as $event): $success = ($event['outcome'] ?? '') === 'success'; ?>
                     <tr>
-                        <td class="small text-nowrap"><?= $view->e($event['timestamp'] ?? '') ?></td>
-                        <td><span class="badge bg-primary-subtle text-primary"><?= $view->e($event['action'] ?? '') ?></span></td>
-                        <td><?= $view->e($event['outcome'] ?? '') ?></td>
-                        <td><?= $view->e($event['actor']['username'] ?? 'غير محدد') ?><br><span class="small text-muted"><?= $view->e($event['actor']['role'] ?? '') ?></span></td>
-                        <td class="small"><?= $view->e($event['request']['route'] ?? '') ?></td>
-                        <td><code class="small"><?= $view->e(json_encode($event['context'] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)) ?></code></td>
+                        <td class="small text-nowrap"><i class="far fa-clock me-1 text-muted" aria-hidden="true"></i><?= $view->e($event['timestamp'] ?? '') ?></td>
+                        <td><strong><?= $view->e($event['action'] ?? '') ?></strong></td>
+                        <td><span class="status-badge <?= $success ? 'text-success bg-success-subtle' : 'text-warning bg-warning-subtle' ?>"><?= $view->e($event['outcome'] ?? '') ?></span></td>
+                        <td><span class="fw-bold"><?= $view->e($event['actor']['username'] ?? 'غير محدد') ?></span><br><small class="text-muted"><?= $view->e($event['actor']['role'] ?? '') ?></small></td>
+                        <td><code><?= $view->e($event['request']['route'] ?? '') ?></code></td>
+                        <td class="audit-context"><details><summary class="btn btn-sm btn-outline-secondary">عرض التفاصيل</summary><code class="d-block mt-2"><?= $view->e(json_encode($event['context'] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PRETTY_PRINT)) ?></code></details></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-    </div>
+        <?php endif; ?>
+    </section>
 </div>

@@ -1,40 +1,41 @@
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-        <div>
-            <h1 class="h3 mb-1">سلة المساجد المحذوفة</h1>
-            <p class="text-muted mb-0">الحذف من الواجهة يؤرشف نسخة قابلة للاستعادة قبل إزالة السجل من الجدول الرئيسي.</p>
-        </div>
-        <a href="audit.php?q=mosque.delete" class="btn btn-outline-primary">عرض عمليات الحذف</a>
-    </div>
+<?php $actions = '<a href="audit.php?q=mosque.delete" class="btn btn-outline-primary"><i class="fas fa-clock-rotate-left me-2" aria-hidden="true"></i>عمليات الحذف</a>'; ?>
+<div class="admin-workspace">
+    <?= $view->partial('components.page_header', [
+        'kicker' => 'الاسترجاع الآمن',
+        'title' => 'سلة المساجد المحذوفة',
+        'subtitle' => 'راجع النسخ المؤرشفة واستعد السجل المناسب دون تغيير بقية بيانات النظام.',
+        'icon' => 'fa-trash-can-arrow-up',
+        'actionsHtml' => $actions,
+    ]) ?>
 
-    <?php if ($successMessage !== null): ?><div class="alert alert-success"><?= $view->e($successMessage) ?></div><?php endif; ?>
-    <?php if ($errorMessage !== null): ?><div class="alert alert-danger"><?= $view->e($errorMessage) ?></div><?php endif; ?>
+    <?php if ($successMessage !== null): ?><div class="alert alert-success" role="status"><i class="fas fa-circle-check me-2" aria-hidden="true"></i><?= $view->e($successMessage) ?></div><?php endif; ?>
+    <?php if ($errorMessage !== null): ?><div class="alert alert-danger" role="alert"><i class="fas fa-circle-exclamation me-2" aria-hidden="true"></i><?= $view->e($errorMessage) ?></div><?php endif; ?>
 
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 app-table app-table--compact">
-                <thead><tr><th>وقت الحذف</th><th>المسجد</th><th>الرمز الوطني</th><th>حذف بواسطة</th><th>إجراء</th></tr></thead>
-                <tbody>
-                <?php if (empty($deletedMosques)): ?>
-                    <tr><td colspan="5" class="text-center text-muted py-5">لا توجد مساجد في السلة.</td></tr>
-                <?php endif; ?>
-                <?php foreach ($deletedMosques as $entry): $mosque = $entry['mosque'] ?? []; ?>
-                    <tr>
-                        <td class="small"><?= $view->e($entry['deleted_at'] ?? '') ?></td>
-                        <td><?= $view->e($mosque['mosque_name'] ?? '') ?></td>
-                        <td><span class="badge bg-light text-dark"><?= $view->e($mosque['national_code'] ?? '') ?></span></td>
-                        <td><?= $view->e($entry['deleted_by']['username'] ?? '') ?></td>
-                        <td>
-                            <form method="post" action="restore_mosque.php" class="d-inline js-confirm-submit" data-confirm="تأكيد استعادة المسجد؟">
-                                <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
-                                <input type="hidden" name="registration_number" value="<?= $view->e($mosque['registration_number'] ?? '') ?>">
-                                <button class="btn btn-sm btn-success"><i class="fas fa-undo me-1"></i>استعادة</button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
+    <div class="alert alert-warning d-flex gap-3 align-items-start"><i class="fas fa-shield-halved fs-4 mt-1" aria-hidden="true"></i><div><strong class="d-block">الاستعادة تعيد السجل إلى الدليل الرئيسي</strong><span>تحقق من الرمز الوطني واسم المسجد قبل التأكيد لتجنب التعارض مع سجل حالي.</span></div></div>
+
+    <section class="data-panel" aria-labelledby="trashTitle">
+        <div class="data-panel__header"><div><span class="page-kicker">الأرشيف القابل للاستعادة</span><h2 id="trashTitle"><?= count($deletedMosques) ?> سجلاً في السلة</h2></div></div>
+        <?php if (empty($deletedMosques)): ?>
+            <?= $view->partial('components.empty_state', ['icon' => 'fa-trash-can-arrow-up', 'title' => 'سلة المحذوفات فارغة', 'message' => 'لا توجد مساجد مؤرشفة وقابلة للاستعادة حالياً.']) ?>
+        <?php else: ?>
+        <div class="row g-3 p-3">
+            <?php foreach ($deletedMosques as $entry): $mosque = $entry['mosque'] ?? []; ?>
+            <div class="col-xl-4 col-md-6">
+                <article class="card h-100 border-0 mosque-mobile-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between gap-3 mb-3"><span class="metric-card__icon"><i class="fas fa-mosque" aria-hidden="true"></i></span><span class="badge bg-light text-dark"><?= $view->e($mosque['national_code'] ?? '') ?></span></div>
+                        <h3 class="h6 mb-2"><?= $view->e($mosque['mosque_name'] ?? 'مسجد غير مسمى') ?></h3>
+                        <dl class="row small mb-3"><dt class="col-5 text-muted">وقت الحذف</dt><dd class="col-7"><?= $view->e($entry['deleted_at'] ?? '') ?></dd><dt class="col-5 text-muted">حذف بواسطة</dt><dd class="col-7"><?= $view->e($entry['deleted_by']['username'] ?? 'غير محدد') ?></dd></dl>
+                        <form method="post" action="restore_mosque.php" class="js-confirm-submit" data-confirm="تأكيد استعادة المسجد؟">
+                            <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
+                            <input type="hidden" name="registration_number" value="<?= $view->e($mosque['registration_number'] ?? '') ?>">
+                            <button class="btn btn-success w-100"><i class="fas fa-rotate-left me-2" aria-hidden="true"></i>استعادة السجل</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+            <?php endforeach; ?>
         </div>
-    </div>
+        <?php endif; ?>
+    </section>
 </div>
