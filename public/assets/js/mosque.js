@@ -581,9 +581,6 @@ function printMosqueDetails() {
     // Get notes
     const notesElement = printContent.querySelector('.card-body p.mb-0');
     const notes = notesElement ? notesElement.textContent.trim() : 'لا توجد ملاحظات';
-
-    const cspNonce = document.querySelector('meta[name="csp-nonce"]')?.content || '';
-    const styleNonceAttribute = cspNonce ? ` nonce="${cspNonce.replace(/"/g, '&quot;')}"` : '';
     // Add print styles with professional design
     printWindow.document.write(`
         <!DOCTYPE html>
@@ -591,143 +588,7 @@ function printMosqueDetails() {
         <head>
             <title>تفاصيل المسجد - ${document.querySelector('#mosqueDetailsModal .modal-title').textContent}</title>
             <meta charset="UTF-8">
-            <style${styleNonceAttribute}>
-                @page {
-                    size: A4;
-                    margin: 15mm 10mm;
-                }
-                body {
-                    font-family: 'Arial', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    margin: 0;
-                    padding: 20px;
-                    color: #333;
-                    direction: rtl;
-                    background-color: #fff;
-                }
-                .print-header {
-                    text-align: center;
-                    margin-bottom: 30px;
-                    padding-bottom: 15px;
-                    border-bottom: 2px solid #2c3e50;
-                }
-                .print-header h1 {
-                    color: #2c3e50;
-                    margin: 0;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-                .print-header .subtitle {
-
-                    color: #7f8c8d;
-                    margin: 5px 0 0;
-                    font-size: 16px;
-                }
-                .print-header .logo {
-                    max-width: 300px;
-                    height: 150px;
-
-                }
-                .info-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 20px;
-                    page-break-inside: avoid;
-                }
-                .info-table th {
-                    background-color: #f8f9fa;
-                    padding: 10px 15px;
-                    text-align: right;
-                    border: 1px solid #ddd;
-                    width: 30%;
-                }
-                .info-table td {
-                    padding: 10px 15px;
-                    border: 1px solid #ddd;
-                }
-                .section-title {
-                    color: #2c3e50;
-                    font-weight: bold;
-                    font-size: 18px;
-                    margin: 25px 0 15px;
-                    padding-bottom: 5px;
-                    border-bottom: 1px solid #eee;
-                }
-                .badge {
-                    font-size: 90%;
-                    padding: 4px 8px;
-                    border-radius: 3px;
-                }
-                .text-success { color: #28a745 !important; }
-                .text-danger { color: #dc3545 !important; }
-                .text-warning { color: #fd7e14 !important; }
-                .text-primary { color: #007bff !important; }
-                .bg-success { background-color: #28a745 !important; }
-                .bg-danger { background-color: #dc3545 !important; }
-                .bg-warning { background-color: #fd7e14 !important; }
-                .bg-info { background-color: #17a2b8 !important; }
-                .bg-primary { background-color: #007bff !important; }
-                .fa { margin-left: 5px; }
-                .footer {
-                    margin-top: 30px;
-                    padding-top: 10px;
-                    border-top: 1px solid #ddd;
-                    text-align: center;
-                    font-size: 12px;
-                    color: #777;
-                }
-                .print-watermark {
-                    position: fixed;
-                    bottom: 20%;
-                    left: 0;
-                    right: 0;
-                    text-align: center;
-                    opacity: 0.1;
-                    font-size: 80px;
-                    color: #999;
-                    transform: rotate(-30deg);
-                    pointer-events: none;
-                    z-index: -1;
-                }
-                .mosque-image {
-                    max-width: 100%;
-                    max-height: 300px;
-                    display: block;
-                    margin: 0 auto 20px;
-                    border-radius: 4px;
-                }
-                .no-image {
-                    text-align: center;
-                    color: #6c757d;
-                    padding: 20px;
-                    border: 1px dashed #ddd;
-                    margin-bottom: 20px;
-                }
-                .staff-section {
-                    margin-bottom: 15px;
-                }
-                .staff-title {
-                    font-weight: bold;
-                    color: #2c3e50;
-                    margin-bottom: 5px;
-                    padding-bottom: 3px;
-                    border-bottom: 1px solid #eee;
-                }
-                @media print {
-                    .no-print {
-                        display: none !important;
-                    }
-                    body {
-                        padding: 0 !important;
-                        background: white !important;
-                    }
-                    .section-title {
-                        page-break-after: avoid;
-                    }
-                    .print-watermark {
-                        display: block !important;
-                    }
-                }
-            </style>
+            <link rel="stylesheet" href="${new URL('assets/dist/app.min.css', window.location.href).href}">
         </head>
         <body>
             <div class="print-header">
@@ -746,11 +607,11 @@ function printMosqueDetails() {
                 <p>جميع الحقوق محفوظة &copy; ${new Date().getFullYear()}</p>
             </div>
 
-            <div class="no-print" style="text-align: center; margin-top: 20px;">
-                <button id="printDocument" type="button" style="padding: 8px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <div class="no-print print-actions">
+                <button id="printDocument" type="button" class="btn btn-primary">
                     <i class="fas fa-print"></i> طباعة
                 </button>
-                <button id="closePrintDocument" type="button" style="padding: 8px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                <button id="closePrintDocument" type="button" class="btn btn-secondary">
                     <i class="fas fa-times"></i> إغلاق
                 </button>
             </div>
@@ -988,7 +849,7 @@ function updateTableWithResults(results) {
     let animationDelay = 0;
 
     // Use the global IS_ADMIN variable that was set in mosques.php
-    const isAdmin = typeof IS_ADMIN !== 'undefined' ? IS_ADMIN : false;
+    const isAdmin = document.body.dataset.isAdmin === 'true';
 
     results.forEach(row => {
         animationDelay += 0.05;
@@ -1016,7 +877,7 @@ function updateTableWithResults(results) {
                 <i class="fas fa-pen"></i>
             </a>
             <form method="POST" action="delete_mosque.php" class="d-inline js-confirm-submit" data-confirm="هل أنت متأكد من حذف هذا المسجد؟">
-                <input type="hidden" name="csrf_token" value="${escapeHtml(typeof CSRF_TOKEN === 'string' ? CSRF_TOKEN : '')}">
+                <input type="hidden" name="csrf_token" value="${escapeHtml(document.querySelector('meta[name="csrf-token"]')?.content || '')}">
                 <input type="hidden" name="id" value="${registrationNumber}">
                 <button type="submit" class="btn btn-sm btn-icon btn-danger rounded-circle"
                     data-bs-toggle="tooltip" data-bs-placement="top" title="حذف" aria-label="حذف المسجد">
@@ -1026,7 +887,7 @@ function updateTableWithResults(results) {
         ` : '';
 
         html += `
-        <tr class="animate__animated animate__fadeInUp" style="animation-delay: ${animationDelay}s">
+        <tr class="animate__animated animate__fadeInUp">
             <td>
                 <input type="checkbox" name="selected_mosques[]" value="${registrationNumber}" class="form-check-input mosque-checkbox">
             </td>
@@ -1322,7 +1183,7 @@ function formatMosqueDetails(mosque) {
 
     const imageDisplay = mosque.main_image ? `
         <div class="text-center mb-4">
-            <img src="${mosque.main_image}" class="img-fluid rounded" style="max-height: 250px;" alt="صورة المسجد">
+            <img src="${mosque.main_image}" class="img-fluid rounded mosque-detail-image" alt="صورة المسجد">
         </div>` : '<div class="alert alert-info text-center">لا توجد صورة متاحة للمسجد</div>';
 
     const adminRows = mosque.admin_type === 'pashalik'
@@ -1636,3 +1497,27 @@ function setupCopyValueButtons() {
 }
 
 document.addEventListener('DOMContentLoaded', setupCopyValueButtons);
+
+
+// Atlas Noor: external bulk-action bootstrap (formerly embedded in the view).
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('deleteSelected')?.addEventListener('click', () => {
+        const ids = [...document.querySelectorAll('.mosque-checkbox:checked')].map((checkbox) => checkbox.value);
+        if (!ids.length) return;
+        const submit = () => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'bulk_delete_mosques.php';
+            const token = document.createElement('input');
+            token.type = 'hidden'; token.name = 'csrf_token'; token.value = document.querySelector('meta[name="csrf-token"]')?.content || '';
+            form.appendChild(token);
+            ids.forEach((id) => { const input = document.createElement('input'); input.type = 'hidden'; input.name = 'selected_mosques[]'; input.value = id; form.appendChild(input); });
+            document.body.appendChild(form);
+            form.submit();
+        };
+        const message = `هل أنت متأكد من حذف ${ids.length} مسجد(اً)؟`;
+        if (window.Swal) {
+            window.Swal.fire({ title: 'تأكيد الحذف', text: message, icon: 'warning', showCancelButton: true, confirmButtonText: 'حذف المحدد', cancelButtonText: 'إلغاء', reverseButtons: true, confirmButtonColor: '#a83e3e' }).then((result) => { if (result.isConfirmed) submit(); });
+        } else if (window.confirm(message)) submit();
+    });
+});

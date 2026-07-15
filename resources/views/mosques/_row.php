@@ -7,7 +7,7 @@
 $fridayIcon = $row['friday_prayer'] == 'نعم' ? 'fa-check-circle text-success' : 'fa-times-circle text-danger';
 $statusIcon = ($row['status'] == 'مفتوح') ? 'fa-check-circle text-success' : (($row['status'] == 'مغلق') ? 'fa-times-circle text-danger' : 'fa-times-circle text-warning');
 ?>
-    <tr class="animate__animated animate__fadeInUp" style="animation-delay: <?= $animationDelay ?>s">
+    <tr class="mosque-table-row reveal">
         <td>
             <input type="checkbox" name="selected_mosques[]" value="<?= $view->e($row['registration_number']) ?>" class="form-check-input mosque-checkbox">
         </td>

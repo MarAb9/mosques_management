@@ -36,7 +36,7 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
     <link rel="stylesheet" href="assets/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="stylesheet" href="assets/dist/app.min.css">
 </head>
-<body data-page="<?= $view->e(pathinfo($currentPage, PATHINFO_FILENAME)) ?>">
+<body data-page="<?= $view->e(pathinfo($currentPage, PATHINFO_FILENAME)) ?>" data-is-admin="<?= $isAdmin ? 'true' : 'false' ?>">
     <a class="skip-link" href="#main-content">الانتقال إلى المحتوى الرئيسي</a>
     <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
 
@@ -116,10 +116,10 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
     <?php if ($currentPage === 'mosques.php'): ?><script src="assets/vendor/chartjs/chart.min.js"></script><?php endif; ?>
     <script src="assets/vendor/sweetalert2/sweetalert2.min.js"></script>
     <script src="assets/dist/app.min.js"></script>
+    <script src="assets/dist/backup-confirm.min.js"></script>
     <?php if ($currentPage === 'index.php'): ?><script src="assets/dist/dashboard.min.js"></script><?php endif; ?>
     <?php if ($currentPage === 'mosques.php'): ?><script src="assets/js/mosque.js"></script><?php endif; ?>
     <?php if (in_array($currentPage, ['quran_mosques.php', 'add_quran_mosque.php', 'edit_quran_mosque.php'], true)): ?><script src="assets/dist/quran.min.js"></script><?php endif; ?>
-    <?php if ($currentPage === 'mosque_maps.php'): ?><script src="assets/dist/maps.min.js"></script><?php endif; ?>
     <?php if ($currentPage === 'import_export.php'): ?><script src="assets/dist/import-export.min.js"></script><?php endif; ?>
 </body>
 </html>

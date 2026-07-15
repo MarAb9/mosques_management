@@ -23,6 +23,13 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
 };
 ?>
 
+<?php
+$directoryActions = '<a class="btn btn-outline-primary" href="import_export.php?export=1"><i class="fas fa-file-export me-2" aria-hidden="true"></i>تصدير</a>';
+if ($isAdmin) { $directoryActions .= '<a class="btn btn-primary" href="add_mosque.php"><i class="fas fa-plus me-2" aria-hidden="true"></i>إضافة مسجد</a>'; }
+?>
+<div class="directory-page-header">
+<?= $view->partial('components.page_header', ['kicker' => 'الدليل التشغيلي', 'title' => 'إدارة مساجد إقليم بركان', 'subtitle' => 'ابحث وصف السجلات وراجع الحالة والموقع والطاقم من مساحة واحدة.', 'icon' => 'fa-mosque', 'actionsHtml' => $directoryActions]) ?>
+</div>
 
 <!-- Dashboard Overview Cards -->
 <div class="row mb-4 g-4 animate__animated animate__fadeIn">
@@ -125,7 +132,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
                                                     placeholder="ابحث بأي معلومة (اسم المسجد، الإمام، الرمز الوطني...)"
                                                     aria-label="بحث"
                                                     value="<?= htmlspecialchars($queryParams['query'] ?? '') ?>">
-                                                <button id="clearSearch" class="btn btn-outline-secondary border-start-0 <?= empty($queryParams['query'] ?? '') ? 'd-none' : '' ?>" type="button" style="border-left: none !important;">
+                                                <button id="clearSearch" class="btn btn-outline-secondary border-start-0 <?= empty($queryParams['query'] ?? '') ? 'd-none' : '' ?>" type="button" atlas-clear-search>
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                                 <button id="searchButton" class="btn btn-primary px-3" type="submit">
@@ -213,7 +220,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
                             <button class="btn btn-outline-primary btn-sm" type="button" id="densityToggle"><i class="fas fa-table-list me-1"></i>كثافة الجدول</button>
                             <div class="dropdown">
                                 <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-columns me-1"></i>الأعمدة</button>
-                                <div class="dropdown-menu p-3 shadow" style="min-width: 220px;">
+                                <div class="dropdown-menu p-3 shadow atlas-column-menu">
                                     <?php foreach ([4 => 'العنوان', 8 => 'سنة البناء', 10 => 'الإمام المرشد', 12 => 'الموقع'] as $col => $label): ?>
                                     <div class="form-check">
                                         <input class="form-check-input js-column-toggle" type="checkbox" checked value="<?= $col ?>" id="colToggle<?= $col ?>">
@@ -403,41 +410,3 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
         </div>
     </div>
 </div>
-
-
-<script nonce="<?= $view->e($cspNonce ?? '') ?>">
-    //Global variable
-    const IS_ADMIN = <?= $isAdmin ? 'true' : 'false' ?>;
-    const CSRF_TOKEN = <?= json_encode((string) $csrfToken, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-
-
-    // Bulk delete handler
-document.getElementById('deleteSelected')?.addEventListener('click', function() {
-    const selected = document.querySelectorAll('.mosque-checkbox:checked');
-    const ids = Array.from(selected).map(cb => cb.value);
-
-    if (ids.length > 0 && confirm(`هل أنت متأكد من حذف ${ids.length} مسجد(اً)؟`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'bulk_delete_mosques.php';
-
-        const tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = 'csrf_token';
-        tokenInput.value = CSRF_TOKEN;
-        form.appendChild(tokenInput);
-
-        ids.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'selected_mosques[]';
-            input.value = id;
-            form.appendChild(input);
-        });
-
-        document.body.appendChild(form);
-        form.submit();
-    }
-});
-</script>
-
