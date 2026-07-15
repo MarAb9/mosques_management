@@ -14,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 const BASE = 'http://localhost';
-const CODE_NEW = 'TESTIMP001';
+const CODE_NEW = '990000003';
 
 $cookieJar = tempnam(sys_get_temp_dir(), 'ck');
 $pass = 0;
@@ -45,6 +45,13 @@ function check(string $name, bool $ok, string $extra = ''): void
     $ok ? $pass++ : $fail++;
 }
 
+function csrfFrom(string $html): string
+{
+    preg_match('/name="csrf_token" value="([a-f0-9]{64})"/', $html, $m);
+
+    return $m[1] ?? '';
+}
+
 $pdo = new PDO('mysql:host=db;dbname=mosques_management;charset=utf8mb4', 'mosques', 'mosques_password');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $pdo->prepare('DELETE FROM mosques WHERE national_code = ?')->execute([CODE_NEW]);
@@ -56,7 +63,16 @@ $r = req('import_export.php');
 check('Guest redirected to login', $r['status'] === 302);
 
 // ── Login ────────────────────────────────────────────────────────────────
-req('login.php', [CURLOPT_POSTFIELDS => http_build_query(['username' => 'admin', 'password' => 'admin123', 'login' => '1'])]);
+$r = req('login.php');
+$loginToken = csrfFrom($r['body']);
+check('Login form carries CSRF token', $loginToken !== '');
+$r = req('login.php', [CURLOPT_POSTFIELDS => http_build_query([
+    'csrf_token' => $loginToken,
+    'username' => 'admin',
+    'password' => 'admin123',
+    'login' => '1',
+])]);
+check('Login redirects to dashboard', $r['status'] === 302);
 
 // ── Page renders ─────────────────────────────────────────────────────────
 $r = req('import_export.php');
@@ -144,7 +160,7 @@ check('Import success message with counters', str_contains($r['body'], 'تم ا�
 $row = $pdo->query("SELECT * FROM mosques WHERE national_code = '" . CODE_NEW . "'")->fetch(PDO::FETCH_ASSOC);
 check('Imported row exists', is_array($row));
 check('Imported values mapped', $row['mosque_name'] === 'مسجد استيراد تجريبي'
-    && $row['construction_date'] === '2010'
+    && $row['construction_date'] === '2010-01-01'
     && $row['friday_prayer'] === 'نعم');
 
 // re-import same file: everything duplicate/skipped

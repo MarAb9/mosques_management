@@ -15,8 +15,16 @@ use RuntimeException;
  */
 final class View
 {
+    /** @var array<string, mixed> */
+    private array $shared = [];
+
     public function __construct(private readonly string $viewsDir)
     {
+    }
+
+    public function share(string $key, mixed $value): void
+    {
+        $this->shared[$key] = $value;
     }
 
     /**
@@ -24,6 +32,7 @@ final class View
      */
     public function render(string $view, array $data = [], ?string $layout = null): string
     {
+        $data = array_replace($this->shared, $data);
         $content = $this->renderFile($this->path($view), $data);
 
         if ($layout !== null) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Config;
 use App\Core\Controller;
 use App\Core\ErrorHandler;
 use App\Core\Request;
@@ -22,6 +23,7 @@ final class MapController extends Controller
         Session $session,
         private readonly MosqueRepository $mosques,
         private readonly ErrorHandler $errors,
+        private readonly Config $config,
     ) {
         parent::__construct($view, $session);
     }
@@ -29,19 +31,28 @@ final class MapController extends Controller
     /** Legacy mosque_maps.php */
     public function index(Request $request): Response
     {
-        $page = max(1, (int) $request->query('page', 1));
-        $start = ($page - 1) * self::PAGE_SIZE;
+        $requestedPage = max(1, (int) $request->query('page', 1));
 
         try {
             $totalWithCoords = $this->mosques->countWithCoordinates();
+            $totalPages = (int) max(1, ceil($totalWithCoords / self::PAGE_SIZE));
+            $page = min($requestedPage, $totalPages);
+            $start = ($page - 1) * self::PAGE_SIZE;
             $data = [
                 'totalWithCoords' => $totalWithCoords,
-                'totalPages' => (int) max(1, ceil($totalWithCoords / self::PAGE_SIZE)),
+                'totalPages' => $totalPages,
                 'mosques' => $this->mosques->withCoordinatesPaginated($start, self::PAGE_SIZE),
                 'allMosques' => $this->mosques->allWithCoordinates(),
                 'totalMosques' => $this->mosques->countAll(),
                 'communities' => $this->mosques->distinctCommunitiesForMap(),
                 'statuses' => $this->mosques->distinctStatuses(),
+                'mapProvider' => (string) $this->config->get('maps.provider', 'google'),
+                'googleMapsApiKey' => (string) $this->config->get('maps.google_api_key', ''),
+                'mapDefaults' => [
+                    'latitude' => (float) $this->config->get('maps.default_latitude', 34.6814),
+                    'longitude' => (float) $this->config->get('maps.default_longitude', -1.9086),
+                    'zoom' => (int) $this->config->get('maps.default_zoom', 9),
+                ],
             ];
         } catch (PDOException $e) {
             $this->errors->log($e);
@@ -55,6 +66,8 @@ final class MapController extends Controller
                 'communities' => [],
                 'statuses' => [],
             ];
+            $page = 1;
+            $start = 0;
         }
 
         $data['page'] = $page;
@@ -64,3 +77,9 @@ final class MapController extends Controller
         return $this->render('maps.index', $data);
     }
 }
+
+
+
+
+
+

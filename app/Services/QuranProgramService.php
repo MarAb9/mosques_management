@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Core\Database;
 use App\Repositories\MosqueRepository;
 use App\Repositories\QuranProgramRepository;
+use InvalidArgumentException;
 
 /**
  * Quran program business logic — list assembly and transactional
@@ -30,8 +31,7 @@ final class QuranProgramService
      */
     public function listPage(array $query): array
     {
-        $page = isset($query['page']) ? (int) $query['page'] : 1;
-        $start = ($page - 1) * self::PAGE_SIZE;
+        $requestedPage = max(1, isset($query['page']) ? (int) $query['page'] : 1);
 
         // Legacy first allowlist narrows the sort key before the SQL-side one.
         $sort = isset($query['sort']) && in_array($query['sort'], ['id', 'mosque_name', 'responsible_name'], true)
@@ -40,12 +40,17 @@ final class QuranProgramService
         $order = isset($query['order']) && strtolower((string) $query['order']) === 'asc' ? 'ASC' : 'DESC';
 
         $total = $this->programs->countForList($query);
+        $pages = max(1, (int) ceil($total / self::PAGE_SIZE));
+        $page = min($requestedPage, $pages);
+        $start = ($page - 1) * self::PAGE_SIZE;
         $rows = $this->programs->searchForList($query, $sort, $order, $start, self::PAGE_SIZE);
 
-        // Per-row lookups the legacy renderer did while printing each row.
         foreach ($rows as &$row) {
-            $row['top_work_program'] = $this->programs->topWorkProgramStatus($row['id']);
-            $row['responsible_names'] = $this->programs->firstResponsibleNames($row['id'], 3);
+            $status = (string) ($row['top_work_program_status'] ?? '');
+            $row['top_work_program'] = $status === '' ? null : ['has_work_program' => $status];
+            $names = (string) ($row['responsible_names_aggregated'] ?? '');
+            $row['responsible_names'] = $names === '' ? [] : array_slice(explode('|||', $names), 0, 3);
+            unset($row['top_work_program_status'], $row['responsible_names_aggregated']);
         }
         unset($row);
 
@@ -53,7 +58,7 @@ final class QuranProgramService
             'programs' => $rows,
             'total' => $total,
             'page' => $page,
-            'pages' => (int) ceil($total / self::PAGE_SIZE),
+            'pages' => $pages,
             'schoolCount' => $this->programs->countWithSchool(),
             'accomCount' => $this->programs->countWithAccommodation(),
             'centerCount' => $this->programs->countCenters(),
@@ -69,6 +74,7 @@ final class QuranProgramService
      */
     public function create(array $post): void
     {
+        $this->validatePayload($post);
         $pdo = $this->db->pdo();
         $pdo->beginTransaction();
 
@@ -97,6 +103,7 @@ final class QuranProgramService
      */
     public function update(int|string $programId, array $post): void
     {
+        $this->validatePayload($post);
         $pdo = $this->db->pdo();
         $pdo->beginTransaction();
 
@@ -160,10 +167,10 @@ final class QuranProgramService
                 $this->sanitize($responsible['national_id'] ?? ''),
                 $responsible['has_work_program'] ?? 'لا',
                 $this->sanitize($responsible['memorization_schedule'] ?? ''),
-                filter_var($responsible['weekly_sessions'] ?? 0, FILTER_SANITIZE_NUMBER_INT),
-                filter_var($responsible['session_hours'] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-                filter_var($responsible['male_students'] ?? 0, FILTER_SANITIZE_NUMBER_INT),
-                filter_var($responsible['female_students'] ?? 0, FILTER_SANITIZE_NUMBER_INT),
+                (int) ($responsible['weekly_sessions'] ?? 0),
+                (float) ($responsible['session_hours'] ?? 0),
+                (int) ($responsible['male_students'] ?? 0),
+                (int) ($responsible['female_students'] ?? 0),
                 $responsible['regular_attendance'] ?? 'لا',
                 $this->sanitize($responsible['challenges'] ?? ''),
                 $this->sanitize($responsible['notes_suggestions'] ?? ''),
@@ -171,9 +178,73 @@ final class QuranProgramService
         }
     }
 
-    /** Legacy FILTER_SANITIZE_FULL_SPECIAL_CHARS treatment. */
+    /** Normalize text for storage; views and JSON consumers encode at output. */
     private function sanitize(mixed $value): string
     {
-        return (string) filter_var((string) ($value ?? ''), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        return trim((string) ($value ?? ''));
+    }
+
+    /** @param array<string, mixed> $post */
+    private function validatePayload(array $post): void
+    {
+        $mosqueCode = $this->sanitize($post['mosque_registration_number'] ?? '');
+        if (!preg_match('/^\d{9}$/', $mosqueCode) || !$this->mosques->nationalCodeExists($mosqueCode)) {
+            throw new InvalidArgumentException('المسجد المحدد غير صالح.');
+        }
+
+        if (!in_array((string) ($post['has_quran_school'] ?? ''), ['نعم', 'لا', 'مركز تحفيظ'], true)) {
+            throw new InvalidArgumentException('نوع برنامج التحفيظ غير صالح.');
+        }
+        if (!in_array((string) ($post['has_accommodation'] ?? ''), ['نعم', 'لا'], true)) {
+            throw new InvalidArgumentException('قيمة الإقامة غير صالحة.');
+        }
+
+        $responsibles = $post['responsibles'] ?? null;
+        if (!is_array($responsibles) || $responsibles === [] || count($responsibles) > 50) {
+            throw new InvalidArgumentException('يجب إدخال مسؤول واحد على الأقل وبحد أقصى 50 مسؤولاً.');
+        }
+
+        foreach ($responsibles as $responsible) {
+            if (!is_array($responsible)) {
+                throw new InvalidArgumentException('بيانات المسؤول غير صالحة.');
+            }
+            $name = $this->sanitize($responsible['name'] ?? '');
+            if ($name === '' || mb_strlen($name) > 255) {
+                throw new InvalidArgumentException('اسم المسؤول مطلوب ويجب ألا يتجاوز 255 حرفاً.');
+            }
+            foreach (['position' => 255, 'national_id' => 50] as $field => $maximum) {
+                if (mb_strlen($this->sanitize($responsible[$field] ?? '')) > $maximum) {
+                    throw new InvalidArgumentException('أحد حقول المسؤول يتجاوز الطول المسموح.');
+                }
+            }
+            if (!in_array((string) ($responsible['has_work_program'] ?? 'لا'), ['نعم', 'لا'], true)
+                || !in_array((string) ($responsible['regular_attendance'] ?? 'لا'), ['نعم', 'لا'], true)
+            ) {
+                throw new InvalidArgumentException('إحدى قيم نعم/لا الخاصة بالمسؤول غير صالحة.');
+            }
+            if (!in_array($this->sanitize($responsible['memorization_schedule'] ?? ''), ['باستمرار', 'بصفة منقطعة'], true)) {
+                throw new InvalidArgumentException('جدول الحفظ غير صالح.');
+            }
+
+            $this->assertNumberInRange($responsible['weekly_sessions'] ?? 0, 0, 21, true, 'عدد الجلسات الأسبوعية');
+            $this->assertNumberInRange($responsible['session_hours'] ?? 0, 0, 24, false, 'مدة الجلسة');
+            $this->assertNumberInRange($responsible['male_students'] ?? 0, 0, 5000, true, 'عدد الطلاب');
+            $this->assertNumberInRange($responsible['female_students'] ?? 0, 0, 5000, true, 'عدد الطالبات');
+
+            if (mb_strlen($this->sanitize($responsible['challenges'] ?? '')) > 5000
+                || mb_strlen($this->sanitize($responsible['notes_suggestions'] ?? '')) > 5000
+            ) {
+                throw new InvalidArgumentException('الملاحظات أو التحديات تتجاوز 5000 حرف.');
+            }
+        }
+    }
+
+    private function assertNumberInRange(mixed $value, float $minimum, float $maximum, bool $integer, string $label): void
+    {
+        $options = $integer ? FILTER_VALIDATE_INT : FILTER_VALIDATE_FLOAT;
+        $validated = filter_var($value, $options);
+        if ($validated === false || $validated < $minimum || $validated > $maximum) {
+            throw new InvalidArgumentException("{$label} غير صالح.");
+        }
     }
 }

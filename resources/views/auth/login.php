@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - مساجد إقليم بركان</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <style>
+    <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="assets/vendor/animate/animate.min.css">
+    <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
+    <style nonce="<?= $view->e($cspNonce ?? '') ?>">
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
@@ -183,17 +184,18 @@
                 <h3 class="form-title">تسجيل الدخول</h3>
 
                 <?php if (!empty($error)): ?>
-                    <div class="alert alert-danger animate__animated animate__shakeX"><?php echo $error; ?></div>
+                    <div class="alert alert-danger animate__animated animate__shakeX" role="alert" aria-live="assertive"><?= $view->e($error) ?></div>
                 <?php endif; ?>
 
                 <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
                     <div class="mb-3">
                         <label for="username" class="form-label">اسم المستخدم</label>
-                        <input type="text" class="form-control animate__animated animate__fadeIn animate__delay-1s" id="username" name="username" required placeholder="أدخل اسم المستخدم">
+                        <input type="text" class="form-control animate__animated animate__fadeIn animate__delay-1s" id="username" name="username" required autocomplete="username" autocapitalize="none" placeholder="أدخل اسم المستخدم">
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">كلمة المرور</label>
-                        <input type="password" class="form-control animate__animated animate__fadeIn animate__delay-1s" id="password" name="password" required placeholder="أدخل كلمة المرور">
+                        <input type="password" class="form-control animate__animated animate__fadeIn animate__delay-1s" id="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور">
                     </div>
                     <button type="submit" name="login" class="btn btn-primary w-100 btn-login animate__animated animate__fadeInUp animate__delay-2s">
                         <i class="fas fa-sign-in-alt me-2"></i> تسجيل الدخول
@@ -207,7 +209,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

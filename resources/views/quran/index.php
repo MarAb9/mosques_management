@@ -116,7 +116,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
                 </div>
                 <?php if ($isAdmin) : ?>
                 <div class="d-flex gap-2">
-                    <a href="add_quran_mosque.php" class="btn btn-primary rounded-pill animate__animated animate__pulse animate__infinite">
+                    <a href="add_quran_mosque.php" class="btn btn-primary rounded-pill">
                         <i class="fas fa-plus me-2"></i>إضافة مسجد تحفيظ
                     </a>
                 </div>
@@ -211,7 +211,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
                                 <th width="120"><?= $isAdmin ? 'الإجراءات' : 'معاينة' ?></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody aria-live="polite" aria-busy="false">
                             <?php if (count($programs) > 0): ?>
                                 <?php $animationDelay = 0; ?>
                                 <?php foreach ($programs as $row): ?>
@@ -256,7 +256,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title"><i class="fas fa-book-quran me-2"></i>تفاصيل مسجد التحفيظ</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <div class="modal-body" id="modal-body-container">
                 <div id="modal-body-content">
@@ -267,7 +267,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
                 <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>إغلاق
                 </button>
-                <button type="button" class="btn btn-primary rounded-pill" onclick="printQuranMosqueDetails()">
+                <button type="button" class="btn btn-primary rounded-pill js-print-quran-details">
                     <i class="fas fa-print me-2"></i>طباعة التفاصيل
                 </button>
             </div>
@@ -275,7 +275,27 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
     </div>
 </div>
 
-<script>
+<script nonce="<?= $view->e($cspNonce ?? '') ?>">
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function escapeRecord(record) {
+    const escaped = {};
+    Object.entries(record || {}).forEach(([key, value]) => {
+        escaped[key] = (typeof value === 'string' || typeof value === 'number')
+            ? escapeHtml(value)
+            : value;
+    });
+    return escaped;
+}
+
 // Quran Mosque Details Modal
 function setupQuranMosqueDetailsModal() {
     const modalElement = document.getElementById('quranMosqueDetailsModal');
@@ -310,7 +330,7 @@ function loadQuranMosqueDetails(mosqueId) {
             <p class="mt-2">جاري تحميل بيانات مسجد التحفيظ</p>
         </div>`;
 
-    fetch(`ajax/get_quran_mosque_details.php?id=${mosqueId}`)
+    fetch(`ajax/get_quran_mosque_details.php?id=${encodeURIComponent(String(mosqueId))}`)
     .then(response => {
         if (!response.ok) throw new Error('Network response was not ok: ' + response.status);
         return response.json();
@@ -331,12 +351,14 @@ function loadQuranMosqueDetails(mosqueId) {
 }
 
 function formatQuranMosqueDetails(mosque) {
+    mosque = escapeRecord(mosque);
     let responsiblesHtml = '';
     let totalStudentsAll = 0;
     let totalSessionsAll = 0;
 
     if (mosque.responsibles && mosque.responsibles.length > 0) {
         mosque.responsibles.forEach((responsible, index) => {
+            responsible = escapeRecord(responsible);
             const totalStudents = (responsible.male_students || 0) + (responsible.female_students || 0);
             totalStudentsAll += totalStudents;
             totalSessionsAll += parseInt(responsible.weekly_sessions || 0);
@@ -453,26 +475,29 @@ function formatQuranMosqueDetails(mosque) {
 }
 
 function showModalError(message) {
+    const safeMessage = escapeHtml(message);
     document.getElementById('modal-body-content').innerHTML = `
         <div class="alert alert-danger animate__animated animate__shakeX" role="alert">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            ${message}
+            ${safeMessage}
         </div>`;
 }
 
 function printQuranMosqueDetails() {
     const modalContent = document.getElementById('modal-body-content').innerHTML;
     const printWindow = window.open('', '_blank');
+    const assetBaseUrl = new URL('.', window.location.href).href;
     printWindow.document.write(`
         <!DOCTYPE html>
         <html lang="ar" dir="rtl">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <base href="${assetBaseUrl}">
             <title>تفاصيل مسجد التحفيظ - طباعة</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-            <style>
+            <link href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css" rel="stylesheet">
+            <link href="assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
+            <style nonce="<?= $view->e($cspNonce ?? '') ?>">
                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
                 .card { border: 1px solid #dee2e6; margin-bottom: 1rem; }
                 .badge { font-size: 0.85em; }
@@ -506,6 +531,15 @@ function printQuranMosqueDetails() {
 // Initialize when document is ready
 document.addEventListener('DOMContentLoaded', function() {
     setupQuranMosqueDetailsModal();
+    document.addEventListener('submit', function(e) {
+        const form = e.target.closest('.js-confirm-submit');
+        if (!form) return;
+        if (!confirm(form.dataset.confirm || 'هل أنت متأكد من الحذف؟')) {
+            e.preventDefault();
+        }
+    });
+
+    document.querySelector('.js-print-quran-details')?.addEventListener('click', printQuranMosqueDetails);
 
     // Checkbox selection logic
     const selectAll = document.getElementById('selectAll');
@@ -562,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const csrfInput = document.createElement('input');
                 csrfInput.type = 'hidden';
                 csrfInput.name = 'csrf_token';
-                csrfInput.value = '<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>';
+                csrfInput.value = <?= json_encode((string) $csrfToken, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
                 form.appendChild(csrfInput);
 
                 selectedIds.forEach(id => {

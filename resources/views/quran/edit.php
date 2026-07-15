@@ -7,15 +7,7 @@
  */
 ?>
 
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تعديل مسجد تحفيظ</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
-    <style>
+<style nonce="<?= $view->e($cspNonce ?? '') ?>">
     :root {
         --primary: #4e73df;
         --primary-dark: #2e59d9;
@@ -195,6 +187,9 @@
     }
 
     .remove-responsible {
+        background: transparent;
+        border: 0;
+        padding: 0;
         position: absolute;
         top: 10px;
         left: 10px;
@@ -221,9 +216,10 @@
         color: var(--primary-dark);
     }
     </style>
-</head>
-<body>
 <div class="container-fluid py-4">
+    <?php if (!empty($errorMessage)): ?>
+        <div class="alert alert-danger" role="alert"><?= $view->e($errorMessage) ?></div>
+    <?php endif; ?>
     <div class="row animate__animated animate__fadeIn">
         <div class="col-lg-10 col-xl-8 mx-auto">
             <div class="card border-0">
@@ -343,7 +339,7 @@
                                         <?php else: ?>
                                             <?php foreach ($responsibles as $index => $responsible): ?>
                                                 <div class="responsible-item" data-index="<?= $index ?>">
-                                                    <span class="remove-responsible" onclick="removeResponsible(this)"><i class="fas fa-times-circle"></i></span>
+                                                    <button type="button" class="remove-responsible" aria-label="حذف المسؤول"><i class="fas fa-times-circle"></i></button>
                                                     <div class="responsible-header">
                                                         <span class="responsible-title">مسؤول <?= $index + 1 ?></span>
                                                     </div>
@@ -495,9 +491,7 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>
+<script nonce="<?= $view->e($cspNonce ?? '') ?>">
 $(document).ready(function() {
     // Initialize select2 with custom templates
     $('.mosque-select').select2({
@@ -510,7 +504,7 @@ $(document).ready(function() {
     function formatMosque(mosque) {
         if (!mosque.id) return mosque.text;
 
-        const mosqueName = mosque.text.split(' (')[0];
+        const mosqueName = escapeHtml(mosque.text.split(' (')[0]);
         const $container = $(
             `<div class="mosque-option">
                 <div class="mosque-name">${mosqueName}</div>
@@ -527,11 +521,15 @@ $(document).ready(function() {
     }
 
     function formatLocationBadge(value) {
-        return value ? `<span class="location-badge">${value}</span>` : '';
+        return value ? `<span class="location-badge">${escapeHtml(value)}</span>` : '';
     }
 
     function formatMosqueSelection(mosque) {
         return mosque.id ? mosque.text.split(' (')[0] : mosque.text;
+    }
+
+    function escapeHtml(value) {
+        return $('<div>').text(String(value ?? '')).html();
     }
 
     // Step navigation
@@ -618,19 +616,19 @@ $(document).ready(function() {
     // Update review summary
     function updateReviewSummary() {
         const mosqueElement = $('#mosque_registration_number option:selected');
-        const mosqueName = mosqueElement.text().split(' (')[0];
+        const mosqueName = escapeHtml(mosqueElement.text().split(' (')[0]);
         const locationData = [
             mosqueElement.data('pashalik'),
             mosqueElement.data('circle'),
             mosqueElement.data('leadership'),
             mosqueElement.data('community'),
             mosqueElement.data('administrative')
-        ].filter(Boolean);
+        ].filter(Boolean).map(escapeHtml);
 
         const features = [
             $('#has_quran_school').val() !== 'لا' && 'كتاب قرآني',
             $('#has_accommodation').val() === 'نعم' && 'إقامة'
-        ].filter(Boolean);
+        ].filter(Boolean).map(escapeHtml);
 
         let totalStudents = 0;
         let totalMale = 0;
@@ -673,7 +671,21 @@ $(document).ready(function() {
             updateReviewSummary();
         }
     });
+    $('#responsibles-container').on('click', '.remove-responsible', function() {
+        const item = $(this).closest('.responsible-item');
+        const index = item.data('index');
 
+        item.remove();
+        $(`.responsible-students[data-index="${index}"]`).remove();
+
+        if ($('.responsible-item').length === 0) {
+            $('#responsibles-container').html('<div class="alert alert-info text-center"><i class="fas fa-info-circle me-2"></i>لم يتم إضافة أي مسؤولين بعد</div>');
+        }
+
+        if ($('.step-content.active').data('step') === 3) {
+            updateReviewSummary();
+        }
+    });
     // Add responsible functionality
     let responsibleCount = <?= count($responsibles) ?>;
 
@@ -683,7 +695,7 @@ $(document).ready(function() {
 
         const responsibleHtml = `
             <div class="responsible-item" data-index="${index}">
-                <span class="remove-responsible" onclick="removeResponsible(this)"><i class="fas fa-times-circle"></i></span>
+                <button type="button" class="remove-responsible" aria-label="حذف المسؤول"><i class="fas fa-times-circle"></i></button>
                 <div class="responsible-header">
                     <span class="responsible-title">مسؤول ${index}</span>
                 </div>
@@ -803,21 +815,4 @@ $(document).ready(function() {
     });
 });
 
-function removeResponsible(element) {
-    const item = $(element).closest('.responsible-item');
-    const index = item.data('index');
-
-    // Remove the responsible item
-    item.remove();
-
-    // Remove the corresponding students section
-    $(`.responsible-students[data-index="${index}"]`).remove();
-
-    // Update the review summary if we're on step 3
-    if ($('.step-content.active').data('step') === 3) {
-        updateReviewSummary();
-    }
-}
 </script>
-</body>
-</html>

@@ -7,6 +7,9 @@ namespace App\Services;
 use App\Repositories\MosqueRepository;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpWord\PhpWord;
 
 /**
@@ -171,14 +174,16 @@ final class MosqueExportService
             // Write data
             $row = 2;
             foreach ($mosques as $mosque) {
-                $sheet->setCellValue('A' . $row, $mosque['mosque_name']);
-                $sheet->setCellValue('B' . $row, $mosque['address']);
-                $sheet->setCellValue('C' . $row, $mosque['national_code']);
-                $sheet->setCellValue('D' . $row, $mosque['pashalik']);
-                $sheet->setCellValue('E' . $row, $mosque['administrative_attachment']);
-                $sheet->setCellValue('F' . $row, $mosque['circle']);
-                $sheet->setCellValue('G' . $row, $mosque['leadership']);
-                $sheet->setCellValue('H' . $row, $mosque['guide_imam_display'] ?: $mosque['guide_imam']);
+                $this->writeTextRow($sheet, $row, [
+                    $mosque['mosque_name'],
+                    $mosque['address'],
+                    $mosque['national_code'],
+                    $mosque['pashalik'],
+                    $mosque['administrative_attachment'],
+                    $mosque['circle'],
+                    $mosque['leadership'],
+                    $mosque['guide_imam_display'] ?: $mosque['guide_imam'],
+                ]);
                 $row++;
             }
         } else {
@@ -214,33 +219,18 @@ final class MosqueExportService
             // Write data
             $row = 2;
             foreach ($mosques as $mosque) {
-                $sheet->setCellValue('A' . $row, $mosque['registration_number']);
-                $sheet->setCellValue('B' . $row, $mosque['mosque_name']);
-                $sheet->setCellValue('C' . $row, $mosque['address']);
-                $sheet->setCellValue('D' . $row, $mosque['construction_date']);
-                $sheet->setCellValue('E' . $row, $mosque['national_code']);
-                $sheet->setCellValue('F' . $row, $mosque['status']);
-                $sheet->setCellValue('G' . $row, $mosque['friday_prayer']);
-                $sheet->setCellValue('H' . $row, $mosque['community']);
-                $sheet->setCellValue('I' . $row, $mosque['funding_source']);
-                $sheet->setCellValue('J' . $row, $mosque['imam_name']);
-                $sheet->setCellValue('K' . $row, $mosque['imam_registration']);
-                $sheet->setCellValue('L' . $row, $mosque['imam_phone']);
-                $sheet->setCellValue('M' . $row, $mosque['preacher_name']);
-                $sheet->setCellValue('N' . $row, $mosque['preacher_registration']);
-                $sheet->setCellValue('O' . $row, $mosque['preacher_phone']);
-                $sheet->setCellValue('P' . $row, $mosque['muezzin_name']);
-                $sheet->setCellValue('Q' . $row, $mosque['muezzin_registration']);
-                $sheet->setCellValue('R' . $row, $mosque['muezzin_phone']);
-                $sheet->setCellValue('S' . $row, $mosque['quran_memorization']);
-                $sheet->setCellValue('T' . $row, $mosque['literacy_program']);
-                $sheet->setCellValue('U' . $row, $mosque['guidance_program']);
-                $sheet->setCellValue('V' . $row, $mosque['guide_imam_display'] ?: $mosque['guide_imam']);
-                $sheet->setCellValue('W' . $row, $mosque['notes']);
-                $sheet->setCellValue('X' . $row, $mosque['pashalik']);
-                $sheet->setCellValue('Y' . $row, $mosque['administrative_attachment']);
-                $sheet->setCellValue('Z' . $row, $mosque['circle']);
-                $sheet->setCellValue('AA' . $row, $mosque['leadership']);
+                $this->writeTextRow($sheet, $row, [
+                    $mosque['registration_number'], $mosque['mosque_name'], $mosque['address'],
+                    $mosque['construction_date'], $mosque['national_code'], $mosque['status'],
+                    $mosque['friday_prayer'], $mosque['community'], $mosque['funding_source'],
+                    $mosque['imam_name'], $mosque['imam_registration'], $mosque['imam_phone'],
+                    $mosque['preacher_name'], $mosque['preacher_registration'], $mosque['preacher_phone'],
+                    $mosque['muezzin_name'], $mosque['muezzin_registration'], $mosque['muezzin_phone'],
+                    $mosque['quran_memorization'], $mosque['literacy_program'], $mosque['guidance_program'],
+                    $mosque['guide_imam_display'] ?: $mosque['guide_imam'], $mosque['notes'],
+                    $mosque['pashalik'], $mosque['administrative_attachment'], $mosque['circle'],
+                    $mosque['leadership'],
+                ]);
 
                 $row++;
             }
@@ -314,6 +304,20 @@ final class MosqueExportService
         }
 
         return $spreadsheet;
+    }
+
+    /** @param list<mixed> $values */
+    private function writeTextRow(Worksheet $sheet, int $row, array $values): void
+    {
+        foreach ($values as $index => $value) {
+            $text = (string) ($value ?? '');
+            if (preg_match('/^[=+\-@]/u', $text) === 1) {
+                $text = "'" . $text;
+            }
+
+            $cell = Coordinate::stringFromColumnIndex($index + 1) . $row;
+            $sheet->setCellValueExplicit($cell, $text, DataType::TYPE_STRING);
+        }
     }
 
     /** Stream callback for the Excel writer. */

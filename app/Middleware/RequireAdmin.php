@@ -14,6 +14,8 @@ use Closure;
 class RequireAdmin implements MiddlewareInterface
 {
     /** Overridden by permission subclasses for feature-specific 403 text. */
+    protected array $allowedRoles = ['admin'];
+
     protected string $message = 'غير مصرح بالوصول إلى هذه الصفحة';
 
     public function __construct(protected readonly Session $session)
@@ -22,7 +24,7 @@ class RequireAdmin implements MiddlewareInterface
 
     public function handle(Request $request, Closure $next): Response
     {
-        if ($this->session->role() !== 'admin') {
+        if (!in_array($this->session->role(), $this->allowedRoles, true)) {
             throw new HttpException(403, $this->message);
         }
 

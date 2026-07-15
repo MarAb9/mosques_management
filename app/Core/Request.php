@@ -83,6 +83,33 @@ final class Request
         return $this->server[$key] ?? $default;
     }
 
+    public function clientIp(): string
+    {
+        return (string) ($this->server['REMOTE_ADDR'] ?? 'unknown');
+    }
+
+    public function userAgent(): string
+    {
+        return substr((string) ($this->server['HTTP_USER_AGENT'] ?? ''), 0, 512);
+    }
+
+    public function isSecure(bool $trustProxyHeaders = false): bool
+    {
+        if ((!empty($this->server['HTTPS']) && $this->server['HTTPS'] !== 'off')
+            || (isset($this->server['SERVER_PORT']) && (int) $this->server['SERVER_PORT'] === 443)
+        ) {
+            return true;
+        }
+
+        if (!$trustProxyHeaders) {
+            return false;
+        }
+
+        $forwardedProto = strtolower(trim(explode(',', (string) ($this->server['HTTP_X_FORWARDED_PROTO'] ?? ''))[0]));
+
+        return $forwardedProto === 'https';
+    }
+
     /**
      * Route key for the router: the requested script path relative to the
      * web root, e.g. "mosques.php" or "ajax/search_mosques.php".

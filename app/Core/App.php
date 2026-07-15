@@ -25,6 +25,7 @@ final class App
     public readonly View $view;
     public readonly Database $database;
     public readonly ErrorHandler $errors;
+    private readonly string $cspNonce;
 
     /** @var array<class-string, object> */
     private array $resolved = [];
@@ -36,9 +37,12 @@ final class App
             (bool) $this->config->get('app.debug', false),
             $basePath . '/storage/logs/app.log'
         );
-        $this->session = new Session();
+        date_default_timezone_set((string) $this->config->get('app.timezone', 'Africa/Casablanca'));
+        $this->session = new Session($this->config);
         $this->database = new Database($this->config);
         $this->view = new View($basePath . '/resources/views');
+        $this->cspNonce = bin2hex(random_bytes(16));
+        $this->view->share('cspNonce', $this->cspNonce);
         $this->router = new Router();
     }
 
@@ -95,6 +99,7 @@ final class App
             $response = $this->errors->handleException($e);
         }
 
+        $this->applySecurityHeaders($response, $request);
         $response->send();
     }
 
@@ -165,4 +170,30 @@ final class App
         return $pipeline;
     }
 
+    private function applySecurityHeaders(Response $response, Request $request): void
+    {
+        $response
+            ->withHeader('X-Content-Type-Options', 'nosniff')
+            ->withHeader('X-Frame-Options', 'DENY')
+            ->withHeader('Referrer-Policy', 'same-origin')
+            ->withHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)')
+            ->withHeader(
+                'Content-Security-Policy',
+                "default-src 'self'; "
+                . "script-src 'self' 'nonce-{$this->cspNonce}' https://maps.googleapis.com https://maps.gstatic.com; "
+                . "style-src 'self' 'unsafe-inline'; "
+                . "style-src-elem 'self' 'unsafe-inline' 'nonce-{$this->cspNonce}' https://fonts.googleapis.com; "
+                . "style-src-attr 'unsafe-inline'; "
+                . "font-src 'self' data: https://fonts.gstatic.com; "
+                . "img-src 'self' data: blob: https://maps.googleapis.com https://maps.gstatic.com https://*.googleusercontent.com; "
+                . "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+            );
+
+        if ($request->isSecure((bool) $this->config->get('security.trust_proxy_headers', false))) {
+            $response->withHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        }
+    }
+
 }
+
+

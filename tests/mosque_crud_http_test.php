@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 const BASE = 'http://localhost';
 const PUBLIC_ROOT = '/var/www/html/public';
-const TEST_CODE_1 = 'TESTMVC001';
-const TEST_CODE_2 = 'TESTMVC002';
+const TEST_CODE_1 = '990000001';
+const TEST_CODE_2 = '990000002';
 
 $cookieJar = tempnam(sys_get_temp_dir(), 'ck');
 $pass = 0;
@@ -63,7 +63,11 @@ $r = req('add_mosque.php');
 check('Guest add form redirects to login', $r['status'] === 302 && str_contains($r['redirect'], 'login.php'));
 
 // ── Login ────────────────────────────────────────────────────────────────
+$r = req('login.php');
+$loginToken = csrfFrom($r['body']);
+check('Login form renders with CSRF token', $r['status'] === 200 && $loginToken !== '');
 $r = req('login.php', [CURLOPT_POSTFIELDS => http_build_query([
+    'csrf_token' => $loginToken,
     'username' => 'admin', 'password' => 'admin123', 'login' => '1',
 ])]);
 check('Login redirects to dashboard', $r['status'] === 302 && str_contains($r['redirect'], 'index.php'));
@@ -109,7 +113,7 @@ check('Row inserted', is_array($row));
 check('Name stored', $row['mosque_name'] === 'مسجد اختبار الهندسة');
 check('Construction date normalized', $row['construction_date'] === '2005-01-01');
 check('Phone digits only', $row['imam_phone'] === '0612345678');
-check('Notes sanitized at input', $row['notes'] === 'ملاحظات &lt;اختبار&gt;');
+check('Notes stored without HTML pre-encoding', $row['notes'] === 'ملاحظات <اختبار>');
 check('GPS stored', abs((float) $row['latitude'] - 34.920917) < 0.0001);
 check('Image path stored', is_string($row['main_image']) && str_starts_with($row['main_image'], 'uploads/mosques/mosque_'));
 check('Image file exists', is_string($row['main_image']) && is_file(PUBLIC_ROOT . '/' . $row['main_image']));
@@ -139,6 +143,8 @@ check('Edit form shows current values', $r['status'] === 200
     && str_contains($r['body'], 'مسجد اختبار الهندسة')
     && str_contains($r['body'], 'تعديل بيانات المسجد')
     && str_contains($r['body'], '2005'));
+check('Edit form escapes stored notes', str_contains($r['body'], 'ملاحظات &lt;اختبار&gt;')
+    && !str_contains($r['body'], 'ملاحظات <اختبار>'));
 
 $editToken = csrfFrom($r['body']);
 

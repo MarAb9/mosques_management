@@ -150,7 +150,13 @@ final class MosqueRepository
     /**
      * @return array{conditions: list<string>, params: list<mixed>}
      */
-    private function liveSearchConditions(string $searchTerm, string $community, string $status, string $fridayPrayer): array
+    private function liveSearchConditions(
+        string $searchTerm,
+        string $community,
+        string $status,
+        string $fridayPrayer,
+        string $guideImam,
+    ): array
     {
         $baseConditions = [];
         $params = [];
@@ -187,6 +193,17 @@ final class MosqueRepository
             $params[] = $fridayPrayer;
         }
 
+        if ($guideImam !== '') {
+            if (ctype_digit($guideImam)) {
+                $baseConditions[] = 'm.guide_imam_id = ?';
+                $params[] = (int) $guideImam;
+            } else {
+                $guideName = (string) preg_replace('/\s*\(\d+\)$/', '', $guideImam);
+                $baseConditions[] = 'm.guide_imam_id IN (SELECT id FROM guide_imams WHERE display_name_normalized LIKE ?)';
+                $params[] = '%' . Arabic::normalize($guideName) . '%';
+            }
+        }
+
         return ['conditions' => $baseConditions, 'params' => $params];
     }
 
@@ -194,10 +211,16 @@ final class MosqueRepository
      * Raw fetchColumn() value, uncast — the legacy endpoint put it into the
      * JSON payload as-is, so the JSON number/string type must match.
      */
-    public function countForLiveSearch(string $searchTerm, string $community, string $status, string $fridayPrayer): mixed
+    public function countForLiveSearch(
+        string $searchTerm,
+        string $community,
+        string $status,
+        string $fridayPrayer,
+        string $guideImam,
+    ): mixed
     {
         ['conditions' => $conditions, 'params' => $params] =
-            $this->liveSearchConditions($searchTerm, $community, $status, $fridayPrayer);
+            $this->liveSearchConditions($searchTerm, $community, $status, $fridayPrayer, $guideImam);
 
         $whereClause = $conditions !== [] ? 'WHERE ' . implode(' AND ', $conditions) : '';
 
@@ -212,10 +235,18 @@ final class MosqueRepository
     /**
      * @return list<array<string, mixed>>
      */
-    public function liveSearch(string $searchTerm, string $community, string $status, string $fridayPrayer, int $start, int $limit): array
+    public function liveSearch(
+        string $searchTerm,
+        string $community,
+        string $status,
+        string $fridayPrayer,
+        string $guideImam,
+        int $start,
+        int $limit,
+    ): array
     {
         ['conditions' => $conditions, 'params' => $params] =
-            $this->liveSearchConditions($searchTerm, $community, $status, $fridayPrayer);
+            $this->liveSearchConditions($searchTerm, $community, $status, $fridayPrayer, $guideImam);
 
         $whereClause = $conditions !== [] ? 'WHERE ' . implode(' AND ', $conditions) : '';
 
@@ -405,6 +436,84 @@ final class MosqueRepository
         ")->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+    /** @return array<string, int> */
+    public function dataQualitySummary(): array
+    {
+        return [
+            'missing_coordinates' => $this->countWhere("latitude IS NULL OR longitude IS NULL OR latitude = '' OR longitude = ''"),
+            'missing_imam_phone' => $this->countWhere("imam_phone IS NULL OR imam_phone = ''"),
+            'incomplete_addresses' => $this->countWhere("address IS NULL OR TRIM(address) = ''"),
+            'invalid_years' => $this->countWhere("construction_date IS NOT NULL AND (YEAR(construction_date) < 1000 OR YEAR(construction_date) > YEAR(CURDATE()) + 1)"),
+            'duplicate_national_codes' => count($this->duplicateNationalCodes(50)),
+        ];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function dataQualitySamples(string $issue, int $limit = 8): array
+    {
+        $conditions = [
+            'missing_coordinates' => "m.latitude IS NULL OR m.longitude IS NULL OR m.latitude = '' OR m.longitude = ''",
+            'missing_imam_phone' => "m.imam_phone IS NULL OR m.imam_phone = ''",
+            'incomplete_addresses' => "m.address IS NULL OR TRIM(m.address) = ''",
+            'invalid_years' => "m.construction_date IS NOT NULL AND (YEAR(m.construction_date) < 1000 OR YEAR(m.construction_date) > YEAR(CURDATE()) + 1)",
+        ];
+
+        if ($issue === 'duplicate_national_codes') {
+            return $this->duplicateNationalCodes($limit);
+        }
+
+        $condition = $conditions[$issue] ?? $conditions['missing_coordinates'];
+        $stmt = $this->db->pdo()->prepare("\n            SELECT m.registration_number, m.national_code, m.mosque_name, m.community, m.address, m.imam_name, m.imam_phone, m.latitude, m.longitude, m.construction_date\n            FROM mosques m\n            WHERE {$condition}\n            ORDER BY m.registration_number DESC\n            LIMIT ?\n        ");
+        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function duplicateNationalCodes(int $limit = 10): array
+    {
+        $stmt = $this->db->pdo()->prepare("\n            SELECT national_code, COUNT(*) AS duplicate_count, GROUP_CONCAT(registration_number ORDER BY registration_number) AS registration_numbers\n            FROM mosques\n            WHERE national_code IS NOT NULL AND national_code != ''\n            GROUP BY national_code\n            HAVING COUNT(*) > 1\n            ORDER BY duplicate_count DESC, national_code\n            LIMIT ?\n        ");
+        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countQuranProgramCoverage(): int
+    {
+        return (int) $this->db->pdo()->query("\n            SELECT COUNT(DISTINCT m.registration_number)\n            FROM mosques m\n            INNER JOIN quran_mosques q ON q.mosque_registration_number = m.national_code\n        ")->fetchColumn();
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function recentlyUpdated(int $limit = 8): array
+    {
+        $stmt = $this->db->pdo()->prepare("\n            SELECT m.registration_number, m.national_code, m.mosque_name, m.community, m.status\n            FROM mosques m\n            ORDER BY m.registration_number DESC\n            LIMIT ?\n        ");
+        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /** @param list<mixed> $nationalCodes */
+    public function deleteByNationalCodes(array $nationalCodes): int
+    {
+        if ($nationalCodes === []) {
+            return 0;
+        }
+
+        $placeholders = rtrim(str_repeat('?,', count($nationalCodes)), ',');
+        $stmt = $this->db->pdo()->prepare("DELETE FROM mosques WHERE national_code IN ({$placeholders})");
+        $stmt->execute(array_values($nationalCodes));
+
+        return $stmt->rowCount();
+    }
+
+    private function countWhere(string $condition): int
+    {
+        return (int) $this->db->pdo()->query("SELECT COUNT(*) FROM mosques WHERE {$condition}")->fetchColumn();
+    }
     // ── CRUD (legacy add/edit/delete pages) ──────────────────────────────
 
     /**
@@ -454,6 +563,17 @@ final class MosqueRepository
         $stmt->execute($this->writeParams($data));
     }
 
+    /** @param array<string, mixed> $data archived mosque row */
+    public function insertRestored(array $data): void
+    {
+        $columns = 'registration_number, ' . implode(', ', self::WRITE_COLUMNS);
+        $placeholders = rtrim(str_repeat('?, ', count(self::WRITE_COLUMNS) + 1), ', ');
+        $params = [(int) $data['registration_number'], ...$this->writeParams($data)];
+
+        $stmt = $this->db->pdo()->prepare("INSERT INTO mosques ({$columns}) VALUES ({$placeholders})");
+        $stmt->execute($params);
+    }
+
     /**
      * @param array<string, mixed> $data
      */
@@ -471,11 +591,13 @@ final class MosqueRepository
     /**
      * @param list<mixed> $registrationNumbers
      */
-    public function deleteByRegistrationNumbers(array $registrationNumbers): void
+    public function deleteByRegistrationNumbers(array $registrationNumbers): int
     {
         $placeholders = rtrim(str_repeat('?,', count($registrationNumbers)), ',');
         $stmt = $this->db->pdo()->prepare("DELETE FROM mosques WHERE registration_number IN ({$placeholders})");
         $stmt->execute(array_values($registrationNumbers));
+
+        return $stmt->rowCount();
     }
 
     /**
@@ -671,7 +793,8 @@ final class MosqueRepository
             preacher_registration, preacher_phone, muezzin_name,
             muezzin_registration, muezzin_phone, quran_memorization,
             literacy_program, guidance_program, guide_imam, notes,
-            admin_type, pashalik, administrative_attachment, circle, leadership
+            admin_type, pashalik, administrative_attachment, circle, leadership,
+            latitude, longitude
         ) VALUES (
             :mosque_name, :address, :construction_date,
             :national_code, :status, :friday_prayer, :community, :funding_source,
@@ -679,7 +802,8 @@ final class MosqueRepository
             :preacher_registration, :preacher_phone, :muezzin_name,
             :muezzin_registration, :muezzin_phone, :quran_memorization,
             :literacy_program, :guidance_program, :guide_imam, :notes,
-            :admin_type, :pashalik, :administrative_attachment, :circle, :leadership
+            :admin_type, :pashalik, :administrative_attachment, :circle, :leadership,
+            :latitude, :longitude
         )');
 
         $stmt->execute($data);

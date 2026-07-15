@@ -69,16 +69,16 @@ final class MosqueFormService
             'leadership' => $this->sanitizeInput($postData['leadership'] ?? ''),
             'main_image' => $existingImage,
             // GPS COORDINATES
-            'latitude' => $this->validateGPS((string) ($postData['latitude'] ?? '')),
-            'longitude' => $this->validateGPS((string) ($postData['longitude'] ?? '')),
+            'latitude' => $this->validateCoordinate((string) ($postData['latitude'] ?? ''), 90),
+            'longitude' => $this->validateCoordinate((string) ($postData['longitude'] ?? ''), 180),
             'guide_imam_id' => $guideImamId,
         ];
     }
 
-    /** Legacy sanitizeInput(): trim + htmlspecialchars at input time. */
+    /** Normalize text for storage; output encoding belongs to the rendering context. */
     private function sanitizeInput(mixed $data): string
     {
-        return htmlspecialchars(trim((string) $data), ENT_QUOTES, 'UTF-8');
+        return trim((string) $data);
     }
 
     /** Legacy validateConstructionYear(): YYYY -> "YYYY-01-01" or null. */
@@ -96,21 +96,28 @@ final class MosqueFormService
         return ($yearInt >= 1000 && $yearInt <= ($currentYear + 1)) ? $year . '-01-01' : null;
     }
 
-    /** Legacy validatePhone(): digits only, or null. */
+    /** Normalize supported phone formatting while preserving invalid input for validation. */
     private function validatePhone(string $phone): ?string
     {
-        if (empty($phone)) {
+        $phone = trim($phone);
+        if ($phone === '') {
             return null;
         }
+
+        if (!preg_match('/^[0-9\s()+.\-]+$/', $phone)) {
+            return $phone;
+        }
+
         $cleaned = preg_replace('/[^0-9]/', '', $phone);
 
-        return !empty($cleaned) ? $cleaned : null;
+        return $cleaned !== '' ? $cleaned : $phone;
     }
 
-    /** Legacy validateGPS(): normalized float within range, or null. */
-    private function validateGPS(string $coordinate): ?float
+    /** Normalize a decimal coordinate and enforce its axis-specific range. */
+    private function validateCoordinate(string $coordinate, int $maximumAbsoluteValue): float|string|null
     {
-        if (empty($coordinate)) {
+        $coordinate = trim($coordinate);
+        if ($coordinate === '') {
             return null;
         }
 
@@ -119,19 +126,14 @@ final class MosqueFormService
             $coordinate = '-' . $matches[1];
         }
 
-        $coordinate = trim($coordinate);
-
-        // Latitude: -90 to +90, Longitude: -180 to +180
-        if (preg_match('/^-?\d{1,2}\.\d{1,16}$/', $coordinate)
-            || preg_match('/^-?\d{1,3}\.\d{1,16}$/', $coordinate)
-        ) {
+        if (preg_match('/^-?\d{1,3}(?:\.\d{1,16})?$/', $coordinate)) {
             $floatValue = floatval($coordinate);
 
-            if (abs($floatValue) <= 180) {
+            if (abs($floatValue) <= $maximumAbsoluteValue) {
                 return $floatValue;
             }
         }
 
-        return null;
+        return $coordinate;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Config;
 use App\Core\Controller;
 use App\Core\ErrorHandler;
 use App\Core\Request;
@@ -14,6 +15,7 @@ use App\Repositories\GuideImamRepository;
 use App\Repositories\MosqueRepository;
 use App\Services\MosqueSearchService;
 use App\Services\MosqueWriteService;
+use App\Services\AuditLogger;
 use PDOException;
 
 final class MosqueController extends Controller
@@ -26,6 +28,8 @@ final class MosqueController extends Controller
         private readonly MosqueRepository $mosques,
         private readonly GuideImamRepository $guideImams,
         private readonly ErrorHandler $errors,
+        private readonly AuditLogger $audit,
+        private readonly Config $config,
     ) {
         parent::__construct($view, $session);
     }
@@ -71,8 +75,15 @@ final class MosqueController extends Controller
         $result = $this->writer->create((array) $request->post(), $this->files($request));
 
         if ($result['success']) {
+            $this->audit->record('mosque.create', 'success', $request, [
+                'national_code' => $result['formData']['national_code'] ?? null,
+            ]);
             return $this->redirectWithFlash('mosques.php', 'success', 'تمت إضافة المسجد بنجاح');
         }
+
+        $this->audit->record('mosque.create', 'failed', $request, [
+            'validation_errors' => array_keys($result['errors']),
+        ]);
 
         return $this->createForm($result['formData'], $result['errors']);
     }
@@ -104,13 +115,32 @@ final class MosqueController extends Controller
         $result = $this->writer->update($mosque, (array) $request->post(), $this->files($request));
 
         if ($result['success']) {
+            $this->audit->record('mosque.update', 'success', $request, [
+                'registration_number' => $mosque['registration_number'],
+                'national_code' => $result['formData']['national_code'] ?? null,
+            ]);
             return $this->redirectWithFlash('mosques.php', 'success', 'تم تحديث بيانات المسجد بنجاح');
         }
+
+        $this->audit->record('mosque.update', 'failed', $request, [
+            'registration_number' => $mosque['registration_number'],
+            'validation_errors' => array_keys($result['errors']),
+        ]);
 
         return $this->editForm($result['formData'], $result['errors']);
     }
 
     // ── Delete (legacy delete_mosque.php) ─────────────────────────────────
+
+    public function checkNationalCode(Request $request): Response
+    {
+        $nationalCode = trim((string) $request->query('national_code', ''));
+        $registrationNumber = $request->query('registration_number');
+
+        return Response::json([
+            'exists' => $nationalCode !== '' && $this->mosques->nationalCodeExistsExcept($nationalCode, $registrationNumber),
+        ]);
+    }
 
     public function destroy(Request $request): Response
     {
@@ -122,16 +152,25 @@ final class MosqueController extends Controller
                     $this->session->flash('error', 'لم يتم تحديد مسجد للحذف');
                 } else {
                     $count = $this->writer->delete(array_values($selected));
+                    $this->audit->record('mosque.delete', 'success', $request, [
+                        'registration_numbers' => array_values($selected),
+                        'deleted_count' => $count,
+                    ]);
                     $this->session->flash('success', "تم حذف {$count} مسجد(اً) بنجاح");
                 }
             } elseif ($request->post('id') !== null) {
                 $this->writer->delete([$request->post('id')]);
+                $this->audit->record('mosque.delete', 'success', $request, [
+                    'registration_numbers' => [$request->post('id')],
+                    'deleted_count' => 1,
+                ]);
                 $this->session->flash('success', 'تم حذف المسجد بنجاح');
             } else {
                 $this->session->flash('error', 'لم يتم تحديد مسجد للحذف');
             }
         } catch (PDOException $e) {
             $this->errors->log($e);
+            $this->audit->record('mosque.delete', 'failed', $request, ['error_type' => $e::class]);
             $this->session->flash('error', 'حدث خطأ أثناء حذف المسجد. يرجى المحاولة لاحقاً');
         }
 
@@ -160,9 +199,14 @@ final class MosqueController extends Controller
 
         try {
             $count = $this->writer->delete(array_values($selected));
+            $this->audit->record('mosque.delete_bulk', 'success', $request, [
+                'registration_numbers' => array_values($selected),
+                'deleted_count' => $count,
+            ]);
             $this->session->flash('success', "تم حذف {$count} مسجد(اً) بنجاح");
         } catch (PDOException $e) {
             $this->errors->log($e);
+            $this->audit->record('mosque.delete_bulk', 'failed', $request, ['error_type' => $e::class]);
             $this->session->flash('error', 'حدث خطأ أثناء الحذف الجماعي. يرجى المحاولة لاحقاً');
         }
 
@@ -186,6 +230,7 @@ final class MosqueController extends Controller
             'formData' => $formData,
             'errors' => $errors,
             'guideImams' => $this->guideImams->all(),
+            ...$this->formMapData(),
         ]);
     }
 
@@ -199,12 +244,26 @@ final class MosqueController extends Controller
             'formData' => $formData,
             'errors' => $errors,
             'guideImams' => $this->guideImams->all(),
+            ...$this->formMapData(),
         ]);
     }
 
     /**
      * @return array<string, mixed>|null
      */
+    /** @return array{googleMapsApiKey: string, mapDefaults: array{latitude: float, longitude: float, zoom: int}} */
+    private function formMapData(): array
+    {
+        return [
+            'googleMapsApiKey' => (string) $this->config->get('maps.google_api_key', ''),
+            'mapDefaults' => [
+                'latitude' => (float) $this->config->get('maps.default_latitude', 34.6814),
+                'longitude' => (float) $this->config->get('maps.default_longitude', -1.9086),
+                'zoom' => (int) $this->config->get('maps.default_zoom', 9),
+            ],
+        ];
+    }
+
     private function findMosqueOrNull(Request $request): ?array
     {
         $id = $request->query('id');

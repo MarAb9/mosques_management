@@ -1,7 +1,7 @@
 <?php
 /**
  * One mosque table row.
- * Expects: $row, $animationDelay, $isAdmin, $csrfToken
+ * Expects: $row, $animationDelay, $isAdmin, $canEditContent, $canDeleteContent, $csrfToken
  */
 
 $fridayIcon = $row['friday_prayer'] == 'نعم' ? 'fa-check-circle text-success' : 'fa-times-circle text-danger';
@@ -59,6 +59,7 @@ $statusIcon = ($row['status'] == 'مفتوح') ? 'fa-check-circle text-success' 
                 data-mosque="<?= $view->e($row['mosque_name']) ?>"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
+                aria-label="عرض المسجد على الخريطة"
                 title="عرض على الخريطة">
             <i class="fas fa-map-marked-alt"></i>
         </button>
@@ -75,30 +76,36 @@ $statusIcon = ($row['status'] == 'مفتوح') ? 'fa-check-circle text-success' 
                 data-mosque-id="<?= $view->e($row['registration_number']) ?>"
                 data-bs-tooltip="tooltip"
                 data-bs-placement="top"
+                aria-label="عرض تفاصيل المسجد"
                 title="عرض التفاصيل">
                     <i class="fas fa-eye"></i>
                 </a>
 
                 <!-- EDIT/DELETE BUTTONS - ONLY FOR ADMIN -->
-                <?php if ($isAdmin): ?>
+                <?php if ($canEditContent ?? $isAdmin): ?>
         <a href="edit_mosque.php?id=<?= $view->e($row['registration_number']) ?>"
             class="btn btn-sm btn-icon btn-primary rounded-circle"
             data-bs-toggle="tooltip"
             data-bs-placement="top"
+            aria-label="تعديل بيانات المسجد"
             title="تعديل">
                 <i class="fas fa-pen"></i>
             </a>
-        <form method="POST" action="delete_mosque.php" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المسجد؟')">
+        <?php if ($canDeleteContent ?? $isAdmin): ?>
+
+        <form method="POST" action="delete_mosque.php" class="d-inline js-confirm-submit" data-confirm="هل أنت متأكد من حذف هذا المسجد؟">
             <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
             <input type="hidden" name="id" value="<?= $view->e($row['registration_number']) ?>">
             <button type="submit"
                 class="btn btn-sm btn-icon btn-danger rounded-circle"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
+                aria-label="حذف المسجد"
                 title="حذف">
                     <i class="fas fa-trash-alt"></i>
             </button>
         </form>
+                        <?php endif; ?>
                 <?php endif; ?>
             </div>
         </td>

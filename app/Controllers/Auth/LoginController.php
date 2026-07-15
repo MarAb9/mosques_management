@@ -35,9 +35,9 @@ final class LoginController extends Controller
         }
 
         $username = trim((string) $request->post('username', ''));
-        $password = trim((string) $request->post('password', ''));
+        $password = (string) $request->post('password', '');
 
-        if ($this->auth->attempt($username, $password)) {
+        if ($this->auth->attempt($username, $password, $request)) {
             return $this->redirect('index.php');
         }
 
@@ -46,7 +46,7 @@ final class LoginController extends Controller
 
     public function logout(Request $request): Response
     {
-        $this->auth->logout();
+        $this->auth->logout($request);
 
         return $this->redirect('login.php');
     }
@@ -54,6 +54,9 @@ final class LoginController extends Controller
     private function loginPage(?string $error = null): Response
     {
         // Standalone page — not wrapped in the shared layout.
-        return $this->render('auth.login', ['error' => $error], null);
+        return $this->render('auth.login', [
+            'error' => $error,
+            'csrfToken' => $this->session->csrfToken(),
+        ], null);
     }
 }
