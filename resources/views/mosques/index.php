@@ -139,15 +139,14 @@ foreach ($activeFilterLabels as $filterKey => $filterLabel) {
                                 'guide' => 'الإمام المرشد',
                                 'location' => 'الموقع',
                             ] as $column => $label): ?>
-                                <div class="form-check">
+                                <label class="directory-column-option" for="column-<?= $view->e($column) ?>">
                                     <input class="form-check-input js-column-toggle" type="checkbox" value="<?= $view->e($column) ?>" id="column-<?= $view->e($column) ?>">
-                                    <label class="form-check-label" for="column-<?= $view->e($column) ?>"><?= $view->e($label) ?></label>
-                                </div>
+                                    <span><?= $view->e($label) ?></span>
+                                </label>
                             <?php endforeach; ?>
                         </fieldset>
                     </div>
                 </div>
-                <button class="btn btn-sm btn-outline-secondary" type="button" id="densityToggle" aria-pressed="false"><i class="fas fa-table-list me-1" aria-hidden="true"></i>الكثافة</button>
                 <button class="btn btn-sm btn-outline-secondary" type="button" id="quickStatsButton" data-bs-toggle="modal" data-bs-target="#quickStatsModal"><i class="fas fa-chart-pie me-1" aria-hidden="true"></i>الإحصائيات</button>
                 <a class="btn btn-sm btn-link" href="mosques.php">مسح التصفيات</a>
             </div>

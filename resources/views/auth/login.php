@@ -23,7 +23,11 @@
                     </div>
                 </div>
 
-                <h1 id="loginTitle">تسجيل الدخول</h1>
+                <div class="login-intro">
+                    <span>مرحباً بعودتك</span>
+                    <h1 id="loginTitle">تسجيل الدخول</h1>
+                    <p>أدخل بياناتك للوصول إلى بوابة إدارة مساجد إقليم بركان.</p>
+                </div>
 
                 <?php if (!empty($error)): ?>
                     <div class="alert alert-danger" role="alert" aria-live="assertive"><i class="fas fa-circle-exclamation me-2" aria-hidden="true"></i><?= $view->e($error) ?></div>
@@ -44,13 +48,15 @@
                     </div>
                     <button type="submit" name="login" value="1" class="btn btn-primary w-100 login-submit"><i class="fas fa-arrow-left-to-bracket me-2" aria-hidden="true"></i>تسجيل الدخول</button>
                 </form>
-            </div>
-        </section>
 
-        <section class="login-visual" aria-label="بوابة الإدارة">
-            <div class="login-visual__content">
-                <img src="assets/images/institutional/mosque-building-3d.svg" alt="" aria-hidden="true">
-                <span class="login-visual__label">بوابة الإدارة</span>
+                <details class="login-recovery">
+                    <summary><i class="fas fa-key" aria-hidden="true"></i>نسيت كلمة المرور؟</summary>
+                    <div class="login-recovery__content" role="note">
+                        <strong>طلب إعادة تعيين كلمة المرور</strong>
+                        <p>تواصل مع المسؤول العام للنظام لتأكيد هويتك وتعيين كلمة مرور جديدة.</p>
+                        <small>حفاظاً على بيانات المساجد، لا يمكن استرجاع كلمة المرور الحالية أو تغييرها تلقائياً.</small>
+                    </div>
+                </details>
             </div>
         </section>
     </main>

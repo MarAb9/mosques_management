@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
     [communityFilter, statusFilter, fridayFilter, guideImamFilter].forEach(filter => {
         if (filter) {
             filter.addEventListener('change', function() {
-                document.getElementById('filterChangedHint')?.classList.remove('d-none');
+                fetchLiveSearchResults(liveSearch ? liveSearch.value.trim() : '');
             });
         }
     });
@@ -138,22 +138,6 @@ function setupDelegatedActions() {
 
 
 function setupListUxControls() {
-    const body = document.body;
-    const densityToggle = document.getElementById('densityToggle');
-    const compact = localStorage.getItem('mosques.tableDensity') === 'compact';
-    body.classList.toggle('table-density-compact', compact);
-    densityToggle?.setAttribute('aria-pressed', compact ? 'true' : 'false');
-
-    if (densityToggle && densityToggle.dataset.densityInitialized !== 'true') {
-        densityToggle.dataset.densityInitialized = 'true';
-        densityToggle.addEventListener('click', function() {
-            body.classList.toggle('table-density-compact');
-            const isCompact = body.classList.contains('table-density-compact');
-            localStorage.setItem('mosques.tableDensity', isCompact ? 'compact' : 'comfortable');
-            densityToggle.setAttribute('aria-pressed', isCompact ? 'true' : 'false');
-        });
-    }
-
     document.querySelectorAll('.js-column-toggle').forEach(input => {
         if (input.dataset.columnToggleInitialized === 'true') return;
         input.dataset.columnToggleInitialized = 'true';
@@ -443,15 +427,7 @@ function showStatsError(message) {
 function handleSearchSubmit(event) {
     const liveSearch = document.getElementById('liveSearch');
     const searchTerm = liveSearch ? liveSearch.value.trim() : '';
-    const hasFilter = ['community', 'status', 'friday_prayer', 'guide_imam']
-        .some(name => (document.querySelector(`[name="${name}"]`)?.value || '') !== '');
-
-    if (searchTerm.length === 0 || hasFilter) {
-        return true;
-    }
-
     event.preventDefault();
-    showLoadingIndicator();
     fetchLiveSearchResults(searchTerm);
     return false;
 }
@@ -802,6 +778,8 @@ function fetchLiveSearchResults(searchTerm, page = 1) {
         if (data.success) {
             updateTableWithResults(data.data);
             updatePaginationForLiveSearch(data.total, data.page, data.pages);
+            updateDirectoryResultSummary(data.total);
+            syncDirectoryQueryState(searchTerm, data.page);
         } else {
             showSearchError(data.message || 'حدث خطأ أثناء البحث');
         }
@@ -810,6 +788,32 @@ function fetchLiveSearchResults(searchTerm, page = 1) {
         console.error('Error during live search:', error);
         showSearchError('حدث خطأ في الاتصال بالخادم');
     });
+}
+
+function updateDirectoryResultSummary(total) {
+    const summary = document.querySelector('.directory-result-summary > strong');
+    if (!summary) return;
+    const count = Number.isFinite(Number(total)) ? Number(total) : 0;
+    summary.textContent = `${new Intl.NumberFormat('ar-MA').format(count)} نتيجة`;
+}
+
+function syncDirectoryQueryState(searchTerm, page = 1) {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set('query', searchTerm);
+
+    [
+        ['community', 'community'],
+        ['status', 'status'],
+        ['friday_prayer', 'friday_prayer'],
+        ['guide_imam', 'guide_imam'],
+    ].forEach(([name, key]) => {
+        const value = document.querySelector(`[name="${name}"]`)?.value || '';
+        if (value) params.set(key, value);
+    });
+
+    if (Number(page) > 1) params.set('page', String(page));
+    const query = params.toString();
+    history.replaceState(null, '', `mosques.php${query ? `?${query}` : ''}`);
 }
 
 function showLoadingIndicator() {

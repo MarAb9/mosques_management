@@ -3,6 +3,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const mode = process.argv[2] === 'before' ? 'before' : 'after';
+const scope = process.env.UI_AUDIT_SCOPE === 'login-directory' ? 'login-directory' : 'full';
 const baseUrl = (process.env.UI_AUDIT_BASE_URL || 'http://127.0.0.1:8085').replace(/\/$/, '');
 const chromePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const port = Number(process.env.UI_AUDIT_DEBUG_PORT || 9333);
@@ -299,7 +300,7 @@ async function interaction(label, width, setup) {
     return { label, width, state, console: events.console, network: events.network, screenshot: evidence };
 }
 
-const results = { mode, baseUrl, generatedAt: new Date().toISOString(), pages: [], interactions: [] };
+const results = { mode, scope, baseUrl, generatedAt: new Date().toISOString(), pages: [], interactions: [] };
 
 try {
     await viewport(1440);
@@ -312,7 +313,66 @@ try {
         results.pages.push(await inspect('mosques', 'mosques.php', 1440, { fullPage: true }));
         results.pages.push(await inspect('mosques-mobile', 'mosques.php', 390));
     } else {
+        if (scope === 'login-directory') {
+            results.pages.push(await inspect('login-mobile', 'login.php', 390));
+            const recovery = await interaction('login-recovery-open', 1440, async () => {
+                await evaluate(`(() => { const details = document.querySelector('.login-recovery'); details.open = true; return true; })()`);
+            });
+            recovery.recoveryState = await evaluate(`({
+                open: document.querySelector('.login-recovery')?.open === true,
+                heading: document.querySelector('.login-recovery__content strong')?.textContent?.trim() || '',
+            })`);
+            results.interactions.push(recovery);
+        }
+
         await submitLogin();
+        if (scope === 'login-directory') {
+            results.pages.push(await inspect('mosques', 'mosques.php', 1440, { fullPage: true }));
+            results.pages.push(await inspect('mosques-mobile', 'mosques.php', 390));
+
+            await viewport(1440);
+            await navigate('mosques.php');
+            const columns = await interaction('mosques-columns-open', 1440, async () => {
+                await evaluate(`bootstrap.Dropdown.getOrCreateInstance(document.querySelector('#columnsDropdown')).show()`);
+            });
+            columns.columnOptions = await evaluate(`[...document.querySelectorAll('.directory-column-option')].map((option) => {
+                const input = option.querySelector('input');
+                const label = option.querySelector('span');
+                const inputRect = input.getBoundingClientRect();
+                const labelRect = label.getBoundingClientRect();
+                return {
+                    text: label.textContent.trim(),
+                    inputRight: Math.round(inputRect.right),
+                    labelRight: Math.round(labelRect.right),
+                    overlap: !(inputRect.right <= labelRect.left || inputRect.left >= labelRect.right),
+                };
+            })`);
+            results.interactions.push(columns);
+
+            await navigate('mosques.php');
+            const liveFilter = await interaction('mosques-live-filter', 1440, async () => {
+                await evaluate(`(() => {
+                    const filter = document.querySelector('#communityFilter');
+                    const option = [...filter.options].find((item) => item.value);
+                    filter.value = option.value;
+                    filter.dispatchEvent(new Event('change', { bubbles: true }));
+                    return option.value;
+                })()`);
+                const deadline = Date.now() + 10000;
+                while (Date.now() < deadline) {
+                    const ready = await evaluate(`location.search.includes('community=') && document.querySelector('.directory-table tbody')?.getAttribute('aria-busy') !== 'true'`);
+                    if (ready) break;
+                    await delay(100);
+                }
+            });
+            liveFilter.filterState = await evaluate(`({
+                selected: document.querySelector('#communityFilter')?.value || '',
+                resultSummary: document.querySelector('.directory-result-summary > strong')?.textContent?.trim() || '',
+                url: location.pathname + location.search,
+                densityControlExists: document.querySelector('#densityToggle') !== null,
+            })`);
+            results.interactions.push(liveFilter);
+        } else {
         const directoryEditHref = await (async () => {
             await navigate('mosques.php');
             return evaluate(`document.querySelector('a[href^="edit_mosque.php?id="]')?.getAttribute('href') || 'edit_mosque.php?id=1'`);
@@ -373,6 +433,7 @@ try {
             await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
             await delay(250);
         }));
+        }
     }
 } finally {
     await writeFile(auditPath, JSON.stringify(results, null, 2));
