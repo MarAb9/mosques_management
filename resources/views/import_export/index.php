@@ -4,7 +4,7 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
 <div class="import-workspace">
     <?= $view->partial('components.page_header', [
         'kicker' => 'نقل البيانات الموثوق',
-        'title' => 'الاستيراد والتصدير',
+        'title' => 'نظام استيراد وتصدير بيانات المساجد',
         'subtitle' => 'راجع ملف Excel قبل إدخاله، صدّر التقارير المطلوبة، واحتفظ بصيغ Excel وWord المعتمدة دون تغيير.',
         'icon' => 'fa-arrow-right-arrow-left',
         'actionsHtml' => $actions,
@@ -16,7 +16,7 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
     <div class="row g-4">
         <div class="col-xl-7">
             <section class="data-panel h-100" aria-labelledby="importTitle">
-                <div class="data-panel__header"><div><span class="page-kicker">المرحلة الأولى</span><h2 id="importTitle">استيراد بيانات المساجد</h2></div><span class="status-badge text-info bg-info-subtle">Excel فقط</span></div>
+                <div class="data-panel__header"><div><span class="page-kicker">المرحلة الأولى</span><h2 id="importTitle">استيراد البيانات</h2></div><span class="status-badge text-info bg-info-subtle">Excel فقط</span></div>
                 <div class="data-panel__body">
                     <?php if ($canImport ?? $isAdmin): ?>
                     <form method="POST" action="" enctype="multipart/form-data" id="importPreviewForm">
