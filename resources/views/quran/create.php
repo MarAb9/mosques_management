@@ -9,7 +9,7 @@
 <div class="container-fluid py-4">
     <?php $formActions = '<img src="assets/images/institutional/quran-book-3d.svg" width="64" height="64" alt="" aria-hidden="true">'
         . '<a href="quran_mosques.php" class="btn btn-outline-secondary align-self-center"><i class="fas fa-arrow-left me-1" aria-hidden="true"></i>رجوع</a>'; ?>
-    <?= $view->partial('components.page_header', ['title' => 'إضافة برنامج قرآني', 'actionsHtml' => $formActions]) ?>
+    <?= $view->partial('components.page_header', ['title' => 'إضافة مسجد تحفيظ', 'actionsHtml' => $formActions]) ?>
     <?php if (!empty($errorMessage)): ?>
         <div class="alert alert-danger" role="alert"><?= $view->e($errorMessage) ?></div>
     <?php endif; ?>

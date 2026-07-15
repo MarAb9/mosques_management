@@ -47,11 +47,10 @@
             </div>
         </section>
 
-        <section class="login-visual" aria-label="رسم توضيحي لمسجد">
+        <section class="login-visual" aria-label="بوابة الإدارة">
             <div class="login-visual__content">
                 <img src="assets/images/institutional/mosque-building-3d.svg" alt="" aria-hidden="true">
-                <h2>نظام إدارة مساجد إقليم بركان</h2>
-                <p>المجلس العلمي المحلي بإقليم بركان</p>
+                <span class="login-visual__label">بوابة الإدارة</span>
             </div>
         </section>
     </main>

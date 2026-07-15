@@ -38,7 +38,7 @@
                                     </span>
                                     <input type="text" id="globalSearch" class="form-control border-start-0 ps-0"
                                            placeholder="ابحث في المساجد، العناوين، الأئمة...">
-                                    <button class="btn btn-outline-secondary border-start-0" type="button" id="clearGlobalSearch">
+                                    <button class="btn btn-outline-secondary border-start-0" type="button" id="clearGlobalSearch" aria-label="مسح البحث" title="مسح البحث">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -136,7 +136,7 @@
                             <i class="fas fa-expand-alt me-2"></i>عرض الكل
                         </button>
                         <div class="header-actions">
-                            <button id="refreshMap" class="btn btn-light btn-icon">
+                            <button id="refreshMap" class="btn btn-light btn-icon" aria-label="تحديث الخريطة" title="تحديث الخريطة">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>

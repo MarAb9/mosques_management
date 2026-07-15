@@ -62,33 +62,7 @@ foreach ($activeFilterLabels as $filterKey => $filterLabel) {
                     <button id="clearSearch" class="btn btn-outline-secondary <?= empty($queryParams['query'] ?? '') ? 'd-none' : '' ?>" type="button" aria-label="مسح البحث"><i class="fas fa-xmark" aria-hidden="true"></i></button>
                     <button id="searchButton" class="btn btn-primary" type="submit"><span>بحث</span></button>
                 </div>
-
-                <div class="directory-toolbar__actions">
-                    <button class="btn btn-outline-primary directory-filter-toggle d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#directoryFilters" aria-controls="directoryFilters" aria-expanded="false"><i class="fas fa-filter me-1" aria-hidden="true"></i>التصفية</button>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="columnsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bs-boundary="viewport" aria-expanded="false"><i class="fas fa-table-columns me-1" aria-hidden="true"></i>الأعمدة</button>
-                        <div class="dropdown-menu dropdown-menu-end directory-column-menu" aria-labelledby="columnsDropdown">
-                            <fieldset>
-                                <legend class="visually-hidden">الأعمدة الاختيارية</legend>
-                                <?php foreach ([
-                                    'registration' => 'رقم التسجيل',
-                                    'friday' => 'صلاة الجمعة',
-                                    'construction' => 'سنة البناء',
-                                    'guide' => 'الإمام المرشد',
-                                    'location' => 'الموقع',
-                                ] as $column => $label): ?>
-                                    <div class="form-check">
-                                        <input class="form-check-input js-column-toggle" type="checkbox" value="<?= $view->e($column) ?>" id="column-<?= $view->e($column) ?>">
-                                        <label class="form-check-label" for="column-<?= $view->e($column) ?>"><?= $view->e($label) ?></label>
-                                    </div>
-                                <?php endforeach; ?>
-                            </fieldset>
-                        </div>
-                    </div>
-                    <button class="btn btn-outline-primary" type="button" id="densityToggle" aria-pressed="false"><i class="fas fa-table-list me-1" aria-hidden="true"></i>الكثافة</button>
-                    <a class="btn btn-outline-secondary" href="mosques.php"><i class="fas fa-rotate-left me-1" aria-hidden="true"></i>مسح</a>
-                    <button class="btn btn-outline-primary" type="button" id="quickStatsButton" data-bs-toggle="modal" data-bs-target="#quickStatsModal"><i class="fas fa-chart-pie me-1" aria-hidden="true"></i>الإحصائيات</button>
-                </div>
+                <button class="btn btn-outline-primary directory-filter-toggle d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#directoryFilters" aria-controls="directoryFilters" aria-expanded="false"><i class="fas fa-filter me-1" aria-hidden="true"></i>التصفية</button>
             </div>
 
             <div class="collapse d-md-block directory-filters" id="directoryFilters">
@@ -143,12 +117,41 @@ foreach ($activeFilterLabels as $filterKey => $filterLabel) {
             <?php endif; ?>
         </form>
 
-        <?php if ($canDelete): ?>
-            <div class="bulk-selection-bar" id="bulkSelectionBar" hidden>
-                <output id="selectedCountOutput" aria-live="polite"><span id="selectedCount">0</span> محدد</output>
-                <button id="deleteSelected" class="btn btn-sm btn-danger" type="button" disabled><i class="fas fa-trash me-1" aria-hidden="true"></i>حذف</button>
+        <div class="directory-list-toolbar">
+            <div class="directory-result-summary">
+                <strong><?= number_format((int) $total) ?> نتيجة</strong>
+                <?php if ($canDelete): ?>
+                    <div class="bulk-selection-bar" id="bulkSelectionBar" hidden>
+                        <output id="selectedCountOutput" aria-live="polite"><span id="selectedCount">0</span> محدد</output>
+                        <button id="deleteSelected" class="btn btn-sm btn-danger" type="button" disabled><i class="fas fa-trash me-1" aria-hidden="true"></i>حذف</button>
+                    </div>
+                <?php endif; ?>
             </div>
-        <?php endif; ?>
+            <div class="directory-table-tools">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="columnsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-reference="parent" aria-expanded="false"><i class="fas fa-table-columns me-1" aria-hidden="true"></i>الأعمدة</button>
+                    <div class="dropdown-menu dropdown-menu-end directory-column-menu" aria-labelledby="columnsDropdown">
+                        <fieldset>
+                            <legend class="visually-hidden">الأعمدة الاختيارية</legend>
+                            <?php foreach ([
+                                'friday' => 'صلاة الجمعة',
+                                'construction' => 'سنة البناء',
+                                'guide' => 'الإمام المرشد',
+                                'location' => 'الموقع',
+                            ] as $column => $label): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input js-column-toggle" type="checkbox" value="<?= $view->e($column) ?>" id="column-<?= $view->e($column) ?>">
+                                    <label class="form-check-label" for="column-<?= $view->e($column) ?>"><?= $view->e($label) ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </fieldset>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" type="button" id="densityToggle" aria-pressed="false"><i class="fas fa-table-list me-1" aria-hidden="true"></i>الكثافة</button>
+                <button class="btn btn-sm btn-outline-secondary" type="button" id="quickStatsButton" data-bs-toggle="modal" data-bs-target="#quickStatsModal"><i class="fas fa-chart-pie me-1" aria-hidden="true"></i>الإحصائيات</button>
+                <a class="btn btn-sm btn-link" href="mosques.php">مسح التصفيات</a>
+            </div>
+        </div>
 
         <div class="directory-results">
             <div class="table-responsive mosque-table-wrapper">
@@ -156,7 +159,7 @@ foreach ($activeFilterLabels as $filterKey => $filterLabel) {
                     <thead>
                         <tr>
                             <?php if ($canDelete): ?><th scope="col" data-column="selection"><label class="visually-hidden" for="selectAll">تحديد كل المساجد</label><input type="checkbox" id="selectAll" class="form-check-input"></th><?php endif; ?>
-                            <th scope="col" data-column="registration" class="column-hidden"><?= $sortableHeader('رقم التسجيل', 'registration_number') ?></th>
+                            <th scope="col" data-column="registration"><?= $sortableHeader('رقم التسجيل', 'registration_number') ?></th>
                             <th scope="col" data-column="name"><?= $sortableHeader('اسم المسجد', 'mosque_name') ?></th>
                             <th scope="col" data-column="address">العنوان</th>
                             <th scope="col" data-column="national"><?= $sortableHeader('الرمز الوطني', 'national_code') ?></th>
@@ -191,14 +194,16 @@ foreach ($activeFilterLabels as $filterKey => $filterLabel) {
             <div class="mosque-mobile-cards">
                 <?php foreach ($mosques as $row): ?>
                     <article class="mosque-mobile-card">
-                        <div class="d-flex justify-content-between gap-2">
+                        <div class="mosque-mobile-card__header">
                             <div><h2><?= $view->e($row['mosque_name']) ?></h2><p><?= $view->e($row['address'] ?: 'العنوان غير محدد') ?></p></div>
-                            <span class="badge bg-light text-dark align-self-start"><?= $view->e($row['national_code']) ?></span>
+                            <div class="mosque-mobile-card__badges">
+                                <span class="badge bg-light text-dark"><?= $view->e($row['national_code']) ?></span>
+                                <span class="status-badge <?= ($row['status'] ?? '') === 'مفتوح' ? 'text-success bg-success-subtle' : ((($row['status'] ?? '') === 'مغلق') ? 'text-danger bg-danger-subtle' : 'text-warning bg-warning-subtle') ?>"><?= $view->e($row['status'] ?: 'غير محدد') ?></span>
+                            </div>
                         </div>
                         <dl>
                             <div><dt>الجماعة</dt><dd><?= $view->e($row['community'] ?: '—') ?></dd></div>
                             <div><dt>الإمام</dt><dd><?= $view->e($row['imam_name'] ?: '—') ?></dd></div>
-                            <div><dt>الوضعية</dt><dd><?= $view->e($row['status'] ?: '—') ?></dd></div>
                         </dl>
                         <div class="record-actions">
                             <button type="button" class="btn btn-sm btn-outline-primary view-mosque-btn" data-bs-toggle="modal" data-bs-target="#mosqueDetailsModal" data-mosque-id="<?= $view->e($row['registration_number']) ?>"><i class="fas fa-eye me-1" aria-hidden="true"></i>عرض</button>
@@ -234,10 +239,10 @@ foreach ($activeFilterLabels as $filterKey => $filterLabel) {
                 </div>
             </div>
             <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>إغلاق
                 </button>
-                <button type="button" class="btn btn-primary rounded-pill js-print-mosque-details">
+                <button type="button" class="btn btn-primary js-print-mosque-details">
                     <i class="fas fa-print me-2"></i>طباعة التفاصيل
                 </button>
             </div>
@@ -286,7 +291,7 @@ foreach ($activeFilterLabels as $filterKey => $filterLabel) {
                 </div>
             </div>
             <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>إغلاق
                 </button>
             </div>

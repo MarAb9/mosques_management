@@ -839,6 +839,7 @@ function updateTableWithResults(results) {
                     <i class="fas fa-search me-2" aria-hidden="true"></i>لا توجد نتائج مطابقة لبحثك
                 </td>
             </tr>`;
+        updateMobileCardsWithResults([]);
         updateBulkSelectionUI();
         return;
     }
@@ -913,11 +914,58 @@ function updateTableWithResults(results) {
     });
 
     tbody.innerHTML = html;
+    updateMobileCardsWithResults(results);
     applySavedColumnVisibility();
     initializeTooltips();
     setupMosqueDetailsModal();
     setupBulkSelection();
     setupMapButtons();
+}
+
+function updateMobileCardsWithResults(results) {
+    const container = document.querySelector('.mosque-mobile-cards');
+    if (!container) return;
+    if (!Array.isArray(results) || results.length === 0) {
+        container.innerHTML = '<div class="mobile-empty-state"><i class="fas fa-search" aria-hidden="true"></i><span>لا توجد نتائج مطابقة</span></div>';
+        return;
+    }
+
+    const canEdit = document.body.dataset.canEdit === 'true';
+    const canDelete = document.body.dataset.canDelete === 'true';
+    const csrfToken = escapeHtml(document.querySelector('meta[name="csrf-token"]')?.content || '');
+    container.innerHTML = results.map((row) => {
+        const registrationValue = String(row.registration_number ?? '');
+        const registrationNumber = escapeHtml(registrationValue);
+        const registrationQuery = encodeURIComponent(registrationValue);
+        const mosqueName = escapeHtml(row.mosque_name || '—');
+        const nationalCode = escapeHtml(row.national_code || '—');
+        const address = escapeHtml(row.address || 'العنوان غير محدد');
+        const community = escapeHtml(row.community || '—');
+        const imamName = escapeHtml(row.imam_name || '—');
+        const status = escapeHtml(row.status || 'غير محدد');
+        const statusClass = row.status === 'مفتوح'
+            ? 'text-success bg-success-subtle'
+            : (row.status === 'مغلق' ? 'text-danger bg-danger-subtle' : 'text-warning bg-warning-subtle');
+        const editAction = canEdit ? `<a class="btn btn-sm btn-primary" href="edit_mosque.php?id=${registrationQuery}"><i class="fas fa-pen me-1" aria-hidden="true"></i>تعديل</a>` : '';
+        const deleteAction = canDelete ? `
+            <form method="POST" action="delete_mosque.php" class="js-confirm-submit" data-confirm="هل أنت متأكد من حذف هذا المسجد؟">
+                <input type="hidden" name="csrf_token" value="${csrfToken}">
+                <input type="hidden" name="id" value="${registrationNumber}">
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash me-1" aria-hidden="true"></i>حذف</button>
+            </form>` : '';
+
+        return `<article class="mosque-mobile-card">
+            <div class="mosque-mobile-card__header">
+                <div><h2>${mosqueName}</h2><p>${address}</p></div>
+                <div class="mosque-mobile-card__badges"><span class="badge bg-light text-dark">${nationalCode}</span><span class="status-badge ${statusClass}">${status}</span></div>
+            </div>
+            <dl><div><dt>الجماعة</dt><dd>${community}</dd></div><div><dt>الإمام</dt><dd>${imamName}</dd></div></dl>
+            <div class="record-actions">
+                <button type="button" class="btn btn-sm btn-outline-primary view-mosque-btn" data-bs-toggle="modal" data-bs-target="#mosqueDetailsModal" data-mosque-id="${registrationNumber}"><i class="fas fa-eye me-1" aria-hidden="true"></i>عرض</button>
+                ${editAction}${deleteAction}
+            </div>
+        </article>`;
+    }).join('');
 }
 
 function showSearchError(message) {

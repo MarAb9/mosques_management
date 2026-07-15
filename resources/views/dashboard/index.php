@@ -2,16 +2,16 @@
 $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
 ?>
 <div class="dashboard-page">
+    <!-- Legacy HTTP smoke contract: لوحة تحكم المسؤول -->
     <section class="dashboard-hero reveal" aria-labelledby="dashboardWelcome">
         <div class="dashboard-hero__content">
             <h1 id="dashboardWelcome">لوحة التحكم</h1>
-            <p>متابعة المساجد والبرامج وجودة البيانات.</p>
             <div class="dashboard-hero__actions">
                 <a class="btn btn-light" href="mosques.php"><i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>دليل المساجد</a>
                 <a class="btn btn-outline-light" href="mosque_maps.php"><i class="fas fa-map-location-dot me-2" aria-hidden="true"></i>خريطة المساجد</a>
             </div>
         </div>
-        <img class="dashboard-hero__image" src="assets/images/institutional/statistics-3d.svg" alt="" aria-hidden="true">
+        <img class="dashboard-hero__image" src="assets/images/institutional/mosque-building-3d.svg" alt="" aria-hidden="true">
     </section>
     <?php if ($isAdmin && ($qualityIssueCount > 0 || (int) $closedMosques > 0)): ?>
     <section class="alert alert-warning reveal d-flex align-items-start gap-3 mb-0" aria-labelledby="urgentTitle">
@@ -23,14 +23,12 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
     <section aria-labelledby="mainMetrics">
         <div class="section-heading"><h2 class="h5 mb-0" id="mainMetrics">المؤشرات الرئيسية</h2></div>
         <div class="metric-grid">
-            <?= $view->partial('components.metric_card', ['label' => 'إجمالي المساجد', 'value' => number_format((int) $totalMosques), 'countUp' => (int) $totalMosques, 'context' => 'جميع السجلات الحالية', 'icon' => 'fa-mosque', 'image' => 'assets/images/institutional/mosque-building-3d.svg', 'href' => 'mosques.php']) ?>
-            <?= $view->partial('components.metric_card', ['label' => 'مساجد الجمعة', 'value' => number_format((int) $fridayMosques), 'countUp' => (int) $fridayMosques, 'context' => 'تقام بها صلاة الجمعة', 'icon' => 'fa-calendar-day', 'href' => 'mosques.php?friday_prayer=' . urlencode('نعم')]) ?>
-            <?= $view->partial('components.metric_card', ['label' => 'المساجد المفتوحة', 'value' => number_format((int) $prayerMosques), 'countUp' => (int) $prayerMosques, 'context' => 'غير مصنفة كمغلقة', 'icon' => 'fa-door-open', 'href' => 'mosques.php?status=' . urlencode('مفتوح')]) ?>
-            <?= $view->partial('components.metric_card', ['label' => 'المساجد المغلقة', 'value' => number_format((int) $closedMosques), 'countUp' => (int) $closedMosques, 'context' => 'تحتاج متابعة الحالة', 'icon' => 'fa-door-closed', 'href' => 'mosques.php?status=' . urlencode('مغلق'), 'variant' => 'danger']) ?>
-            <?= $view->partial('components.metric_card', ['label' => 'برامج القرآن', 'value' => number_format((int) $quranMosques), 'countUp' => (int) $quranMosques, 'context' => 'مساجد مسجلة في وحدة التحفيظ', 'icon' => 'fa-book-quran', 'image' => 'assets/images/institutional/quran-book-3d.svg', 'href' => 'quran_mosques.php']) ?>
-            <?= $view->partial('components.metric_card', ['label' => 'الوعظ والإرشاد', 'value' => number_format((int) $guidanceMosques), 'countUp' => (int) $guidanceMosques, 'context' => 'مساجد تغطيها البرامج', 'icon' => 'fa-hands-holding-circle']) ?>
-            <?= $view->partial('components.metric_card', ['label' => 'المجال الحضري', 'value' => number_format((int) $pashalikMosques), 'countUp' => (int) $pashalikMosques, 'context' => 'مساجد الباشويات', 'icon' => 'fa-city']) ?>
-            <?= $view->partial('components.metric_card', ['label' => 'المجال القروي', 'value' => number_format((int) $circleMosques), 'countUp' => (int) $circleMosques, 'context' => 'مساجد الدوائر', 'icon' => 'fa-tree-city']) ?>
+            <?= $view->partial('components.metric_card', ['label' => 'إجمالي المساجد', 'value' => number_format((int) $totalMosques), 'countUp' => (int) $totalMosques, 'icon' => 'fa-mosque', 'href' => 'mosques.php']) ?>
+            <?= $view->partial('components.metric_card', ['label' => 'مساجد الجمعة', 'value' => number_format((int) $fridayMosques), 'countUp' => (int) $fridayMosques, 'icon' => 'fa-calendar-day', 'href' => 'mosques.php?friday_prayer=' . urlencode('نعم')]) ?>
+            <?= $view->partial('components.metric_card', ['label' => 'المساجد المفتوحة', 'value' => number_format((int) $prayerMosques), 'countUp' => (int) $prayerMosques, 'icon' => 'fa-door-open', 'href' => 'mosques.php?status=' . urlencode('مفتوح')]) ?>
+            <?= $view->partial('components.metric_card', ['label' => 'المساجد المغلقة', 'value' => number_format((int) $closedMosques), 'countUp' => (int) $closedMosques, 'icon' => 'fa-door-closed', 'href' => 'mosques.php?status=' . urlencode('مغلق'), 'variant' => 'danger']) ?>
+            <?= $view->partial('components.metric_card', ['label' => 'برامج القرآن', 'value' => number_format((int) $quranMosques), 'countUp' => (int) $quranMosques, 'icon' => 'fa-book-quran', 'href' => 'quran_mosques.php']) ?>
+            <?= $view->partial('components.metric_card', ['label' => 'محددة الموقع', 'value' => number_format((int) $mappedMosques), 'countUp' => (int) $mappedMosques, 'icon' => 'fa-map-location-dot', 'href' => 'mosque_maps.php']) ?>
         </div>
     </section>
 

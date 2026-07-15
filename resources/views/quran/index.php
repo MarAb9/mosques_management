@@ -23,7 +23,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
         . $title . '<i class="fas fa-chevron-' . $iconDirection . ' ms-1" aria-hidden="true"></i></a>';
 };
 
-$quranActions = '<img src="assets/images/institutional/quran-book-3d.svg" width="64" height="64" alt="" aria-hidden="true" loading="eager">'
+$quranActions = '<img class="quran-header-illustration" src="assets/images/institutional/quran-book-3d.svg" width="56" height="56" alt="" aria-hidden="true" loading="eager">'
     . '<span class="badge bg-light text-dark align-self-center">' . number_format($total) . ' سجل</span>';
 if ($isAdmin) {
     $quranActions .= '<a class="btn btn-primary align-self-center" href="add_quran_mosque.php"><i class="fas fa-plus me-2" aria-hidden="true"></i>إضافة مسجد</a>';
@@ -32,7 +32,8 @@ if ($isAdmin) {
 
 <div class="directory-page-header">
     <?= $view->partial('components.page_header', [
-        'title' => 'مساجد التحفيظ',
+        'title' => 'قائمة مساجد التحفيظ',
+        'subtitle' => 'إجمالي مساجد التحفيظ: ' . number_format($total),
         'actionsHtml' => $quranActions,
     ]) ?>
 </div>

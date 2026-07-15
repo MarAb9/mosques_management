@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
-                <div><h1 class="h4 mb-0"><i class="fas fa-pen-to-square me-2 text-muted" aria-hidden="true"></i>تعديل مسجد</h1></div><img class="page-title-box__image" src="assets/images/institutional/mosque-building-3d.svg" alt="" aria-hidden="true">
+                <div><h1 class="h4 mb-0"><i class="fas fa-pen-to-square me-2 text-muted" aria-hidden="true"></i>تعديل بيانات المسجد</h1></div><img class="page-title-box__image" src="assets/images/institutional/mosque-building-3d.svg" alt="" aria-hidden="true">
             </div>
         </div>
     </div>

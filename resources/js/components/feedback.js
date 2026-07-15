@@ -1,9 +1,11 @@
 export function initConfirmations() {
     const logoutButton = document.getElementById('logoutButton');
     const logoutForm = document.getElementById('logoutForm');
+    const topbarLogoutButton = document.getElementById('topbarLogoutButton');
+    const topbarLogoutForm = document.getElementById('topbarLogoutForm');
 
-    logoutButton?.addEventListener('click', async () => {
-        if (!logoutForm) return;
+    const confirmLogout = async (form) => {
+        if (!form) return;
         if (window.Swal) {
             const result = await window.Swal.fire({
                 title: 'تأكيد تسجيل الخروج',
@@ -16,11 +18,14 @@ export function initConfirmations() {
                 confirmButtonColor: '#a83e3e',
                 cancelButtonColor: '#51605a',
             });
-            if (result.isConfirmed) logoutForm.submit();
+            if (result.isConfirmed) form.submit();
         } else if (window.confirm('هل تريد تسجيل الخروج؟')) {
-            logoutForm.submit();
+            form.submit();
         }
-    });
+    };
+
+    logoutButton?.addEventListener('click', () => confirmLogout(logoutForm));
+    topbarLogoutButton?.addEventListener('click', () => confirmLogout(topbarLogoutForm));
 
     document.addEventListener('submit', (event) => {
         const form = event.target.closest('.js-confirm-submit');

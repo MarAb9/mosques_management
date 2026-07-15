@@ -1,71 +1,38 @@
-body[data-page="quran_mosques"],
-body[data-page="add_quran_mosque"],
-body[data-page="edit_quran_mosque"] {
-    --quran-accent: #9a7134;
-    --quran-accent-strong: #715020;
-    --quran-surface: #fbf6e9;
-}
-
+body[data-page="quran_mosques"], body[data-page="add_quran_mosque"], body[data-page="edit_quran_mosque"] { --quran-accent: #8b672f; --quran-surface: #fbf8f1; }
 body[data-page="quran_mosques"] .bg-primary-gradient,
 body[data-page="quran_mosques"] .bg-success-gradient,
-body[data-page="quran_mosques"] .bg-info-gradient {
-    color: var(--color-text-primary) !important;
-    background: linear-gradient(145deg, #fff, var(--quran-surface)) !important;
-    border: 1px solid rgba(199, 161, 90, .34) !important;
-}
-
-body[data-page="quran_mosques"] .bg-warning-gradient {
-    color: #fff !important;
-    background: linear-gradient(135deg, #7c5a2a, #aa7c3b) !important;
-}
-
-body[data-page="quran_mosques"] .row.mb-4.g-4 > [class*="col-"] .card i {
-    color: var(--quran-accent) !important;
-}
-
-body[data-page="quran_mosques"] .row.mb-4.g-4 > [class*="col-"] .bg-warning-gradient i {
-    color: var(--color-brass-soft) !important;
-}
-
+body[data-page="quran_mosques"] .bg-info-gradient { color: var(--color-text-primary) !important; background: #fff !important; border: 1px solid var(--color-border-soft) !important; }
+body[data-page="quran_mosques"] .bg-warning-gradient { color: #fff !important; background: var(--color-warning) !important; }
+body[data-page="quran_mosques"] .row.mb-4.g-4 > [class*="col-"] .card i { color: var(--quran-accent) !important; }
 body[data-page="quran_mosques"] .glass-effect > .card-header,
 body[data-page="add_quran_mosque"] .card > .card-header,
-body[data-page="edit_quran_mosque"] .card > .card-header {
-    color: var(--color-text-primary);
-    background: linear-gradient(90deg, rgba(248, 240, 217, .9), rgba(255, 255, 255, .75)) !important;
-    border-color: rgba(199, 161, 90, .25) !important;
-}
-
+body[data-page="edit_quran_mosque"] .card > .card-header { color: var(--color-text-primary); background: var(--color-surface-base) !important; border-color: var(--color-border-soft) !important; }
 body[data-page="add_quran_mosque"] .card > .card-header.text-white,
-body[data-page="edit_quran_mosque"] .card > .card-header.text-white {
-    color: var(--color-brand-950) !important;
-}
-
-.step-progress { position: relative; margin-block-end: 2rem; }
+body[data-page="edit_quran_mosque"] .card > .card-header.text-white { color: var(--color-brand-950) !important; }
+.step-progress { position: relative; margin-block-end: 1.5rem; }
 .steps { position: relative; display: flex; justify-content: space-between; padding-inline: 2rem; }
-.steps::before { content: ""; position: absolute; inset-block-start: 1.55rem; inset-inline: 3.1rem; z-index: 0; height: 2px; background: var(--color-border-soft); }
+.steps::before { content: ""; position: absolute; inset-block-start: 1.25rem; inset-inline: 3rem; z-index: 0; height: 2px; background: var(--color-border-soft); }
 .step { position: relative; z-index: 1; flex: 1; color: var(--color-text-muted); text-align: center; }
-.step-icon { display: grid; width: 3.1rem; height: 3.1rem; place-items: center; margin-inline: auto; color: var(--color-text-secondary); background: #eee9dc; border: 3px solid #fff; border-radius: 50%; box-shadow: var(--shadow-soft); transition: transform var(--duration-normal), background var(--duration-normal), color var(--duration-normal); }
-.step.active .step-icon, .step.completed .step-icon { color: #fff; background: linear-gradient(135deg, var(--quran-accent), var(--quran-accent-strong)); }
-.step.active .step-icon { transform: scale(1.05); }
-.step-label { display: block; margin-block-start: .45rem; font-size: .72rem; font-weight: 800; }
+.step-icon { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; margin-inline: auto; color: var(--color-text-secondary); background: #e9eeeb; border: 2px solid #fff; border-radius: 50%; transition: background-color var(--duration-normal), color var(--duration-normal); }
+.step.active .step-icon, .step.completed .step-icon { color: #fff; background: var(--color-brand-700); }
+.step-label { display: block; margin-block-start: .375rem; font-size: .6875rem; font-weight: 800; }
 .step-content { display: none; }
-.step-content.active { display: block; animation: quran-reveal var(--duration-slow) var(--ease-standard); }
-.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .75rem; margin-block: 1.25rem; }
-.feature-checkbox:checked + label { color: #fff; background: var(--quran-accent-strong); border-color: var(--quran-accent-strong); box-shadow: 0 9px 20px rgba(113, 80, 32, .18); }
-.mosque-option { padding: .4rem; }
+.step-content.active { display: block; animation: quran-reveal var(--duration-normal) var(--ease-standard); }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .75rem; margin-block: 1rem; }
+.feature-checkbox:checked + label { color: #fff; background: var(--color-brand-700); border-color: var(--color-brand-700); }
+.mosque-option { padding: .375rem; }
 .mosque-name { color: var(--color-brand-900); font-weight: 800; }
-.location-badges { display: flex; flex-wrap: wrap; gap: .35rem; margin-block-start: .4rem; }
-.location-badge { padding: .22rem .5rem; color: var(--color-text-secondary); background: #f0ece1; border-radius: 999px; font-size: .7rem; }
-.responsible-item { position: relative; padding: 1rem; margin-block-end: 1rem; background: linear-gradient(145deg, #fff, #faf6ec); border: 1px solid rgba(199, 161, 90, .25); border-inline-start: .25rem solid var(--quran-accent) !important; border-radius: var(--radius-md); }
-.remove-responsible { position: absolute; inset-block-start: .7rem; inset-inline-end: auto; inset-inline-start: .7rem; color: var(--color-danger); background: transparent; border: 0; font-size: 1.15rem; }
-.responsible-header { display: flex; align-items: center; justify-content: space-between; padding-block-end: .55rem; margin-block-end: 1rem; border-block-end: 1px solid var(--color-border-soft); }
-.responsible-title { color: var(--quran-accent-strong); font-weight: 800; }
-.select2-results__option { padding: .7rem .85rem !important; border-block-end: 1px solid #f4f0e7; }
-
-@keyframes quran-reveal { from { opacity: 0; transform: translateY(.6rem); } to { opacity: 1; transform: translateY(0); } }
-
+.location-badges { display: flex; flex-wrap: wrap; gap: .375rem; margin-block-start: .375rem; }
+.location-badge { padding: .25rem .5rem; color: var(--color-text-secondary); background: #eef2f0; border-radius: .375rem; font-size: .6875rem; }
+.responsible-item { position: relative; padding: 1rem; margin-block-end: 1rem; background: #fff; border: 1px solid var(--color-border-soft); border-inline-start: .25rem solid var(--quran-accent) !important; border-radius: var(--radius-lg); }
+.remove-responsible { position: absolute; inset-block-start: .75rem; inset-inline-start: .75rem; color: var(--color-danger); background: transparent; border: 0; font-size: 1rem; }
+.responsible-header { display: flex; align-items: center; justify-content: space-between; padding-block-end: .5rem; margin-block-end: 1rem; border-block-end: 1px solid var(--color-border-soft); }
+.responsible-title { color: var(--color-brand-900); font-weight: 800; }
+.select2-results__option { padding: .625rem .75rem !important; border-block-end: 1px solid #eef2f0; }
+@keyframes quran-reveal { from { opacity: 0; transform: translateY(.5rem); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 575.98px) {
-    .steps { padding-inline: .2rem; }
+    .steps { padding-inline: .25rem; }
     .steps::before { inset-inline: 1.5rem; }
     .step-label { display: none; }
+    .quran-header-illustration { display: none; }
 }

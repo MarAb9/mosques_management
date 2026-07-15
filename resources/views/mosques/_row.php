@@ -9,7 +9,7 @@ $constructionYear = !empty($row['construction_date']) ? date('Y', strtotime((str
     <?php if ($canDelete): ?>
         <td data-column="selection"><label class="visually-hidden" for="mosque-<?= $view->e($row['registration_number']) ?>">تحديد <?= $view->e($row['mosque_name']) ?></label><input type="checkbox" id="mosque-<?= $view->e($row['registration_number']) ?>" name="selected_mosques[]" value="<?= $view->e($row['registration_number']) ?>" class="form-check-input mosque-checkbox"></td>
     <?php endif; ?>
-    <td data-column="registration" class="column-hidden text-muted"><?= $view->e($row['registration_number']) ?></td>
+    <td data-column="registration" class="text-muted"><?= $view->e($row['registration_number']) ?></td>
     <td data-column="name"><strong class="record-name"><i class="fas fa-mosque" aria-hidden="true"></i><?= $view->e($row['mosque_name']) ?></strong></td>
     <td data-column="address"><span class="record-address"><?= $view->e($row['address'] ?: '—') ?></span></td>
     <td data-column="national"><span class="badge bg-light text-dark"><?= $view->e($row['national_code'] ?: '—') ?></span></td>

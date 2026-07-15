@@ -3,7 +3,7 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
 ?>
 <div class="import-workspace">
     <?= $view->partial('components.page_header', [
-        'title' => 'الاستيراد والتصدير',
+        'title' => 'نظام استيراد وتصدير بيانات المساجد',
         'subtitle' => 'إدارة ملفات المساجد بصيغ Excel وWord.',
         'icon' => 'fa-arrow-right-arrow-left',
         'illustration' => 'assets/images/institutional/import-export-3d.svg',

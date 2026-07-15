@@ -44,18 +44,13 @@ export function initGlobalSearch() {
     const close = () => {
         requestController?.abort();
         if (dialog.open) dialog.close();
+        trigger.setAttribute('aria-expanded', 'false');
     };
 
     const open = () => {
-        const directorySearch = document.getElementById('liveSearch');
-        if (document.body.dataset.page === 'mosques' && directorySearch) {
-            directorySearch.focus();
-            directorySearch.select?.();
-            return;
-        }
-
         restoreFocus = document.activeElement;
         if (!dialog.open) dialog.showModal();
+        trigger.setAttribute('aria-expanded', 'true');
         requestAnimationFrame(() => input.focus());
     };
 
@@ -111,6 +106,7 @@ export function initGlobalSearch() {
     trigger.addEventListener('click', open);
     closeButton?.addEventListener('click', close);
     dialog.addEventListener('close', () => {
+        trigger.setAttribute('aria-expanded', 'false');
         input.value = '';
         resetResults();
         if (restoreFocus instanceof HTMLElement) restoreFocus.focus();
