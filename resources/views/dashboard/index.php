@@ -7,7 +7,7 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
     <section class="dashboard-hero reveal" aria-labelledby="dashboardWelcome">
         <div class="atlas-pattern" aria-hidden="true"></div>
         <div class="dashboard-hero__content">
-            <span class="page-kicker">مركز القيادة · بركان</span>
+            <span class="page-kicker"><?= $isAdmin ? 'لوحة تحكم المسؤول' : 'لوحة الاستعلام' ?> · مركز القيادة · بركان</span>
             <h1 id="dashboardWelcome" class="mt-2 mb-3">رؤية موحدة لخدمة مساجد الإقليم بثقة ووضوح</h1>
             <p class="mb-0">تابع التغطية الجغرافية، برامج القرآن، جودة السجلات، وآخر العمليات من مساحة عمل واحدة مبنية على البيانات الفعلية للنظام.</p>
             <div class="dashboard-hero__actions">
