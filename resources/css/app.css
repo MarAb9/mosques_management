@@ -16,5 +16,7 @@
 @import "./pages/login.css";
 @import "./pages/dashboard.css";
 @import "./pages/workspaces.css";
+@import "./pages/quran.css";
+@import "./pages/records-responsive.css";
 @import "./pages/maps.css";
 @import "./foundation/print.css";

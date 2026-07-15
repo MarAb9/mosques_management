@@ -1,10 +1,49 @@
 .map-workspace { position: relative; }
-.map-workspace #map { width: 100%; height: clamp(31rem, 67vh, 48rem); background: linear-gradient(145deg, #dce6df, #cbd9d1); }
-.map-workspace #mosquesList { max-height: clamp(26rem, 60vh, 42rem); overflow-y: auto; }
-.map-workspace .mosque-list-item { transition: background var(--duration-fast), transform var(--duration-fast); }
-.map-workspace .mosque-list-item:hover { background: var(--color-brand-50); transform: translateX(-2px); }
+.map-workspace .page-header { margin-block-end: 1rem; }
+.map-workspace .header-icon, .map-workspace .stat-icon { display: grid; width: 3rem; height: 3rem; place-items: center; color: var(--color-brand-700); background: var(--color-brand-50) !important; border: 1px solid rgba(43,146,117,.14); border-radius: .95rem !important; }
+.map-workspace .stat-card { overflow: hidden; border: 1px solid var(--color-border-soft) !important; background: linear-gradient(145deg, #fff, #f8f4e9); box-shadow: var(--shadow-soft) !important; transition: transform var(--duration-normal), box-shadow var(--duration-normal); }
+.map-workspace .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-raised) !important; }
+.map-workspace #map { width: 100%; height: clamp(31rem, 67vh, 48rem); overflow: hidden; background: linear-gradient(145deg, #dce6df, #cbd9d1); border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+.map-workspace #mosquesList { max-height: clamp(26rem, 60vh, 42rem); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--color-border-strong) transparent; }
+.map-workspace .mosque-list-item { border-color: var(--color-border-soft) !important; transition: background var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast); }
+.map-workspace .mosque-list-item:hover, .map-workspace .mosque-list-item.is-active { background: var(--color-brand-50); box-shadow: inset .2rem 0 var(--color-brass); transform: translateX(-2px); }
+.map-workspace .mosque-name { cursor: pointer; }
+.map-workspace .mosque-name:hover { color: var(--color-brand-900) !important; }
+.map-workspace .search-widget, .map-workspace .filter-widget { position: relative; }
+.map-workspace .search-suggestions { position: absolute; inset-block-start: 100%; inset-inline: 0; z-index: 1000; display: none; max-height: 13rem; overflow-y: auto; background: #fff; border: 1px solid var(--color-border-soft); border-block-start: 0; border-radius: 0 0 var(--radius-sm) var(--radius-sm); box-shadow: var(--shadow-floating); }
+.map-workspace .search-suggestions.show { display: block; }
+.map-workspace .suggestion-header { padding: .5rem .8rem; background: #f5f2e9; border-block-end: 1px solid var(--color-border-soft); }
+.map-workspace .suggestion-item { cursor: pointer; transition: background var(--duration-fast); }
+.map-workspace .suggestion-item:hover { background: var(--color-brand-50); }
+.map-workspace #activeFilters .badge { padding: .5rem .75rem; }
+.map-workspace #activeFilters .btn-close { padding: .25rem; font-size: .7rem; }
+.map-workspace .pagination-container { border: 1px solid var(--color-border-soft) !important; background: rgba(255,255,255,.82); }
+.map-workspace #mapLoading { z-index: 3; padding: 1.5rem; background: rgba(255,255,255,.94); border: 1px solid var(--color-border-soft); border-radius: var(--radius-md); box-shadow: var(--shadow-floating); backdrop-filter: blur(10px); }
+.map-workspace .map-loading-spinner { width: 3rem; height: 3rem; }
+.map-workspace .gm-style { font-family: inherit; background: #e6eee9; }
+.map-workspace .custom-mosque-marker { background: transparent !important; border: 0 !important; }
+.map-workspace .gm-style .gm-style-iw-c { padding: 0; overflow: hidden; border-radius: var(--radius-md); box-shadow: var(--shadow-floating); }
+.map-workspace .gm-style .gm-style-iw-d { overflow: auto !important; }
+.map-workspace .mosque-popup { width: min(18.75rem, 75vw); }
+.map-workspace mark { padding: .1rem .2rem; background: #fff0bc; border-radius: .2rem; }
+.map-workspace .status-indicator { display: inline-block; width: .5rem; height: .5rem; margin-inline-end: .3rem; border-radius: 50%; }
+.map-workspace .status-open { background: var(--color-success); }
+.map-workspace .status-closed { background: var(--color-danger); }
+.map-workspace .status-unauthorized { background: var(--color-warning); }
 .map-loading-spinner { width: 3rem; height: 3rem; }
 .map-legend { position: absolute; inset-block-end: 1rem; inset-inline-start: 1rem; z-index: 2; padding: .7rem .8rem; background: rgba(255,255,255,.92); border: 1px solid var(--color-border-soft); border-radius: var(--radius-sm); box-shadow: var(--shadow-floating); }
 #activeFiltersContainer[hidden] { display: none !important; }
-@media (max-width: 991.98px) { .map-workspace #map { height: 32rem; } .map-workspace #mosquesList { max-height: 24rem; } }
-@media (max-width: 575.98px) { .map-workspace #map { height: 27rem; } }
+
+@media (max-width: 991.98px) {
+    .map-workspace #map { height: 32rem; }
+    .map-workspace #mosquesList { max-height: 24rem; }
+}
+
+@media (max-width: 767.98px) {
+    .map-workspace #map { height: 28rem; }
+    .map-workspace .search-suggestions { position: fixed; inset-block: auto 0; inset-inline: 0; max-height: 50vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+    .map-workspace .filter-widget { margin-block-end: .7rem; }
+    .map-workspace .page-header { align-items: flex-start !important; }
+}
+
+@media (max-width: 430px) { .map-workspace #map { height: 25rem; } }
