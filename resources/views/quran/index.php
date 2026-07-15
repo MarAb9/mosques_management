@@ -30,6 +30,10 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
 };
 ?>
 
+<?php $quranActions = $isAdmin ? '<a class="btn btn-primary" href="add_quran_mosque.php"><i class="fas fa-plus me-2" aria-hidden="true"></i>إضافة برنامج</a>' : ''; ?>
+<div class="directory-page-header">
+<?= $view->partial('components.page_header', ['kicker' => 'برامج القرآن الكريم', 'title' => 'مساجد التحفيظ', 'subtitle' => 'متابعة البرامج والمسؤولين والطلبة والجلسات ضمن الهوية الإدارية نفسها.', 'icon' => 'fa-book-quran', 'actionsHtml' => $quranActions]) ?>
+</div>
 
 <!-- Dashboard Overview Cards -->
 <div class="row mb-4 g-4 animate__animated animate__fadeIn">
@@ -146,7 +150,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
                                                     placeholder="ابحث بأي معلومة (اسم المسجد، الرمز الوطني...)"
                                                     aria-label="بحث"
                                                     value="<?= htmlspecialchars($queryParams['query'] ?? '') ?>">
-                                                <button id="clearSearch" class="btn btn-outline-secondary border-start-0 <?= empty($queryParams['query'] ?? '') ? 'd-none' : '' ?>" type="button" style="border-left: none !important;">
+                                                <button id="clearSearch" class="btn btn-outline-secondary border-start-0 <?= empty($queryParams['query'] ?? '') ? 'd-none' : '' ?>" type="button" atlas-clear-search>
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                                 <button id="searchButton" class="btn btn-primary px-3" type="submit">
@@ -194,7 +198,7 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
                     </div>
                 </div>
 
-                <div class="table-responsive animate__animated animate__fadeIn">
+                <div class="table-responsive animate__animated animate__fadeIn quran-table-wrapper">
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
@@ -232,6 +236,13 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
                             <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+
+
+                <div class="quran-mobile-cards">
+                    <?php foreach ($programs as $row): ?>
+                        <?= $view->partial('quran._card', ['row' => $row, 'isAdmin' => $isAdmin, 'csrfToken' => $csrfToken]) ?>
+                    <?php endforeach; ?>
                 </div>
 
                 <!-- Pagination -->
@@ -275,377 +286,5 @@ $sortableHeader = function (string $title, string $sortKey) use ($queryParams, $
     </div>
 </div>
 
-<script nonce="<?= $view->e($cspNonce ?? '') ?>">
-function escapeHtml(value) {
-    if (value === null || value === undefined) return '';
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
 
-function escapeRecord(record) {
-    const escaped = {};
-    Object.entries(record || {}).forEach(([key, value]) => {
-        escaped[key] = (typeof value === 'string' || typeof value === 'number')
-            ? escapeHtml(value)
-            : value;
-    });
-    return escaped;
-}
-
-// Quran Mosque Details Modal
-function setupQuranMosqueDetailsModal() {
-    const modalElement = document.getElementById('quranMosqueDetailsModal');
-    const modal = new bootstrap.Modal(modalElement, {
-        backdrop: 'static',
-        keyboard: false
-    });
-
-    // Clear content when modal is hidden
-    modalElement.addEventListener('hidden.bs.modal', function() {
-        document.getElementById('modal-body-content').innerHTML = '';
-    });
-
-    document.querySelectorAll('.view-quran-mosque-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const mosqueId = this.getAttribute('data-mosque-id');
-            loadQuranMosqueDetails(mosqueId);
-        });
-    });
-}
-
-function loadQuranMosqueDetails(mosqueId) {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('quranMosqueDetailsModal'));
-    const modalBody = document.getElementById('modal-body-content');
-
-    modalBody.innerHTML = `
-        <div class="text-center py-5 animate__animated animate__fadeIn">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">جاري التحميل...</span>
-            </div>
-            <p class="mt-2">جاري تحميل بيانات مسجد التحفيظ</p>
-        </div>`;
-
-    fetch(`ajax/get_quran_mosque_details.php?id=${encodeURIComponent(String(mosqueId))}`)
-    .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok: ' + response.status);
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            modalBody.innerHTML = formatQuranMosqueDetails(data.data);
-        } else {
-            showModalError(data.message || 'حدث خطأ أثناء جلب بيانات المسجد');
-        }
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        showModalError('حدث خطأ في الاتصال بالخادم. الرجاء التحقق من اتصال الشبكة والمحاولة مرة أخرى.');
-    });
-
-    modal.show();
-}
-
-function formatQuranMosqueDetails(mosque) {
-    mosque = escapeRecord(mosque);
-    let responsiblesHtml = '';
-    let totalStudentsAll = 0;
-    let totalSessionsAll = 0;
-
-    if (mosque.responsibles && mosque.responsibles.length > 0) {
-        mosque.responsibles.forEach((responsible, index) => {
-            responsible = escapeRecord(responsible);
-            const totalStudents = (responsible.male_students || 0) + (responsible.female_students || 0);
-            totalStudentsAll += totalStudents;
-            totalSessionsAll += parseInt(responsible.weekly_sessions || 0);
-
-            responsiblesHtml += `
-            <div class="card mb-3 animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0"><i class="fas fa-user-tie me-2"></i>${responsible.responsible_name}</h6>
-                    ${responsible.responsible_position ? `<span class="badge bg-info">${responsible.responsible_position}</span>` : ''}
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <strong>برنامج العمل:</strong> ${responsible.has_work_program || 'لا'}<br>
-                            <strong>جدول الحفظ:</strong> ${responsible.memorization_schedule || 'غير محدد'}<br>
-                            <strong>الجلسات الأسبوعية:</strong> ${responsible.weekly_sessions || '0'} جلسة<br>
-                            <strong>مدة الجلسة:</strong> ${responsible.session_hours || '0'} ساعة
-                        </div>
-                        <div class="col-md-6">
-                            <strong>الطلاب الذكور:</strong> ${responsible.male_students || '0'}<br>
-                            <strong>الطالبات الإناث:</strong> ${responsible.female_students || '0'}<br>
-                            <strong>إجمالي الطلاب:</strong> <span class="badge bg-success">${totalStudents}</span><br>
-                            <strong>انتظام الحضور:</strong> ${responsible.regular_attendance || 'لا'}
-                        </div>
-                    </div>
-                    ${responsible.challenges ? `<div class="mt-2"><strong>التحديات:</strong> ${responsible.challenges}</div>` : ''}
-                    ${responsible.notes_suggestions ? `<div class="mt-2"><strong>ملاحظات:</strong> ${responsible.notes_suggestions}</div>` : ''}
-                </div>
-            </div>`;
-        });
-    } else {
-        responsiblesHtml = '<p class="text-muted">لا توجد معلومات عن المسؤولين</p>';
-    }
-
-    return `
-    <div class="row animate__animated animate__fadeIn">
-        <div class="col-md-6">
-            <div class="card mb-4 animate__animated animate__fadeInLeft">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>المعلومات الأساسية</h6>
-                </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4">اسم المسجد:</dt>
-                        <dd class="col-sm-8">${mosque.mosque_name || 'غير محدد'}</dd>
-
-                        <dt class="col-sm-4">الرمز الوطني:</dt>
-                        <dd class="col-sm-8">${mosque.national_code || 'غير محدد'}</dd>
-
-                        <dt class="col-sm-4">الجماعة:</dt>
-                        <dd class="col-sm-8">${mosque.community || 'غير محدد'}</dd>
-                    </dl>
-                </div>
-            </div>
-
-            <div class="card mb-4 animate__animated animate__fadeInLeft animate__delay-1s">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>المسؤولون (${mosque.responsibles ? mosque.responsibles.length : 0})</h6>
-                </div>
-                <div class="card-body">
-                    ${responsiblesHtml}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card mb-4 animate__animated animate__fadeInRight">
-                <div class="card-header bg-light">
-                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>الإحصائيات</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center mb-3">
-                        <div class="col-md-6">
-                            <div class="card bg-primary-gradient text-white mb-3">
-                                <div class="card-body">
-                                    <h4 class="mb-0">${totalStudentsAll}</h4>
-                                    <small>إجمالي الطلاب</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card bg-success-gradient text-white mb-3">
-                                <div class="card-body">
-                                    <h4 class="mb-0">${totalSessionsAll}</h4>
-                                    <small>إجمالي الجلسات الأسبوعية</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-home me-2"></i>مرافق الإقامة</h6>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>الإقامة:</strong> ${mosque.has_accommodation || 'لا'}</p>
-                            ${mosque.accommodation_capacity ? `<p><strong>سعة الإقامة:</strong> ${mosque.accommodation_capacity} شخص</p>` : ''}
-                            ${mosque.accommodation_condition ? `<p><strong>حالة الإقامة:</strong> ${mosque.accommodation_condition}</p>` : ''}
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-sticky-note me-2"></i>ملاحظات إضافية</h6>
-                        </div>
-                        <div class="card-body">
-                            ${mosque.additional_notes ? `<p>${mosque.additional_notes}</p>` : '<p class="text-muted">لا توجد ملاحظات إضافية</p>'}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>`;
-}
-
-function showModalError(message) {
-    const safeMessage = escapeHtml(message);
-    document.getElementById('modal-body-content').innerHTML = `
-        <div class="alert alert-danger animate__animated animate__shakeX" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            ${safeMessage}
-        </div>`;
-}
-
-function printQuranMosqueDetails() {
-    const modalContent = document.getElementById('modal-body-content').innerHTML;
-    const printWindow = window.open('', '_blank');
-    const assetBaseUrl = new URL('.', window.location.href).href;
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="ar" dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <base href="${assetBaseUrl}">
-            <title>تفاصيل مسجد التحفيظ - طباعة</title>
-            <link href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css" rel="stylesheet">
-            <link href="assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
-            <style nonce="<?= $view->e($cspNonce ?? '') ?>">
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-                .card { border: 1px solid #dee2e6; margin-bottom: 1rem; }
-                .badge { font-size: 0.85em; }
-                @media print {
-                    .btn { display: none; }
-                    .card-header { background-color: #f8f9fa !important; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container-fluid py-4">
-                <div class="row mb-4">
-                    <div class="col-12 text-center">
-                        <h2 class="text-primary">تفاصيل مسجد التحفيظ</h2>
-                        <p class="text-muted">${new Date().toLocaleString('ar-EG')}</p>
-                    </div>
-                </div>
-                ${modalContent}
-            </div>
-        </body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-    }, 500);
-}
-
-// Initialize when document is ready
-document.addEventListener('DOMContentLoaded', function() {
-    setupQuranMosqueDetailsModal();
-    document.addEventListener('submit', function(e) {
-        const form = e.target.closest('.js-confirm-submit');
-        if (!form) return;
-        if (!confirm(form.dataset.confirm || 'هل أنت متأكد من الحذف؟')) {
-            e.preventDefault();
-        }
-    });
-
-    document.querySelector('.js-print-quran-details')?.addEventListener('click', printQuranMosqueDetails);
-
-    // Checkbox selection logic
-    const selectAll = document.getElementById('selectAll');
-    const checkboxes = document.querySelectorAll('.mosque-checkbox');
-    const deleteBtn = document.getElementById('deleteSelected');
-    const selectedCountBtn = document.getElementById('selectedCountBtn');
-    const selectedCountSpan = document.getElementById('selectedCount');
-
-    // Only initialize checkbox functionality if elements exist
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-            updateSelectionUI();
-        });
-    }
-
-    if (checkboxes.length > 0) {
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', updateSelectionUI);
-        });
-    }
-
-    function updateSelectionUI() {
-        const selectedCount = document.querySelectorAll('.mosque-checkbox:checked').length;
-        if (selectedCountSpan) {
-            selectedCountSpan.textContent = selectedCount;
-        }
-
-        if (deleteBtn) {
-            deleteBtn.disabled = selectedCount === 0;
-        }
-
-        if (selectedCountBtn) {
-            selectedCountBtn.disabled = selectedCount === 0;
-        }
-    }
-
-    // Delete selected functionality - only if delete button exists
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', function() {
-            const selectedIds = Array.from(document.querySelectorAll('.mosque-checkbox:checked'))
-                .map(checkbox => checkbox.value);
-
-            if (selectedIds.length === 0) return;
-
-            if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} مسجد(اً) محدد(ة)؟`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'delete_quran_mosque.php';
-
-                // Add CSRF token
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = 'csrf_token';
-                csrfInput.value = <?= json_encode((string) $csrfToken, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-                form.appendChild(csrfInput);
-
-                selectedIds.forEach(id => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'selected_mosques[]';
-                    input.value = id;
-                    form.appendChild(input);
-                });
-
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-
-    // Live search functionality
-    const liveSearch = document.getElementById('liveSearch');
-    const clearSearch = document.getElementById('clearSearch');
-    const searchForm = document.getElementById('searchForm');
-
-    if (liveSearch) {
-        liveSearch.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') {
-                searchForm.submit();
-            }
-        });
-    }
-
-    if (clearSearch) {
-        clearSearch.addEventListener('click', function() {
-            liveSearch.value = '';
-            this.classList.add('d-none');
-            searchForm.submit();
-        });
-    }
-
-    if (liveSearch) {
-        liveSearch.addEventListener('input', function() {
-            if (clearSearch) {
-                clearSearch.classList.toggle('d-none', this.value === '');
-            }
-        });
-    }
-
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-});
-</script>
+<script type="application/json" id="quranPageData" nonce="<?= $view->e($cspNonce ?? '') ?>"><?= json_encode(['csrfToken' => $csrfToken], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
