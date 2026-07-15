@@ -15,11 +15,11 @@ foreach ($pageParamNames as $param) {
     }
 }
 ?>
-<nav aria-label="Page navigation" class="mt-4 animate__animated animate__fadeIn">
+<nav aria-label="التنقل بين صفحات النتائج" class="mt-4 animate__animated animate__fadeIn">
     <ul class="pagination justify-content-center">
 <?php if ($currentPage > 1): ?>
         <li class="page-item">
-            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage - 1 ?><?= $view->e($queryString) ?>" aria-label="Previous">
+            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage - 1 ?><?= $view->e($queryString) ?>" aria-label="الصفحة السابقة">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -43,7 +43,7 @@ if ($startPage > 1): ?>
 <?php endif; ?>
 <?php if ($currentPage < $totalPages): ?>
         <li class="page-item">
-            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage + 1 ?><?= $view->e($queryString) ?>" aria-label="Next">
+            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage + 1 ?><?= $view->e($queryString) ?>" aria-label="الصفحة التالية">
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>

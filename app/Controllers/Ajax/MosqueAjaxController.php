@@ -35,10 +35,18 @@ final class MosqueAjaxController extends Controller
         $community = trim((string) $request->query('community', ''));
         $status = trim((string) $request->query('status', ''));
         $fridayPrayer = trim((string) $request->query('friday_prayer', ''));
-        $page = (int) $request->query('page', 1);
+        $guideImam = trim((string) $request->query('guide_imam', ''));
+        $page = max(1, (int) $request->query('page', 1));
 
         try {
-            $payload = $this->search->liveSearch($searchTerm, $community, $status, $fridayPrayer, $page);
+            $payload = $this->search->liveSearch(
+                $searchTerm,
+                $community,
+                $status,
+                $fridayPrayer,
+                $guideImam,
+                $page,
+            );
 
             return $this->json($payload);
         } catch (PDOException $e) {

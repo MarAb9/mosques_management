@@ -24,6 +24,11 @@ abstract class Controller
             $data += [
                 'csrfToken' => $this->session->csrfToken(),
                 'isAdmin' => $this->session->role() === 'admin',
+                'canEditContent' => $this->session->canEditContent(),
+                'canDeleteContent' => $this->session->canDeleteContent(),
+                'canImportData' => $this->session->canImportData(),
+                'canViewAudit' => $this->session->canViewAudit(),
+                'currentRole' => $this->session->role(),
             ];
         }
 

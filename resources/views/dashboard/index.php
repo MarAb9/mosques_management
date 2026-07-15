@@ -7,7 +7,7 @@
  */
 ?>
 
-<style>
+<style nonce="<?= $view->e($cspNonce ?? '') ?>">
     :root {
         --primary-gradient: linear-gradient(135deg, #3A7BD5 0%, #00D2FF 100%);
         --success-gradient: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
@@ -215,6 +215,76 @@
     <?php endif; ?>
 </div>
 <!-- END DYNAMIC ROLE HEADER -->
+<div class="container-fluid mb-4 operational-dashboard">
+    <div class="row g-3">
+        <div class="col-xl-3 col-md-6">
+            <a href="data_quality.php?issue=missing_coordinates" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="btn btn-warning btn-icon rounded-circle"><i class="fas fa-map-marker-alt"></i></span>
+                    <div><div class="text-muted small">مساجد بدون إحداثيات</div><div class="h3 mb-0 text-dark"><?= number_format((int)($dataQuality['missing_coordinates'] ?? 0)) ?></div></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="data_quality.php?issue=missing_imam_phone" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="btn btn-danger btn-icon rounded-circle"><i class="fas fa-phone-slash"></i></span>
+                    <div><div class="text-muted small">هاتف الإمام ناقص</div><div class="h3 mb-0 text-dark"><?= number_format((int)($dataQuality['missing_imam_phone'] ?? 0)) ?></div></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="mosques.php?status=<?= urlencode('مغلق') ?>" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="btn btn-secondary btn-icon rounded-circle"><i class="fas fa-door-closed"></i></span>
+                    <div><div class="text-muted small">مساجد مغلقة للمتابعة</div><div class="h3 mb-0 text-dark"><?= number_format((int)$closedMosques) ?></div></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="import_export.php?export=1&no_location=1" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between"><span class="text-muted small">تغطية الخريطة</span><span class="fw-bold"><?= $view->e($mapCoveragePercent ?? 0) ?>%</span></div>
+                    <div class="progress mt-2" style="height: 8px;"><div class="progress-bar" style="width: <?= (float)($mapCoveragePercent ?? 0) ?>%"></div></div>
+                    <div class="small text-muted mt-2"><?= number_format((int)($mappedMosques ?? 0)) ?> من <?= number_format((int)$totalMosques) ?> مسجد محدد الموقع</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="quran_mosques.php" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between"><span class="text-muted small">تغطية التحفيظ</span><span class="fw-bold"><?= $view->e($quranCoveragePercent ?? 0) ?>%</span></div>
+                    <div class="progress mt-2" style="height: 8px;"><div class="progress-bar bg-success" style="width: <?= (float)($quranCoveragePercent ?? 0) ?>%"></div></div>
+                    <div class="small text-muted mt-2"><?= number_format((int)$quranMosques) ?> مسجد تحفيظ</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="audit.php?q=mosque.import" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="btn btn-info btn-icon rounded-circle"><i class="fas fa-file-import"></i></span>
+                    <div><div class="text-muted small">مشاكل الاستيراد الأخيرة</div><div class="h3 mb-0 text-dark"><?= number_format((int)($recentImportIssues ?? 0)) ?></div></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="audit.php" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="btn btn-primary btn-icon rounded-circle"><i class="fas fa-history"></i></span>
+                    <div><div class="text-muted small">سجل التدقيق</div><div class="fw-bold text-dark">عرض آخر العمليات</div></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="backup.php" class="card border-0 shadow-sm h-100 text-decoration-none">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="btn btn-dark btn-icon rounded-circle"><i class="fas fa-download"></i></span>
+                    <div><div class="text-muted small">نسخة احتياطية</div><div class="fw-bold text-dark">تحميل JSON آمن</div></div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
 <div class="container">
     <div class="row g-4">
         <!-- Stat Cards -->
@@ -426,7 +496,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="<?= $view->e($cspNonce ?? '') ?>">
 // Scroll animation trigger
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize tooltips

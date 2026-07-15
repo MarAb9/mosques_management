@@ -13,4 +13,7 @@ return [
 
     // Application display name (user-facing, Arabic).
     'name' => 'نظام إدارة مساجد إقليم بركان',
+
+    // All persisted timestamps should be UTC; presentation may localize them.
+    'timezone' => Config::env('APP_TIMEZONE', 'Africa/Casablanca'),
 ];

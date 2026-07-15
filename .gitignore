@@ -19,6 +19,8 @@ config/*.local.php
 # Composer dependencies (install via: composer install)
 # ---------------------------------------------------------------------------
 vendor/
+!public/assets/vendor/
+!public/assets/vendor/**
 
 # ---------------------------------------------------------------------------
 # Database dumps and backups

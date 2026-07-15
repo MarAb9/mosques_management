@@ -13,14 +13,14 @@
             <!-- Alerts -->
             <?php if ($successMessage !== null): ?>
                 <div class="alert alert-success alert-dismissible fade show">
-                    <?php echo $successMessage; ?>
+                    <?= $view->e($successMessage) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
 
             <?php if ($errorMessage !== null): ?>
                 <div class="alert alert-danger alert-dismissible fade show">
-                    <?php echo $errorMessage; ?>
+                    <?= $view->e($errorMessage) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
@@ -35,12 +35,12 @@
 
                 <div class="card-body">
                     <!-- Import Section -->
-                    <?php if ($isAdmin): ?>
+                    <?php if ($canImport ?? $isAdmin): ?>
                         <div class="mb-5">
                             <h5 class="mb-3 text-dark">
                                 <i class="fas fa-file-import text-primary me-2"></i>استيراد البيانات
                             </h5>
-                            <form method="POST" action="" enctype="multipart/form-data" class="row g-3">
+                            <form method="POST" action="" enctype="multipart/form-data" class="row g-3" id="importPreviewForm">
                                 <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
                                 <!-- KEEP YOUR EXISTING IMPORT FORM -->
                                 <div class="col-md-8">
@@ -48,8 +48,8 @@
                                     <input type="file" class="form-control" id="import_file" name="import_file" accept=".xlsx, .xls" required>
                                 </div>
                                 <div class="col-md-4 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        <i class="fas fa-upload me-2"></i>استيراد
+                                    <button type="submit" name="preview_import" value="1" class="btn btn-primary w-100">
+                                        <i class="fas fa-eye me-2"></i>استيراد
                                     </button>
                                 </div>
                             </form>
@@ -62,6 +62,63 @@
                         </div>
                     <?php endif; ?>
 
+
+                    <?php if (!empty($importPreview)): ?>
+                        <div class="card border-primary mb-5">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-table me-2"></i>معاينة الاستيراد قبل التنفيذ</span>
+                                <?php if (!empty($importPreview['errors'])): ?>
+                                    <a class="btn btn-light btn-sm" href="import_export.php?import_error_report=<?= urlencode((string) $importPreview['token']) ?>">
+                                        <i class="fas fa-file-csv me-1"></i>تنزيل تقرير الأخطاء
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 mb-3 text-center">
+                                    <div class="col-md-3"><div class="p-3 bg-light rounded"><div class="fw-bold"><?= number_format((int) ($importPreview['total_rows'] ?? 0)) ?></div><small>إجمالي الصفوف</small></div></div>
+                                    <div class="col-md-3"><div class="p-3 bg-success-subtle rounded"><div class="fw-bold text-success"><?= number_format((int) ($importPreview['valid_rows'] ?? 0)) ?></div><small>جاهزة للاستيراد</small></div></div>
+                                    <div class="col-md-3"><div class="p-3 bg-warning-subtle rounded"><div class="fw-bold text-warning"><?= number_format((int) ($importPreview['duplicate_rows'] ?? 0)) ?></div><small>مكررة</small></div></div>
+                                    <div class="col-md-3"><div class="p-3 bg-danger-subtle rounded"><div class="fw-bold text-danger"><?= number_format((int) ($importPreview['skipped_rows'] ?? 0)) ?></div><small>أخطاء/ناقصة</small></div></div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered align-middle">
+                                        <thead class="table-light"><tr><th>السطر</th><th>المسجد</th><th>الرمز الوطني</th><th>الحالة</th><th>ملاحظة</th></tr></thead>
+                                        <tbody>
+                                            <?php foreach (($importPreview['preview_rows'] ?? []) as $row): ?>
+                                                <?php $badge = ($row['status'] ?? '') === 'valid' ? 'success' : ((($row['status'] ?? '') === 'duplicate') ? 'warning' : 'danger'); ?>
+                                                <tr>
+                                                    <td><?= $view->e((string) ($row['row'] ?? '')) ?></td>
+                                                    <td><?= $view->e((string) ($row['mosque_name'] ?? '')) ?></td>
+                                                    <td><?= $view->e((string) ($row['national_code'] ?? '')) ?></td>
+                                                    <td><span class="badge bg-<?= $badge ?>"><?= $view->e((string) ($row['status'] ?? '')) ?></span></td>
+                                                    <td><?= $view->e((string) ($row['message'] ?? '')) ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <form method="POST" action="import_export.php" class="d-flex justify-content-end gap-2 mt-3 js-confirm-submit" data-confirm="هل تريد تنفيذ الاستيراد الآن؟">
+                                    <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
+                                    <input type="hidden" name="import_token" value="<?= $view->e((string) $importPreview['token']) ?>">
+                                    <a href="import_export.php" class="btn btn-outline-secondary">إلغاء</a>
+                                    <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>تأكيد الاستيراد</button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (($canImport ?? $isAdmin) && !empty($lastImport)): ?>
+                        <div class="alert alert-warning d-flex justify-content-between align-items-center gap-3 mb-5">
+                            <div>
+                                <strong><i class="fas fa-rotate-left me-1"></i>آخر استيراد قابل للتراجع:</strong>
+                                <?= $view->e((string) ($lastImport['original_name'] ?? '')) ?> — <?= number_format((int) ($lastImport['row_count'] ?? 0)) ?> سجل
+                            </div>
+                            <form method="POST" action="import_export.php" class="js-confirm-submit" data-confirm="سيتم حذف السجلات التي أضيفت في آخر استيراد. هل تريد المتابعة؟">
+                                <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
+                                <button type="submit" name="rollback_last_import" value="1" class="btn btn-outline-danger btn-sm">تراجع عن آخر استيراد</button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
                     <!-- Export Section -->
                     <div>
                         <h5 class="mb-3 text-dark">
@@ -118,7 +175,7 @@
                 <h5 class="modal-title" id="filterModalLabel">
                     <i class="fas fa-filter me-2"></i>تصدير مخصص
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <form id="exportForm" action="import_export.php" method="GET">
                 <input type="hidden" name="export" value="1">

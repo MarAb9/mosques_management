@@ -14,11 +14,11 @@ if (!empty($filteredParams)) {
     $queryString = '&' . http_build_query($filteredParams);
 }
 ?>
-<nav aria-label="Page navigation" class="mt-4 animate__animated animate__fadeIn">
+<nav aria-label="التنقل بين صفحات النتائج" class="mt-4 animate__animated animate__fadeIn">
     <ul class="pagination justify-content-center" style="z-index: 1; position: relative;">
 <?php if ($currentPage > 1): ?>
         <li class="page-item">
-            <a class="page-link" href="quran_mosques.php?page=<?= $currentPage - 1 ?><?= $view->e($queryString) ?>" aria-label="Previous" style="text-decoration: none;">
+            <a class="page-link" href="quran_mosques.php?page=<?= $currentPage - 1 ?><?= $view->e($queryString) ?>" aria-label="الصفحة السابقة" style="text-decoration: none;">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -46,7 +46,7 @@ if ($startPage > 1): ?>
 <?php endif; ?>
 <?php if ($currentPage < $totalPages): ?>
         <li class="page-item">
-            <a class="page-link" href="quran_mosques.php?page=<?= $currentPage + 1 ?><?= $view->e($queryString) ?>" aria-label="Next" style="text-decoration: none;">
+            <a class="page-link" href="quran_mosques.php?page=<?= $currentPage + 1 ?><?= $view->e($queryString) ?>" aria-label="الصفحة التالية" style="text-decoration: none;">
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>

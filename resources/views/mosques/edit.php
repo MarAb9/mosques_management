@@ -6,26 +6,26 @@
 ?>
 
 <!-- Add data attributes to form elements for initialization -->
-<script>
+<script nonce="<?= $view->e($cspNonce ?? '') ?>">
     // Pass saved values to JavaScript
     document.addEventListener('DOMContentLoaded', function() {
         const adminTypeSelect = document.getElementById('admin_type');
-        if (adminTypeSelect) adminTypeSelect.dataset.savedValue = "<?= $formData['admin_type'] ?? '' ?>";
+        if (adminTypeSelect) adminTypeSelect.dataset.savedValue = <?= json_encode((string) ($formData['admin_type'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
         const pashalikSelect = document.getElementById('pashalik');
-        if (pashalikSelect) pashalikSelect.dataset.savedValue = "<?= $formData['pashalik'] ?? '' ?>";
+        if (pashalikSelect) pashalikSelect.dataset.savedValue = <?= json_encode((string) ($formData['pashalik'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
         const circleSelect = document.getElementById('circle');
-        if (circleSelect) circleSelect.dataset.savedValue = "<?= $formData['circle'] ?? '' ?>";
+        if (circleSelect) circleSelect.dataset.savedValue = <?= json_encode((string) ($formData['circle'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
         const pashalikCommunitySelect = document.getElementById('pashalik_community');
-        if (pashalikCommunitySelect) pashalikCommunitySelect.dataset.savedValue = "<?= $formData['community'] ?? '' ?>";
+        if (pashalikCommunitySelect) pashalikCommunitySelect.dataset.savedValue = <?= json_encode((string) ($formData['community'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
         const leadershipSelect = document.getElementById('leadership');
-        if (leadershipSelect) leadershipSelect.dataset.savedValue = "<?= $formData['leadership'] ?? '' ?>";
+        if (leadershipSelect) leadershipSelect.dataset.savedValue = <?= json_encode((string) ($formData['leadership'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
         const attachmentSelect = document.getElementById('administrative_attachment');
-        if (attachmentSelect) attachmentSelect.dataset.savedValue = "<?= $formData['administrative_attachment'] ?? '' ?>";
+        if (attachmentSelect) attachmentSelect.dataset.savedValue = <?= json_encode((string) ($formData['administrative_attachment'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     });
 </script>
 
@@ -40,16 +40,41 @@
     </div>
     <br>
     <?php if (!empty($errors['database'])): ?>
-        <div class="alert alert-danger"><?= $errors['database'] ?></div>
+        <div class="alert alert-danger"><?= $view->e($errors['database']) ?></div>
+    <?php endif; ?>
+    <?php $validationErrors = array_filter($errors, static fn ($key) => $key !== 'database', ARRAY_FILTER_USE_KEY); ?>
+    <?php if ($validationErrors !== []): ?>
+        <div class="alert alert-warning" id="validationSummary" role="alert" tabindex="-1">
+            <div class="fw-bold mb-2"><i class="fas fa-triangle-exclamation me-1"></i>يرجى تصحيح الحقول التالية قبل الحفظ:</div>
+            <ul class="mb-0">
+                <?php foreach ($validationErrors as $field => $message): ?>
+                    <li><a href="#<?= $view->e((string) $field) ?>" class="alert-link"><?= $view->e($message) ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     <?php endif; ?>
 
-    <form method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data">
+    <nav class="form-stepper card border-0 shadow-sm mb-3" aria-label="مراحل إدخال بيانات المسجد">
+        <div class="card-body d-flex flex-wrap gap-2 py-2">
+            <a class="btn btn-sm btn-outline-primary" href="#section-basic"><i class="fas fa-info-circle me-1"></i>المعلومات الأساسية</a>
+            <a class="btn btn-sm btn-outline-primary" href="#section-services"><i class="fas fa-list-check me-1"></i>الخدمات</a>
+            <a class="btn btn-sm btn-outline-primary" href="#section-admin"><i class="fas fa-sitemap me-1"></i>التقسيم الإداري</a>
+            <a class="btn btn-sm btn-outline-primary" href="#section-staff"><i class="fas fa-users me-1"></i>الموارد البشرية</a>
+            <a class="btn btn-sm btn-outline-primary" href="#section-extra"><i class="fas fa-clipboard me-1"></i>المراجعة والحفظ</a>
+        </div>
+    </nav>
+
+    <form method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data"
+          data-guard-unsaved="true"
+          data-original-registration-number="<?= $view->e((string) ($formData['registration_number'] ?? '')) ?>"
+          data-google-maps-key="<?= $view->e((string) ($googleMapsApiKey ?? '')) ?>"
+          data-map-defaults="<?= $view->e(json_encode($mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)) ?>">
         <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
         <div class="row g-4">
             <!-- Mosque Basic Information -->
 
             <div class="col-md-6">
-                <div class="card mb-4">
+                <div class="card mb-4" id="section-basic">
                     <div class="card-header bg-light">
                         <h5 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>المعلومات الأساسية للمسجد</h5>
                     </div>
@@ -60,11 +85,11 @@
                                    id="main_image" name="main_image" accept="image/jpeg, image/png">
                             <small class="text-muted">الحد الأقصى لحجم الملف: 2MB (الصيغ المسموحة: JPG, PNG)</small>
                             <?php if (isset($errors['main_image'])): ?>
-                                <div class="invalid-feedback d-block"><?= $errors['main_image'] ?></div>
+                                <div class="invalid-feedback d-block"><?= $view->e($errors['main_image']) ?></div>
                             <?php endif; ?>
                             <div id="image-preview-container" class="mt-2 <?= empty($formData['main_image']) ? 'd-none' : '' ?>">
                                 <?php if (!empty($formData['main_image'])): ?>
-                                    <img id="image-preview" class="img-thumbnail" style="max-height: 200px;" src="<?= $formData['main_image'] ?>">
+                                    <img id="image-preview" class="img-thumbnail" style="max-height: 200px;" src="<?= $view->e($formData['main_image']) ?>" alt="صورة المسجد الحالية">
                                 <?php else: ?>
                                     <img id="image-preview" class="img-thumbnail" style="max-height: 200px;">
                                 <?php endif; ?>
@@ -76,21 +101,21 @@
                         <div class="mb-3">
                             <label for="mosque_name" class="form-label">اسم المسجد <span class="text-danger">*</span></label>
                             <input type="text" class="form-control <?= isset($errors['mosque_name']) ? 'is-invalid' : '' ?>"
-                                   id="mosque_name" name="mosque_name" value="<?= $formData['mosque_name'] ?? '' ?>" required>
+                                   id="mosque_name" name="mosque_name" value="<?= $view->e($formData['mosque_name'] ?? '') ?>" required>
                             <div class="invalid-feedback"><?= $errors['mosque_name'] ?? 'يرجى إدخال اسم المسجد' ?></div>
                         </div>
 
                         <div class="mb-3">
                             <label for="national_code" class="form-label">الرمز الوطني <span class="text-danger">*</span></label>
                             <input type="text" class="form-control <?= isset($errors['national_code']) ? 'is-invalid' : '' ?>"
-                                   id="national_code" name="national_code" value="<?= $formData['national_code'] ?? '' ?>" required>
+                                   id="national_code" name="national_code" value="<?= $view->e($formData['national_code'] ?? '') ?>" required>
                             <div class="invalid-feedback"><?= $errors['national_code'] ?? 'يرجى إدخال الرقم الوطني' ?></div>
                         </div>
 
                         <div class="mb-3">
                             <label for="address" class="form-label">العنوان <span class="text-danger">*</span></label>
                             <textarea class="form-control <?= isset($errors['address']) ? 'is-invalid' : '' ?>"
-                                      id="address" name="address" rows="2" required><?= $formData['address'] ?? '' ?></textarea>
+                                      id="address" name="address" rows="2" required><?= $view->e($formData['address'] ?? '') ?></textarea>
                             <div class="invalid-feedback"><?= $errors['address'] ?? 'يرجى إدخال عنوان المسجد' ?></div>
                         </div>
 
@@ -98,7 +123,7 @@
                             <label for="construction_year" class="form-label">سنة البناء <span class="text-danger">*</span></label>
                             <input type="text" class="form-control <?= isset($errors['construction_date']) ? 'is-invalid' : '' ?>"
                                    id="construction_year" name="construction_year"
-                                   value="<?= $formData['construction_year'] ?? '' ?>"
+                                   value="<?= $view->e($formData['construction_year'] ?? '') ?>"
                                    pattern="\d{4}"
                                    maxlength="4"
                                    placeholder="YYYY"
@@ -107,25 +132,38 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">خط العرض (Latitude)</label>
-                            <input type="text" name="latitude" class="form-control"
-                                placeholder="34.92091796542819" value="<?= htmlspecialchars($formData['latitude'] ?? '') ?>"
-                                pattern="-?\d{1,2}\.\d{1,16}"
+                            <input type="text" name="latitude" class="form-control <?= isset($errors['latitude']) ? 'is-invalid' : '' ?>"
+                                placeholder="34.92091796542819" value="<?= $view->e($formData['latitude'] ?? '') ?>"
+                                inputmode="decimal" pattern="-?\d{1,2}(?:\.\d{1,16})?"
                                 title="يجب أن يكون خط العرض بين -90 و 90 (مثال: 34.92091796542819)">
+                            <?php if (isset($errors['latitude'])): ?><div class="invalid-feedback"><?= $view->e($errors['latitude']) ?></div><?php endif; ?>
                             <small class="text-muted">مثال: 34.92091796542819</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">خط الطول (Longitude)</label>
-                            <input type="text" name="longitude" class="form-control"
-                                placeholder="-2.325653868551601" value="<?= htmlspecialchars($formData['longitude'] ?? '') ?>"
-                                pattern="-?\d{1,3}\.\d{1,16}"
+                            <input type="text" name="longitude" class="form-control <?= isset($errors['longitude']) ? 'is-invalid' : '' ?>"
+                                placeholder="-2.325653868551601" value="<?= $view->e($formData['longitude'] ?? '') ?>"
+                                inputmode="decimal" pattern="-?\d{1,3}(?:\.\d{1,16})?"
                                 title="يجب أن يكون خط الطول بين -180 و 180 (مثال: -2.325653868551601)">
+                            <?php if (isset($errors['longitude'])): ?><div class="invalid-feedback"><?= $view->e($errors['longitude']) ?></div><?php endif; ?>
                             <small class="text-muted">مثال: -2.325653868551601</small>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div id="mapContainer" style="height: 300px; display: none;" class="border rounded">
+                                <div id="map" style="height: 100%;"></div>
+                            </div>
+                            <button type="button" id="showMapBtn" class="btn btn-outline-primary btn-sm mt-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>اختر الموقع على الخريطة
+                            </button>
+                            <button type="button" id="getCurrentLocationBtn" class="btn btn-outline-success btn-sm mt-2">
+                                <i class="fas fa-location-arrow me-2"></i>استخدام موقعي الحالي
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Mosque Services -->
-                <div class="card mb-4">
+                <div class="card mb-4" id="section-services">
                     <div class="card-header bg-light">
                         <h5 class="mb-0"><i class="fas fa-tasks me-2 text-primary"></i>خدمات المسجد</h5>
                     </div>
@@ -178,7 +216,7 @@
             <!-- Administrative Information -->
             <div class="col-md-6">
                 <!-- Administrative Hierarchy Section -->
-                <div class="card mb-4">
+                <div class="card mb-4" id="section-admin">
                     <div class="card-header bg-light">
                         <h5 class="mb-0"><i class="fas fa-sitemap me-2 text-primary"></i>التقسيم الإداري</h5>
                     </div>
@@ -305,7 +343,7 @@
                 </div>
 
                 <!-- Mosque Staff Information -->
-                <div class="card mb-4">
+                <div class="card mb-4" id="section-staff">
                     <div class="card-header bg-light">
                         <h5 class="mb-0"><i class="fas fa-users me-2 text-primary"></i>طاقم المسجد</h5>
                     </div>
@@ -330,14 +368,14 @@
                                         <div class="mb-3">
                                             <label for="imam_name" class="form-label">اسم الإمام</label>
                                             <input type="text" class="form-control" id="imam_name" name="imam_name"
-                                                   value="<?= $formData['imam_name'] ?? '' ?>">
+                                                   value="<?= $view->e($formData['imam_name'] ?? '') ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="imam_registration" class="form-label">ر.ب.ت.و</label>
                                             <input type="text" class="form-control" id="imam_registration" name="imam_registration"
-                                                   value="<?= $formData['imam_registration'] ?? '' ?>">
+                                                   value="<?= $view->e($formData['imam_registration'] ?? '') ?>">
                                         </div>
                                     </div>
                                 </div>
@@ -345,19 +383,21 @@
                                     <label for="imam_phone" class="form-label">رقم الهاتف</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                        <input type="tel" class="form-control" id="imam_phone" name="imam_phone"
-                                               value="<?= $formData['imam_phone'] ?? '' ?>">
+                                        <input type="tel" class="form-control <?= isset($errors['imam_phone']) ? 'is-invalid' : '' ?>" id="imam_phone" name="imam_phone"
+                                               value="<?= $view->e($formData['imam_phone'] ?? '') ?>" inputmode="tel" autocomplete="tel">
                                     </div>
+                                    <?php if (isset($errors['imam_phone'])): ?><div class="invalid-feedback d-block"><?= $view->e($errors['imam_phone']) ?></div><?php endif; ?>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="guide_imam_id" class="form-label">الإمام المرشد</label>
-                                    <select class="form-select" id="guide_imam_id" name="guide_imam_id">
+                                    <select class="form-select <?= isset($errors['guide_imam_id']) ? 'is-invalid' : '' ?>" id="guide_imam_id" name="guide_imam_id">
                                         <option value="">-- اختر الإمام المرشد --</option>
                                         <?php foreach ($guideImams as $imam): ?>
-                                        <option value="<?= $imam['id'] ?>" <?= (isset($formData['guide_imam_id']) && $formData['guide_imam_id'] == $imam['id']) ? 'selected' : '' ?>><?= htmlspecialchars($imam['display_name']) ?></option>
+                                        <option value="<?= $view->e($imam['id']) ?>" <?= (isset($formData['guide_imam_id']) && $formData['guide_imam_id'] == $imam['id']) ? 'selected' : '' ?>><?= $view->e($imam['display_name']) ?></option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <?php if (isset($errors['guide_imam_id'])): ?><div class="invalid-feedback"><?= $view->e($errors['guide_imam_id']) ?></div><?php endif; ?>
                                 </div>
                             </div>
 
@@ -368,14 +408,14 @@
                                         <div class="mb-3">
                                             <label for="preacher_name" class="form-label">اسم الخطيب</label>
                                             <input type="text" class="form-control" id="preacher_name" name="preacher_name"
-                                                   value="<?= $formData['preacher_name'] ?? '' ?>">
+                                                   value="<?= $view->e($formData['preacher_name'] ?? '') ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="preacher_registration" class="form-label">ر.ب.ت.و</label>
                                             <input type="text" class="form-control" id="preacher_registration" name="preacher_registration"
-                                                   value="<?= $formData['preacher_registration'] ?? '' ?>">
+                                                   value="<?= $view->e($formData['preacher_registration'] ?? '') ?>">
                                         </div>
                                     </div>
                                 </div>
@@ -383,9 +423,10 @@
                                     <label for="preacher_phone" class="form-label">هاتف الخطيب</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                        <input type="tel" class="form-control" id="preacher_phone" name="preacher_phone"
-                                               value="<?= $formData['preacher_phone'] ?? '' ?>">
+                                        <input type="tel" class="form-control <?= isset($errors['preacher_phone']) ? 'is-invalid' : '' ?>" id="preacher_phone" name="preacher_phone"
+                                               value="<?= $view->e($formData['preacher_phone'] ?? '') ?>" inputmode="tel" autocomplete="tel">
                                     </div>
+                                    <?php if (isset($errors['preacher_phone'])): ?><div class="invalid-feedback d-block"><?= $view->e($errors['preacher_phone']) ?></div><?php endif; ?>
                                 </div>
                             </div>
 
@@ -396,14 +437,14 @@
                                         <div class="mb-3">
                                             <label for="muezzin_name" class="form-label">المؤذن</label>
                                             <input type="text" class="form-control" id="muezzin_name" name="muezzin_name"
-                                                   value="<?= $formData['muezzin_name'] ?? '' ?>">
+                                                   value="<?= $view->e($formData['muezzin_name'] ?? '') ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="muezzin_registration" class="form-label">ر ب ت و</label>
                                             <input type="text" class="form-control" id="muezzin_registration" name="muezzin_registration"
-                                                   value="<?= $formData['muezzin_registration'] ?? '' ?>">
+                                                   value="<?= $view->e($formData['muezzin_registration'] ?? '') ?>">
                                         </div>
                                     </div>
                                 </div>
@@ -411,9 +452,10 @@
                                     <label for="muezzin_phone" class="form-label">رقم الهاتف</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                        <input type="tel" class="form-control" id="muezzin_phone" name="muezzin_phone"
-                                               value="<?= $formData['muezzin_phone'] ?? '' ?>">
+                                        <input type="tel" class="form-control <?= isset($errors['muezzin_phone']) ? 'is-invalid' : '' ?>" id="muezzin_phone" name="muezzin_phone"
+                                               value="<?= $view->e($formData['muezzin_phone'] ?? '') ?>" inputmode="tel" autocomplete="tel">
                                     </div>
+                                    <?php if (isset($errors['muezzin_phone'])): ?><div class="invalid-feedback d-block"><?= $view->e($errors['muezzin_phone']) ?></div><?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -422,7 +464,7 @@
             </div>
 
             <!-- Additional Information -->
-            <div class="col-12">
+            <div class="col-12" id="section-extra">
                 <div class="card mb-4">
                     <div class="card-header bg-light">
                         <h5 class="mb-0"><i class="fas fa-plus-circle me-2 text-primary"></i>معلومات إضافية</h5>
@@ -430,7 +472,7 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="notes" class="form-label">ملاحظات</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3"><?= $formData['notes'] ?? '' ?></textarea>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"><?= $view->e($formData['notes'] ?? '') ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -454,3 +496,6 @@
     </form>
 </div>
 <script src="assets/js/mosque_form.js"></script>
+<?php if (!empty($googleMapsApiKey)): ?>
+<script nonce="<?= $view->e($cspNonce ?? '') ?>" src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode((string) $googleMapsApiKey) ?>&callback=initMosqueFormMapPicker&loading=async" async defer></script>
+<?php endif; ?>

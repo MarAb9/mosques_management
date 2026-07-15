@@ -62,6 +62,8 @@ final class UploadService
             $imageInfo = getimagesize((string) $file['tmp_name']);
             if (!$imageInfo) {
                 $errors[] = 'الملف المرفوع ليس صورة صالحة';
+            } elseif (((int) $imageInfo[0] * (int) $imageInfo[1]) > (int) $this->config->get('uploads.max_pixels', 25_000_000)) {
+                $errors[] = 'أبعاد الصورة كبيرة جداً';
             }
         }
 
@@ -82,10 +84,27 @@ final class UploadService
             mkdir($dir, 0755, true);
         }
 
-        $fileExt = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
-        $filename = uniqid('mosque_') . '.' . $fileExt;
+        $contents = file_get_contents((string) $file['tmp_name']);
+        $image = $contents === false ? false : @imagecreatefromstring($contents);
+        if ($image === false) {
+            return null;
+        }
 
-        if (!move_uploaded_file((string) $file['tmp_name'], $dir . '/' . $filename)) {
+        $mime = (string) (getimagesize((string) $file['tmp_name'])['mime'] ?? '');
+        $extension = $mime === 'image/png' ? 'png' : 'jpg';
+        $filename = 'mosque_' . bin2hex(random_bytes(16)) . '.' . $extension;
+        $destination = $dir . '/' . $filename;
+
+        if ($extension === 'png') {
+            imagealphablending($image, false);
+            imagesavealpha($image, true);
+            $stored = imagepng($image, $destination, 6);
+        } else {
+            $stored = imagejpeg($image, $destination, 90);
+        }
+        imagedestroy($image);
+
+        if (!$stored) {
             return null;
         }
 

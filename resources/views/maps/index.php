@@ -106,7 +106,7 @@
                                     <span class="input-group-text bg-white border-end-0 ps-3">
                                         <i class="fas fa-search text-muted"></i>
                                     </span>
-                                    <input type="text" id="globalSearch" class="form-control border-start-0 ps-0" 
+                                    <input type="text" id="globalSearch" class="form-control border-start-0 ps-0"
                                            placeholder="ابحث في المساجد، العناوين، الأئمة...">
                                     <button class="btn btn-outline-secondary border-start-0" type="button" id="clearGlobalSearch">
                                         <i class="fas fa-times"></i>
@@ -279,14 +279,14 @@
                             </div>
                         <?php else: ?>
                             <?php foreach ($mosques as $index => $mosque): ?>
-                                <div class="mosque-list-item p-3 border-bottom" 
+                                <div class="mosque-list-item p-3 border-bottom"
                                      data-mosque-id="<?= htmlspecialchars($mosque['registration_number']) ?>"
                                      data-name="<?= htmlspecialchars($mosque['mosque_name']) ?>"
                                      data-address="<?= htmlspecialchars($mosque['address']) ?>"
                                      data-imam="<?= htmlspecialchars($mosque['imam_name'] ?: '') ?>"
                                      data-community="<?= htmlspecialchars($mosque['community'] ?: '') ?>"
                                      data-status="<?= htmlspecialchars($mosque['status']) ?>"
-                                     data-friday="<?= $mosque['friday_prayer'] ? '1' : '0' ?>"
+                                     data-friday="<?= $mosque['friday_prayer'] === 'نعم' ? '1' : '0' ?>"
                                      data-lat="<?= htmlspecialchars($mosque['latitude']) ?>"
                                      data-lng="<?= htmlspecialchars($mosque['longitude']) ?>">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
@@ -311,16 +311,16 @@
                                         <?= htmlspecialchars($mosque['community']) ?>
                                     </p>
                                     <?php endif; ?>
-                                    
+
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-primary flex-fill zoom-to-mosque d-flex align-items-center justify-content-center" 
-                                                data-lat="<?= htmlspecialchars($mosque['latitude']) ?>" 
+                                        <button class="btn btn-sm btn-outline-primary flex-fill zoom-to-mosque d-flex align-items-center justify-content-center"
+                                                data-lat="<?= htmlspecialchars($mosque['latitude']) ?>"
                                                 data-lng="<?= htmlspecialchars($mosque['longitude']) ?>"
                                                 data-name="<?= htmlspecialchars($mosque['mosque_name']) ?>">
                                             <i class="fas fa-search-location me-1"></i>تحديد
                                         </button>
-                                        <a href="mosques.php?national_code=<?= urlencode($mosque['national_code']) ?>&from_map=<?= urlencode($mosque['national_code']) ?>" 
-                                        class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" 
+                                        <a href="mosques.php?national_code=<?= urlencode($mosque['national_code']) ?>&from_map=<?= urlencode($mosque['national_code']) ?>"
+                                        class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center"
                                         title="عرض التفاصيل في قائمة المساجد">
                                             <i class="fas fa-info-circle"></i>
                                         </a>
@@ -356,17 +356,18 @@
     <?php endif; ?>
 </div>
 
-<!-- Include Leaflet CSS & JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-// Global variables
+<!-- Google Maps API-ready implementation. Add GOOGLE_MAPS_API_KEY to .env to activate. -->
+<?php $hasGoogleMapsKey = trim((string) ($googleMapsApiKey ?? '')) !== ''; ?>
+<script nonce="<?= $view->e($cspNonce ?? '') ?>">
 let map;
+let infoWindow;
 let markers = [];
-let currentPage = <?= $page ?>;
-let mosquesData = <?= json_encode($mosques) ?>;
-let allMosquesData = <?= json_encode($allMosques) ?>;
+let clusterMarkers = [];
+let mosquesData = <?= json_encode($mosques, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?>;
+let allMosquesData = <?= json_encode($allMosques, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?>;
+const mapDefaults = <?= json_encode($mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+const hasGoogleMapsKey = <?= $hasGoogleMapsKey ? 'true' : 'false' ?>;
+
 let activeFilters = {
     search: '',
     community: '',
@@ -375,189 +376,232 @@ let activeFilters = {
 };
 let currentSort = 'name';
 
-// Initialize Leaflet Map
-function initMap() {
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function statusColor(status) {
+    const value = String(status || '');
+    if (value.includes('مغلق')) return '#dc3545';
+    if (value.includes('دون') || value.includes('ترخيص')) return '#ffc107';
+    if (value.includes('مفتوح')) return '#198754';
+    return '#6c757d';
+}
+
+function statusBadgeClass(status) {
+    const value = String(status || '');
+    if (value.includes('مغلق')) return 'danger';
+    if (value.includes('دون') || value.includes('ترخيص')) return 'warning';
+    if (value.includes('مفتوح')) return 'success';
+    return 'secondary';
+}
+
+function markerIcon(status) {
+    return {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: statusColor(status),
+        fillOpacity: 0.95,
+        strokeColor: '#ffffff',
+        strokeWeight: 2,
+        scale: 9
+    };
+}
+
+window.initGoogleMosqueMap = function initGoogleMosqueMap() {
     try {
         hideMapError();
         showMapLoading();
-        
-        const defaultCenter = [31.7917, -7.0926];
-        
-        map = L.map('map').setView(defaultCenter, 7);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: false,
-            maxZoom: 19
-        }).addTo(map);
-        
-        addMosqueMarkers();
-        setupEventListeners();
-        hideMapLoading();
-        
-    } catch (error) {
-        console.error('Map initialization error:', error);
-        hideMapLoading();
-        showMapError();
-    }
-}
 
-// Add mosque markers - use ALL data for markers
+        const center = {
+            lat: Number(mapDefaults.latitude) || 34.6814,
+            lng: Number(mapDefaults.longitude) || -1.9086
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            center,
+            zoom: Number(mapDefaults.zoom) || 9,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: true,
+            gestureHandling: 'greedy'
+        });
+        infoWindow = new google.maps.InfoWindow();
+
+        addMosqueMarkers();
+        setupMapButtons();
+        hideMapLoading();
+    } catch (error) {
+        console.error('Google Maps initialization error:', error);
+        hideMapLoading();
+        showMapError('تعذر تحميل خرائط Google. تحقق من المفتاح أو اتصال الشبكة.');
+    }
+};
+
 function addMosqueMarkers() {
-    if (!map) return;
-    
-    // Clear existing markers
     clearMarkers();
-    
+    const bounds = new google.maps.LatLngBounds();
     let validMarkers = 0;
-    const bounds = L.latLngBounds();
-    
-    // Use allMosquesData instead of mosquesData for markers
-    allMosquesData.forEach((mosque, index) => {
-        const lat = parseFloat(mosque.latitude);
-        const lng = parseFloat(mosque.longitude);
-        
-        if (isNaN(lat) || isNaN(lng)) return;
-        
-        // Create custom icon
-        const icon = createCustomIcon(mosque.status);
-        
-        // Create marker
-        const marker = L.marker([lat, lng], { icon: icon })
-            .addTo(map)
-            .bindPopup(createPopupContent(mosque));
-        
-        // Store marker reference with searchable data
+
+    allMosquesData.forEach(mosque => {
+        const lat = Number.parseFloat(mosque.latitude);
+        const lng = Number.parseFloat(mosque.longitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const marker = new google.maps.Marker({
+            position: { lat, lng },
+            title: String(mosque.mosque_name || ''),
+            icon: markerIcon(mosque.status),
+            optimized: true
+        });
+
+        marker.filteredVisible = true;
         marker.mosqueData = {
             id: mosque.registration_number,
+            national_code: mosque.national_code,
             name: mosque.mosque_name,
             address: mosque.address,
             imam: mosque.imam_name,
+            guide_imam: mosque.guide_imam,
             community: mosque.community,
             status: mosque.status,
-            friday: mosque.friday_prayer ? '1' : '0',
-            lat: lat,
-            lng: lng
+            friday: mosque.friday_prayer === 'نعم' ? '1' : '0',
+            lat,
+            lng,
+            raw: mosque
         };
-        
+        marker.addListener('click', () => openMarker(marker));
+
         markers.push(marker);
-        bounds.extend([lat, lng]);
+        bounds.extend(marker.getPosition());
         validMarkers++;
     });
-    
-    // Fit map to show all markers
+
     if (validMarkers > 0) {
-        map.fitBounds(bounds, { padding: [50, 50] });
+        map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
     }
+
+    google.maps.event.addListener(map, 'idle', renderClusters);
+    renderClusters();
 }
 
-// Enhanced filter functionality
+function renderClusters() {
+    if (!map || !window.google) return;
+
+    clearClusterMarkers();
+    markers.forEach(marker => marker.setMap(null));
+
+    const visibleMarkers = markers.filter(marker => marker.filteredVisible);
+    const zoom = map.getZoom() || Number(mapDefaults.zoom) || 9;
+
+    if (zoom >= 15 || visibleMarkers.length < 60) {
+        visibleMarkers.forEach(marker => marker.setMap(map));
+        return;
+    }
+
+    const gridSize = Math.max(0.0005, 360 / Math.pow(2, zoom + 4));
+    const groups = new Map();
+
+    visibleMarkers.forEach(marker => {
+        const position = marker.getPosition();
+        const key = `${Math.floor(position.lat() / gridSize)}:${Math.floor(position.lng() / gridSize)}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(marker);
+    });
+
+    groups.forEach(group => {
+        if (group.length < 3) {
+            group.forEach(marker => marker.setMap(map));
+            return;
+        }
+
+        const lat = group.reduce((sum, marker) => sum + marker.getPosition().lat(), 0) / group.length;
+        const lng = group.reduce((sum, marker) => sum + marker.getPosition().lng(), 0) / group.length;
+        const cluster = new google.maps.Marker({
+            map,
+            position: { lat, lng },
+            label: { text: String(group.length), color: '#ffffff', fontWeight: '700' },
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                fillColor: '#0d6efd',
+                fillOpacity: 0.9,
+                strokeColor: '#ffffff',
+                strokeWeight: 3,
+                scale: 17
+            },
+            title: `${group.length} مسجد`
+        });
+        cluster.addListener('click', () => {
+            map.setCenter(cluster.getPosition());
+            map.setZoom(Math.min((map.getZoom() || 9) + 2, 18));
+        });
+        clusterMarkers.push(cluster);
+    });
+}
+
 function applyFilters() {
     if (!map) return;
-    
-    let visibleMarkers = 0;
-    const bounds = L.latLngBounds();
-    let filteredMosques = [];
-    
+
+    const filteredMosques = [];
     markers.forEach(marker => {
         const data = marker.mosqueData;
+        const haystack = [data.name, data.address, data.imam, data.community, data.national_code]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
         let showMarker = true;
-        
-        // Apply search filter
-        if (activeFilters.search && 
-            !data.name.toLowerCase().includes(activeFilters.search) &&
-            !data.address.toLowerCase().includes(activeFilters.search) &&
-            !(data.imam && data.imam.toLowerCase().includes(activeFilters.search))) {
-            showMarker = false;
-        }
-        
-        // Apply community filter
-        if (activeFilters.community && data.community !== activeFilters.community) {
-            showMarker = false;
-        }
-        
-        // Apply status filter
-        if (activeFilters.status && data.status !== activeFilters.status) {
-            showMarker = false;
-        }
-        
-        // Apply Friday prayer filter
-        if (activeFilters.friday !== '' && data.friday != activeFilters.friday) {
-            showMarker = false;
-        }
-        
-        if (showMarker) {
-            marker.addTo(map);
-            bounds.extend(marker.getLatLng());
-            visibleMarkers++;
-            filteredMosques.push(data);
-        } else {
-            map.removeLayer(marker);
-        }
+
+        if (activeFilters.search && !haystack.includes(activeFilters.search)) showMarker = false;
+        if (activeFilters.community && data.community !== activeFilters.community) showMarker = false;
+        if (activeFilters.status && data.status !== activeFilters.status) showMarker = false;
+        if (activeFilters.friday !== '' && data.friday !== activeFilters.friday) showMarker = false;
+
+        marker.filteredVisible = showMarker;
+        if (showMarker) filteredMosques.push(data);
     });
-    
-    // Update UI
+
     updateActiveFiltersDisplay();
     updateSidebarList(filteredMosques);
-    
-    // Update map view if there are visible markers
-    if (visibleMarkers > 0) {
-        map.fitBounds(bounds, { padding: [50, 50] });
+    fitToVisibleMarkers(false);
+    renderClusters();
+}
+
+function fitToVisibleMarkers(force = true) {
+    if (!map) return;
+    const visibleMarkers = markers.filter(marker => marker.filteredVisible);
+    if (visibleMarkers.length === 0) return;
+
+    const bounds = new google.maps.LatLngBounds();
+    visibleMarkers.forEach(marker => bounds.extend(marker.getPosition()));
+
+    if (visibleMarkers.length === 1) {
+        map.setCenter(visibleMarkers[0].getPosition());
+        if (force) map.setZoom(16);
+        return;
     }
+
+    map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
 }
 
-// Update active filters display
-function updateActiveFiltersDisplay() {
-    const container = document.getElementById('activeFiltersContainer');
-    const filtersDiv = document.getElementById('activeFilters');
-    
-    filtersDiv.innerHTML = '';
-    let hasActiveFilters = false;
-    
-    Object.entries(activeFilters).forEach(([key, value]) => {
-        if (value && value !== '') {
-            hasActiveFilters = true;
-            const filterBadge = document.createElement('span');
-            filterBadge.className = 'badge bg-success bg-opacity-20 text-white border border-sucess';
-            
-            let filterText = '';
-            switch(key) {
-                case 'search':
-                    filterText = `بحث: "${value}"`;
-                    break;
-                case 'community':
-                    filterText = `الجماعة: ${value}`;
-                    break;
-                case 'status':
-                    filterText = `الحالة: ${value}`;
-                    break;
-                case 'friday':
-                    filterText = `صلاة الجمعة: ${value === '1' ? 'نعم' : 'لا'}`;
-                    break;
-            }
-            
-            filterBadge.innerHTML = `
-                ${filterText}
-                <button type="button" class="btn-close btn-close-sm ms-1" data-filter="${key}"></button>
-            `;
-            filtersDiv.appendChild(filterBadge);
-        }
-    });
-    
-    container.style.display = hasActiveFilters ? 'block' : 'none';
-}
-
-// Setup enhanced search functionality
 function setupSearchFunctionality() {
     const globalSearch = document.getElementById('globalSearch');
     const clearGlobalSearch = document.getElementById('clearGlobalSearch');
     const searchSuggestions = document.getElementById('searchSuggestions');
-    
-    // Global search with debouncing
+    if (!globalSearch || !clearGlobalSearch || !searchSuggestions) return;
+
     let searchTimeout;
-    globalSearch.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.trim().toLowerCase();
+    globalSearch.addEventListener('input', function(event) {
+        const searchTerm = event.target.value.trim().toLowerCase();
         activeFilters.search = searchTerm;
-        
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             if (searchTerm.length >= 2) {
@@ -567,10 +611,9 @@ function setupSearchFunctionality() {
                 searchSuggestions.classList.remove('show');
             }
             applyFilters();
-        }, 300);
+        }, 250);
     });
-    
-    // Clear global search
+
     clearGlobalSearch.addEventListener('click', function() {
         globalSearch.value = '';
         activeFilters.search = '';
@@ -579,445 +622,331 @@ function setupSearchFunctionality() {
         applyFilters();
         globalSearch.focus();
     });
-    
-    // Search suggestions
-    function showSearchSuggestions(searchTerm) {
-        const suggestions = allMosquesData.filter(mosque => 
-            mosque.mosque_name.toLowerCase().includes(searchTerm) ||
-            mosque.address.toLowerCase().includes(searchTerm) ||
-            (mosque.imam_name && mosque.imam_name.toLowerCase().includes(searchTerm))
-        ).slice(0, 5);
-        
-        if (suggestions.length > 0) {
-            let html = '<div class="suggestion-header text-muted small mb-2">نتائج مقترحة:</div>';
-            suggestions.forEach(mosque => {
-                html += `
-                    <div class="suggestion-item p-2 border-bottom cursor-pointer" 
-                         data-lat="${mosque.latitude}" 
-                         data-lng="${mosque.longitude}"
-                         data-name="${mosque.mosque_name}">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <strong>${highlightText(mosque.mosque_name, searchTerm)}</strong>
-                                <div class="text-muted small">${highlightText(mosque.address, searchTerm)}</div>
-                            </div>
-                            <span class="badge bg-${getStatusBadgeClass(mosque.status)}">${mosque.status}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            searchSuggestions.innerHTML = html;
-            searchSuggestions.classList.add('show');
-            
-            // Add click handlers to suggestions
-            document.querySelectorAll('.suggestion-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const lat = parseFloat(this.getAttribute('data-lat'));
-                    const lng = parseFloat(this.getAttribute('data-lng'));
-                    const name = this.getAttribute('data-name');
-                    zoomToMosque(lat, lng, name);
-                    searchSuggestions.classList.remove('show');
-                });
-            });
-        } else {
-            searchSuggestions.innerHTML = '<div class="text-muted text-center p-2">لا توجد نتائج مقترحة</div>';
-            searchSuggestions.classList.add('show');
-        }
-    }
-    
-    // Hide suggestions when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!globalSearch.contains(e.target) && !searchSuggestions.contains(e.target)) {
+
+    document.addEventListener('click', function(event) {
+        if (!globalSearch.contains(event.target) && !searchSuggestions.contains(event.target)) {
             searchSuggestions.classList.remove('show');
         }
     });
 }
 
-// Setup filter functionality
-function setupFilters() {
-    // Community filter
-    document.getElementById('communityFilter').addEventListener('change', function() {
-        activeFilters.community = this.value;
-        applyFilters();
-    });
-    
-    // Status filter
-    document.getElementById('statusFilter').addEventListener('change', function() {
-        activeFilters.status = this.value;
-        applyFilters();
-    });
-    
-    // Friday prayer filter
-    document.getElementById('fridayFilter').addEventListener('change', function() {
-        activeFilters.friday = this.value;
-        applyFilters();
-    });
-    
-    // Clear all filters
-    document.getElementById('clearAllFilters').addEventListener('click', function() {
-        resetAllFilters();
-    });
-    
-    // Remove individual filter
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-close')) {
-            const filterKey = e.target.getAttribute('data-filter');
-            removeFilter(filterKey);
-        }
-    });
-}
+function showSearchSuggestions(searchTerm) {
+    const searchSuggestions = document.getElementById('searchSuggestions');
+    const suggestions = allMosquesData.filter(mosque => {
+        return [mosque.mosque_name, mosque.address, mosque.imam_name, mosque.national_code]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase()
+            .includes(searchTerm);
+    }).slice(0, 6);
 
-// Remove specific filter
-function removeFilter(filterKey) {
-    activeFilters[filterKey] = '';
-    
-    // Reset corresponding form element
-    switch(filterKey) {
-        case 'search':
-            document.getElementById('globalSearch').value = '';
-            document.getElementById('searchSuggestions').classList.remove('show');
-            break;
-        case 'community':
-            document.getElementById('communityFilter').value = '';
-            break;
-        case 'status':
-            document.getElementById('statusFilter').value = '';
-            break;
-        case 'friday':
-            document.getElementById('fridayFilter').value = '';
-            break;
-    }
-    
-    applyFilters();
-}
-
-// Reset all filters
-function resetAllFilters() {
-    activeFilters = {
-        search: '',
-        community: '',
-        status: '',
-        friday: ''
-    };
-    
-    document.getElementById('globalSearch').value = '';
-    document.getElementById('communityFilter').value = '';
-    document.getElementById('statusFilter').value = '';
-    document.getElementById('fridayFilter').value = '';
-    document.getElementById('searchSuggestions').classList.remove('show');
-    
-    applyFilters();
-}
-
-
-
-// Apply sorting to sidebar list
-function applySorting() {
-    const mosquesList = document.getElementById('mosquesList');
-    const items = Array.from(mosquesList.querySelectorAll('.mosque-list-item'));
-    
-    items.sort((a, b) => {
-        const aValue = a.getAttribute(`data-${currentSort}`) || '';
-        const bValue = b.getAttribute(`data-${currentSort}`) || '';
-        return aValue.localeCompare(bValue, 'ar');
-    });
-    
-    // Re-append sorted items
-    items.forEach(item => mosquesList.appendChild(item));
-}
-
-
-// Update sidebar list with filtered results
-function updateSidebarList(filteredMosques) {
-    const mosquesList = document.getElementById('mosquesList');
-    const sidebarCount = document.getElementById('sidebarMosqueCount');
-    const resultsSummary = document.getElementById('resultsSummary');
-    
-    if (filteredMosques.length === 0) {
-        mosquesList.innerHTML = `
-            <div class="text-center py-5 text-muted">
-                <i class="fas fa-search fa-3x mb-3 opacity-50"></i>
-                <p class="mb-0">لا توجد نتائج للبحث</p>
-                <small class="text-muted">جرب تعديل معايير البحث</small>
-            </div>
-        `;
-        sidebarCount.textContent = '0';
-        resultsSummary.textContent = 'لا توجد نتائج';
+    if (suggestions.length === 0) {
+        searchSuggestions.innerHTML = '<div class="text-muted text-center p-2">لا توجد نتائج مقترحة</div>';
+        searchSuggestions.classList.add('show');
         return;
     }
-    
-    let html = '';
-    filteredMosques.forEach((mosque, index) => {
-        const searchTerm = activeFilters.search;
-        const highlightedName = searchTerm ? highlightText(mosque.name, searchTerm) : mosque.name;
-        const highlightedAddress = searchTerm ? highlightText(mosque.address, searchTerm) : mosque.address;
-        const highlightedImam = mosque.imam ? (searchTerm ? highlightText(mosque.imam, searchTerm) : mosque.imam) : 'غير محدد';
-        
-        html += `
-            <div class="mosque-list-item p-3 border-bottom" 
-                 data-mosque-id="${mosque.id}"
-                 data-name="${mosque.name}"
-                 data-address="${mosque.address}"
-                 data-imam="${mosque.imam || ''}"
-                 data-community="${mosque.community || ''}"
-                 data-status="${mosque.status}"
-                 data-friday="${mosque.friday || '0'}"
-                 data-lat="${mosque.lat}"
-                 data-lng="${mosque.lng}">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="mb-0 text-primary cursor-pointer mosque-name fw-bold">
-                        ${index + 1}. ${highlightedName}
-                    </h6>
-                    <span class="badge bg-${getStatusBadgeClass(mosque.status)} px-2 py-1">
-                        ${mosque.status}
-                    </span>
-                </div>
-                <p class="text-muted small mb-1">
-                    <i class="fas fa-map-marker-alt me-1"></i>
-                    ${highlightedAddress}
-                </p>
-                <p class="text-muted small mb-1">
-                    <i class="fas fa-user me-1"></i>
-                    ${highlightedImam}
-                </p>
-                ${mosque.community && mosque.community !== 'غير محدد' ? `
-                <p class="text-muted small mb-2">
-                    <i class="fas fa-users me-1"></i>
-                    ${mosque.community}
-                </p>
-                ` : ''}
-                
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-primary flex-fill zoom-to-mosque d-flex align-items-center justify-content-center" 
-                            data-lat="${mosque.lat}" 
-                            data-lng="${mosque.lng}"
-                            data-name="${mosque.name}">
-                        <i class="fas fa-search-location me-1"></i>تحديد
-                    </button>
-                    <a href="mosques.php?national_code=${mosque.id}&from_map=${mosque.id}" 
-                    class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" 
-                    title="عرض التفاصيل في قائمة المساجد">
-                        <i class="fas fa-info-circle"></i>
-                    </a>
-                </div>
-            </div>
-        `;
-    });
-    
-    mosquesList.innerHTML = html;
-    sidebarCount.textContent = filteredMosques.length;
-    resultsSummary.textContent = `عرض ${filteredMosques.length} مسجد`;
-    
-    // Re-attach event listeners
-    reattachZoomEventListeners();
-    applySorting();
-}
 
-// Create custom icon
-function createCustomIcon(status) {
-    const colors = {
-        'مفتوح': '#28a745',
-        'مغلق': '#dc3545',
-        'مفتوح دون ترخيص': '#ffc107',
-        'default': '#6c757d'
-    };
-    
-    const color = colors[status] || colors.default;
-    
-    return L.divIcon({
-        className: 'custom-mosque-marker',
-        html: `
-            <div style="
-                background-color: ${color};
-                width: 30px;
-                height: 30px;
-                border-radius: 50% 50% 50% 0;
-                transform: rotate(-45deg);
-                border: 3px solid white;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                position: relative;
-            ">
-                <div style="
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(45deg);
-                    width: 8px;
-                    height: 8px;
-                    background: white;
-                    border-radius: 50%;
-                "></div>
-            </div>
-        `,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30]
-    });
-}
-
-// Create popup content
-function createPopupContent(mosque) {
-    const statusColor = getStatusBadgeClass(mosque.status);
-    const fridayBadge = mosque.friday_prayer ? '<span class="badge bg-info me-1">صلاة الجمعة</span>' : '';
-    
-    return `
-        <div class="mosque-popup text-start">
-            <div class="popup-header bg-primary text-white text-center p-3 rounded-top">
-                <h6 class="mb-0">
-                    <i class="fas fa-mosque me-2"></i>
-                    <strong>مسجد </strong>${mosque.mosque_name}
-                </h6>
-            </div>
-            <div class="popup-body p-3">
-                <div class="mb-3">
-                    <span class="badge bg-${statusColor} me-2">${mosque.status}</span>
-                    ${fridayBadge}
-                    <span class="badge bg-secondary">${mosque.national_code}</span>
+    searchSuggestions.innerHTML = '<div class="suggestion-header text-muted small mb-2">نتائج مقترحة:</div>' + suggestions.map(mosque => {
+        const lat = Number.parseFloat(mosque.latitude);
+        const lng = Number.parseFloat(mosque.longitude);
+        return `
+            <button type="button" class="suggestion-item p-2 border-bottom cursor-pointer text-start w-100 bg-white border-0"
+                    data-lat="${Number.isFinite(lat) ? lat : ''}"
+                    data-lng="${Number.isFinite(lng) ? lng : ''}"
+                    data-name="${escapeHtml(mosque.mosque_name)}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${highlightText(mosque.mosque_name, searchTerm)}</strong>
+                        <div class="text-muted small">${highlightText(mosque.address, searchTerm)}</div>
+                    </div>
+                    <span class="badge bg-${statusBadgeClass(mosque.status)}">${escapeHtml(mosque.status)}</span>
                 </div>
-                
-                <div class="mb-2">
-                    <i class="fas fa-map-marker-alt text-muted me-2"></i>
-                    <strong>العنوان:</strong> ${mosque.address}
-                </div>
-                
-                <div class="mb-2">
-                    <i class="fas fa-user text-muted me-2"></i>
-                    <strong>الإمام:</strong> ${mosque.imam_name || 'غير محدد'}
-                </div>
-                <div class="mb-2">
-                    <i class="fas fa-user-tie text-muted me-2"></i>
-                    <strong> الإمام المرشد: </strong> ${mosque.guide_imam || 'غير محدد'}
-                </div>
-                
-                ${mosque.community && mosque.community !== 'غير محدد' ? `
-                <div class="mb-2">
-                    <i class="fas fa-users text-muted me-2"></i>
-                    <strong>الجماعة:</strong> ${mosque.community}
-                </div>
-                ` : ''}
-                
-                <div class="d-flex gap-2 mt-3">
-                    <a href="mosques.php?national_code=${mosque.national_code}&from_map=${mosque.national_code}" 
-                       class="btn btn-sm btn-primary text-white flex-fill">
-                        <i class="fas fa-info-circle me-1"></i>عرض التفاصيل
-                    </a>
-                    <button class="btn btn-sm btn-outline-secondary" 
-                            onclick="openInGoogleMaps(${mosque.latitude}, ${mosque.longitude})"
-                            title="فتح في خرائط جوجل">
-                        <i class="fas fa-external-link-alt"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-}
+            </button>`;
+    }).join('');
+    searchSuggestions.classList.add('show');
 
-// Setup event listeners
-function setupEventListeners() {
-    // Fit to markers button
-    document.getElementById('fitToMarkers').addEventListener('click', () => {
-        if (markers.length > 0) {
-            const group = new L.featureGroup(markers);
-            map.fitBounds(group.getBounds(), { padding: [50, 50] });
-        }
-    });
-
-    // Mosque list item clicks
-    reattachZoomEventListeners();
-
-    // Refresh map button
-    document.getElementById('refreshMap').addEventListener('click', () => {
-        window.location.reload();
-    });
-
-    // Retry map button
-    document.getElementById('retryMap').addEventListener('click', initMap);
-}
-
-// Re-attach event listeners to zoom buttons
-function reattachZoomEventListeners() {
-    document.querySelectorAll('.zoom-to-mosque').forEach(button => {
-        button.addEventListener('click', function() {
-            const lat = parseFloat(this.getAttribute('data-lat'));
-            const lng = parseFloat(this.getAttribute('data-lng'));
-            const name = this.getAttribute('data-name');
-            
-            zoomToMosque(lat, lng, name);
+    searchSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
+        item.addEventListener('click', function() {
+            zoomToMosque(Number.parseFloat(this.dataset.lat || ''), Number.parseFloat(this.dataset.lng || ''), this.dataset.name || '');
+            searchSuggestions.classList.remove('show');
         });
     });
 }
 
-// Zoom to specific mosque
-function zoomToMosque(lat, lng, name) {
-    map.setView([lat, lng], 16);
-    
-    // Find and open popup for the marker
-    const marker = markers.find(m => {
-        const markerLat = m.getLatLng().lat;
-        const markerLng = m.getLatLng().lng;
-        return markerLat === lat && markerLng === lng;
+function setupFilters() {
+    const bindings = [
+        ['communityFilter', 'community'],
+        ['statusFilter', 'status'],
+        ['fridayFilter', 'friday']
+    ];
+    bindings.forEach(([elementId, filterKey]) => {
+        const element = document.getElementById(elementId);
+        if (element) element.addEventListener('change', function() {
+            activeFilters[filterKey] = this.value;
+            applyFilters();
+        });
     });
-    
-    if (marker) {
-        marker.openPopup();
+
+    document.getElementById('clearAllFilters')?.addEventListener('click', resetAllFilters);
+    document.addEventListener('click', function(event) {
+        const button = event.target instanceof Element ? event.target.closest('[data-filter]') : null;
+        if (button) removeFilter(button.dataset.filter);
+    });
+}
+
+function updateActiveFiltersDisplay() {
+    const container = document.getElementById('activeFiltersContainer');
+    const filtersDiv = document.getElementById('activeFilters');
+    if (!container || !filtersDiv) return;
+
+    filtersDiv.innerHTML = '';
+    let hasActiveFilters = false;
+    const labels = {
+        search: 'بحث',
+        community: 'الجماعة',
+        status: 'الحالة',
+        friday: 'صلاة الجمعة'
+    };
+
+    Object.entries(activeFilters).forEach(([key, value]) => {
+        if (!value) return;
+        hasActiveFilters = true;
+        const filterBadge = document.createElement('span');
+        filterBadge.className = 'badge bg-primary-subtle text-primary border';
+        filterBadge.appendChild(document.createTextNode(`${labels[key] || key}: ${key === 'friday' ? (value === '1' ? 'نعم' : 'لا') : value} `));
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'btn-close btn-close-sm ms-1';
+        removeButton.dataset.filter = key;
+        removeButton.setAttribute('aria-label', 'إزالة عامل التصفية');
+        filterBadge.appendChild(removeButton);
+        filtersDiv.appendChild(filterBadge);
+    });
+
+    container.style.display = hasActiveFilters ? 'block' : 'none';
+}
+
+function removeFilter(filterKey) {
+    activeFilters[filterKey] = '';
+    const inputMap = {
+        search: 'globalSearch',
+        community: 'communityFilter',
+        status: 'statusFilter',
+        friday: 'fridayFilter'
+    };
+    const element = document.getElementById(inputMap[filterKey]);
+    if (element) element.value = '';
+    document.getElementById('searchSuggestions')?.classList.remove('show');
+    applyFilters();
+}
+
+function resetAllFilters() {
+    activeFilters = { search: '', community: '', status: '', friday: '' };
+    ['globalSearch', 'communityFilter', 'statusFilter', 'fridayFilter'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.value = '';
+    });
+    document.getElementById('searchSuggestions')?.classList.remove('show');
+    applyFilters();
+}
+
+function updateSidebarList(filteredMosques) {
+    const mosquesList = document.getElementById('mosquesList');
+    const sidebarCount = document.getElementById('sidebarMosqueCount');
+    const resultsSummary = document.getElementById('resultsSummary');
+    if (!mosquesList || !sidebarCount || !resultsSummary) return;
+
+    if (filteredMosques.length === 0) {
+        mosquesList.innerHTML = `
+            <div class="empty-state text-center py-5 text-muted">
+                <i class="fas fa-search fa-3x mb-3 opacity-50"></i>
+                <p class="mb-0">لا توجد نتائج للبحث</p>
+                <small class="text-muted">جرب تعديل معايير البحث</small>
+            </div>`;
+        sidebarCount.textContent = '0';
+        resultsSummary.textContent = 'لا توجد نتائج';
+        return;
+    }
+
+    mosquesList.innerHTML = filteredMosques.map((mosque, index) => {
+        const safeId = escapeHtml(mosque.id);
+        const safeCode = encodeURIComponent(String(mosque.national_code || mosque.id || ''));
+        return `
+            <div class="mosque-list-item p-3 border-bottom" data-mosque-id="${safeId}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0 text-primary cursor-pointer mosque-name fw-bold">${index + 1}. ${highlightText(mosque.name, activeFilters.search)}</h6>
+                    <span class="badge bg-${statusBadgeClass(mosque.status)} px-2 py-1">${escapeHtml(mosque.status)}</span>
+                </div>
+                <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt me-1"></i>${highlightText(mosque.address, activeFilters.search)}</p>
+                <p class="text-muted small mb-1"><i class="fas fa-user me-1"></i>${escapeHtml(mosque.imam || 'غير محدد')}</p>
+                ${mosque.community ? `<p class="text-muted small mb-2"><i class="fas fa-users me-1"></i>${escapeHtml(mosque.community)}</p>` : ''}
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-primary flex-fill zoom-to-mosque d-flex align-items-center justify-content-center"
+                            data-lat="${mosque.lat}" data-lng="${mosque.lng}" data-name="${escapeHtml(mosque.name)}">
+                        <i class="fas fa-search-location me-1"></i>تحديد
+                    </button>
+                    <a href="mosques.php?national_code=${safeCode}&from_map=${safeCode}" class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" title="عرض التفاصيل">
+                        <i class="fas fa-info-circle"></i>
+                    </a>
+                </div>
+            </div>`;
+    }).join('');
+
+    sidebarCount.textContent = String(filteredMosques.length);
+    resultsSummary.textContent = `عرض ${filteredMosques.length} مسجد`;
+    reattachZoomEventListeners();
+}
+
+function createPopupContent(mosque) {
+    const data = mosque.raw || mosque;
+    const lat = Number.parseFloat(data.latitude || mosque.lat);
+    const lng = Number.parseFloat(data.longitude || mosque.lng);
+    const nationalCode = data.national_code || mosque.national_code || mosque.id || '';
+    const nationalCodeQuery = encodeURIComponent(String(nationalCode));
+    const fridayBadge = data.friday_prayer === 'نعم' ? '<span class="badge bg-info me-1">صلاة الجمعة</span>' : '';
+
+    return `
+        <div class="mosque-popup text-start">
+            <div class="popup-header bg-primary text-white text-center p-3 rounded-top">
+                <h6 class="mb-0"><i class="fas fa-mosque me-2"></i>${escapeHtml(data.mosque_name || mosque.name)}</h6>
+            </div>
+            <div class="popup-body p-3">
+                <div class="mb-3">
+                    <span class="badge bg-${statusBadgeClass(data.status || mosque.status)} me-2">${escapeHtml(data.status || mosque.status)}</span>
+                    ${fridayBadge}
+                    <span class="badge bg-secondary">${escapeHtml(nationalCode)}</span>
+                </div>
+                <div class="mb-2"><i class="fas fa-map-marker-alt text-muted me-2"></i><strong>العنوان:</strong> ${escapeHtml(data.address || mosque.address)}</div>
+                <div class="mb-2"><i class="fas fa-user text-muted me-2"></i><strong>الإمام:</strong> ${escapeHtml(data.imam_name || mosque.imam || 'غير محدد')}</div>
+                <div class="mb-2"><i class="fas fa-user-tie text-muted me-2"></i><strong>الإمام المرشد:</strong> ${escapeHtml(data.guide_imam || mosque.guide_imam || 'غير محدد')}</div>
+                ${data.community || mosque.community ? `<div class="mb-2"><i class="fas fa-users text-muted me-2"></i><strong>الجماعة:</strong> ${escapeHtml(data.community || mosque.community)}</div>` : ''}
+                <div class="d-flex gap-2 mt-3">
+                    <a href="mosques.php?national_code=${nationalCodeQuery}&from_map=${nationalCodeQuery}" class="btn btn-sm btn-primary text-white flex-fill"><i class="fas fa-info-circle me-1"></i>عرض التفاصيل</a>
+                    <button class="btn btn-sm btn-outline-secondary js-open-google-maps" data-lat="${lat}" data-lng="${lng}" title="فتح في خرائط Google"><i class="fas fa-external-link-alt"></i></button>
+                </div>
+            </div>
+        </div>`;
+}
+
+function setupMapButtons() {
+    document.getElementById('fitToMarkers')?.addEventListener('click', () => fitToVisibleMarkers(true));
+    document.getElementById('refreshMap')?.addEventListener('click', () => window.location.reload());
+    document.getElementById('retryMap')?.addEventListener('click', () => window.location.reload());
+    reattachZoomEventListeners();
+}
+
+function reattachZoomEventListeners() {
+    document.querySelectorAll('.zoom-to-mosque').forEach(button => {
+        button.addEventListener('click', function() {
+            zoomToMosque(Number.parseFloat(this.dataset.lat || ''), Number.parseFloat(this.dataset.lng || ''), this.dataset.name || '');
+        });
+    });
+    document.querySelectorAll('.mosque-list-item').forEach(item => {
+        item.addEventListener('click', function(event) {
+            if (event.target instanceof Element && event.target.closest('a,button')) return;
+            const id = this.dataset.mosqueId;
+            const marker = markers.find(candidate => String(candidate.mosqueData.id) === String(id));
+            if (marker) openMarker(marker);
+        });
+    });
+}
+
+function openMarker(marker) {
+    if (!map || !marker) return;
+    marker.setMap(map);
+    infoWindow.setContent(createPopupContent(marker.mosqueData));
+    infoWindow.open({ map, anchor: marker });
+    highlightSidebarItem(marker.mosqueData.id);
+}
+
+function zoomToMosque(lat, lng, name) {
+    if (!map || !Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    map.setCenter({ lat, lng });
+    map.setZoom(16);
+    const marker = markers.find(candidate => Math.abs(candidate.getPosition().lat() - lat) < 0.000001 && Math.abs(candidate.getPosition().lng() - lng) < 0.000001);
+    if (marker) openMarker(marker);
+}
+
+function highlightSidebarItem(id) {
+    document.querySelectorAll('.mosque-list-item').forEach(item => item.classList.remove('is-active'));
+    const item = document.querySelector(`.mosque-list-item[data-mosque-id="${CSS.escape(String(id))}"]`);
+    if (item) {
+        item.classList.add('is-active');
+        item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 }
 
-// Clear markers
 function clearMarkers() {
-    markers.forEach(marker => {
-        map.removeLayer(marker);
-    });
+    markers.forEach(marker => marker.setMap(null));
     markers = [];
+    clearClusterMarkers();
 }
 
-// Utility functions
+function clearClusterMarkers() {
+    clusterMarkers.forEach(marker => marker.setMap(null));
+    clusterMarkers = [];
+}
+
 function openInGoogleMaps(lat, lng) {
-    const url = `https://www.google.com/maps?q=${lat},${lng}&z=17`;
-    window.open(url, '_blank');
+    window.open(`https://www.google.com/maps?q=${lat},${lng}&z=17`, '_blank', 'noopener,noreferrer');
 }
 
 function showMapLoading() {
-    document.getElementById('mapLoading').classList.remove('d-none');
+    document.getElementById('mapLoading')?.classList.remove('d-none');
 }
 
 function hideMapLoading() {
-    document.getElementById('mapLoading').classList.add('d-none');
+    document.getElementById('mapLoading')?.classList.add('d-none');
 }
 
-function showMapError() {
-    document.getElementById('mapError').classList.remove('d-none');
+function showMapError(message) {
+    const mapError = document.getElementById('mapError');
+    if (!mapError) return;
+    if (message) {
+        const paragraph = mapError.querySelector('p');
+        if (paragraph) paragraph.textContent = message;
+    }
+    mapError.classList.remove('d-none');
 }
 
 function hideMapError() {
-    document.getElementById('mapError').classList.add('d-none');
+    document.getElementById('mapError')?.classList.add('d-none');
 }
 
-function getStatusBadgeClass(status) {
-    const classes = {
-        'مفتوح': 'success',
-        'مغلق': 'danger',
-        'مفتوح دون ترخيص': 'warning',
-        'default': 'secondary'
-    };
-    return classes[status] || classes['default'];
-}
-
-// Highlight matching text in search results
 function highlightText(text, searchTerm) {
-    if (!searchTerm || !text) return text;
-    const regex = new RegExp(`(${searchTerm})`, 'gi');
-    return text.replace(regex, '<mark class="bg-warning">$1</mark>');
+    const safeText = escapeHtml(text);
+    if (!searchTerm || !text) return safeText;
+    const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+    return safeText.replace(regex, '<mark class="bg-warning">$1</mark>');
 }
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    initMap();
+function bootMapPage() {
     setupSearchFunctionality();
     setupFilters();
-});
-</script>
 
-<style>
+    document.addEventListener('click', function(event) {
+        const target = event.target instanceof Element ? event.target.closest('.js-open-google-maps') : null;
+        if (!target) return;
+        const lat = Number.parseFloat(target.dataset.lat || '');
+        const lng = Number.parseFloat(target.dataset.lng || '');
+        if (Number.isFinite(lat) && Number.isFinite(lng)) openInGoogleMaps(lat, lng);
+    });
+
+    if (!hasGoogleMapsKey) {
+        hideMapLoading();
+        showMapError('مفتاح Google Maps غير مضبوط بعد. أضف GOOGLE_MAPS_API_KEY في ملف .env لتفعيل الخريطة.');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', bootMapPage);
+</script>
+<?php if ($hasGoogleMapsKey): ?>
+<script nonce="<?= $view->e($cspNonce ?? '') ?>" src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode((string) $googleMapsApiKey) ?>&callback=initGoogleMosqueMap&loading=async" async defer></script>
+<?php endif; ?>
+
+
+<style nonce="<?= $view->e($cspNonce ?? '') ?>">
 /* Modern Design Enhancements */
 :root {
     --primary-color: #4361ee;
@@ -1089,7 +1018,7 @@ body {
     overflow: hidden;
 }
 
-.leaflet-container {
+.gm-style {
     background: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -1099,16 +1028,19 @@ body {
     border: none !important;
 }
 
-/* Enhanced Popup styles */
-.leaflet-popup-content {
-    margin: 0;
-    width: 300px !important;
+/* Enhanced Google Maps popup styles */
+.gm-style .gm-style-iw-c {
+    padding: 0;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
-.leaflet-popup-content-wrapper {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+.gm-style .gm-style-iw-d {
+    overflow: auto !important;
+}
+
+.mosque-popup {
+    width: 300px;
 }
 
 /* Enhanced Search and Filter Styles */
@@ -1327,9 +1259,9 @@ body {
     z-index: 1000;
 }
 
-/* Map attribution */
-.leaflet-control-attribution {
-    display: none !important;
+.mosque-list-item.is-active {
+    background: #e7f1ff;
+    border-left-color: #0d6efd;
 }
 
 /* Responsive Design */
@@ -1337,7 +1269,7 @@ body {
     #map {
         height: 400px;
     }
-    
+
     .search-suggestions {
         position: fixed;
         top: auto;
@@ -1347,20 +1279,20 @@ body {
         max-height: 50vh;
         border-radius: 12px 12px 0 0;
     }
-    
+
     .filter-widget {
         margin-bottom: 1rem;
     }
-    
+
     #activeFilters {
         justify-content: center;
     }
-    
+
     .page-header {
         flex-direction: column;
         align-items: flex-start !important;
     }
-    
+
     .header-actions {
         margin-top: 1rem;
         width: 100%;
@@ -1469,46 +1401,46 @@ h1, h2, h3, h4, h5, h6 {
 // Helper functions
 function renderPagination($currentPage, $totalPages) {
     if ($totalPages <= 1) return '';
-    
-    $html = '<nav aria-label="Page navigation"><ul class="pagination pagination-sm mb-0">';
-    
+
+    $html = '<nav aria-label="التنقل بين صفحات النتائج"><ul class="pagination pagination-sm mb-0">';
+
     // Previous button
     if ($currentPage > 1) {
-        $html .= '<li class="page-item"><a class="page-link" href="?page='.($currentPage - 1).'" aria-label="Previous"><i class="fas fa-chevron-right"></i></a></li>';
+        $html .= '<li class="page-item"><a class="page-link" href="?page='.($currentPage - 1).'" aria-label="الصفحة السابقة"><i class="fas fa-chevron-right"></i></a></li>';
     } else {
         $html .= '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
     }
-    
+
     // Page numbers
     $startPage = max(1, $currentPage - 2);
     $endPage = min($totalPages, $currentPage + 2);
-    
+
     if ($startPage > 1) {
         $html .= '<li class="page-item"><a class="page-link" href="?page=1">1</a></li>';
         if ($startPage > 2) {
             $html .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
         }
     }
-    
+
     for ($i = $startPage; $i <= $endPage; $i++) {
         $active = $i == $currentPage ? ' active' : '';
         $html .= '<li class="page-item'.$active.'"><a class="page-link" href="?page='.$i.'">'.$i.'</a></li>';
     }
-    
+
     if ($endPage < $totalPages) {
         if ($endPage < $totalPages - 1) {
             $html .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
         }
         $html .= '<li class="page-item"><a class="page-link" href="?page='.$totalPages.'">'.$totalPages.'</a></li>';
     }
-    
+
     // Next button
     if ($currentPage < $totalPages) {
-        $html .= '<li class="page-item"><a class="page-link" href="?page='.($currentPage + 1).'" aria-label="Next"><i class="fas fa-chevron-left"></i></a></li>';
+        $html .= '<li class="page-item"><a class="page-link" href="?page='.($currentPage + 1).'" aria-label="الصفحة التالية"><i class="fas fa-chevron-left"></i></a></li>';
     } else {
         $html .= '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
     }
-    
+
     $html .= '</ul></nav>';
     return $html;
 }
@@ -1516,7 +1448,7 @@ function renderPagination($currentPage, $totalPages) {
 function getStatusBadgeColor($status) {
     $colors = [
         'مفتوح' => 'success',
-        'مغلق' => 'danger', 
+        'مغلق' => 'danger',
         'مفتوح دون ترخيص' => 'warning'
     ];
     return $colors[$status] ?? 'secondary';
@@ -1532,4 +1464,5 @@ function getStatusBadgeClass($status) {
     return $classes[$status] ?? $classes['default'];
 }
 ?>
+
 

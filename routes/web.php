@@ -18,8 +18,12 @@ return function (Router $router): void {
     ]);
     $router->post('login.php', [\App\Controllers\Auth\LoginController::class, 'login'], [
         \App\Middleware\Guest::class,
+        \App\Middleware\VerifyCsrf::class,
     ]);
-    $router->get('logout.php', [\App\Controllers\Auth\LoginController::class, 'logout']);
+    $router->post('logout.php', [\App\Controllers\Auth\LoginController::class, 'logout'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\VerifyCsrf::class,
+    ]);
 
     // ── Dashboard ────────────────────────────────────────────────────────
     $router->get('index.php', [\App\Controllers\DashboardController::class, 'index'], [
@@ -36,6 +40,10 @@ return function (Router $router): void {
     $router->get('ajax/get_mosque_details.php', [\App\Controllers\Ajax\MosqueAjaxController::class, 'details'], [
         \App\Middleware\Authenticate::class,
     ]);
+    $router->get('check_national_code.php', [\App\Controllers\MosqueController::class, 'checkNationalCode'], [
+        \App\Middleware\Authenticate::class,
+    ]);
+
     $router->get('ajax/get_mosque_stats.php', [\App\Controllers\Ajax\MosqueAjaxController::class, 'stats'], [
         \App\Middleware\Authenticate::class,
     ]);
@@ -84,11 +92,36 @@ return function (Router $router): void {
     // import (permission + CSRF checked inside with legacy ordering).
     $router->get('import_export.php', [\App\Controllers\ImportExportController::class, 'handle'], [
         \App\Middleware\Authenticate::class,
+        \App\Middleware\CanUseImportExport::class,
     ]);
     $router->post('import_export.php', [\App\Controllers\ImportExportController::class, 'import'], [
         \App\Middleware\Authenticate::class,
+        \App\Middleware\CanUseImportExport::class,
     ]);
 
+
+    // ── Administration / accountability ─────────────────────────────────
+    $router->get('data_quality.php', [\App\Controllers\AdministrationController::class, 'dataQuality'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\RequireAdmin::class,
+    ]);
+    $router->get('audit.php', [\App\Controllers\AdministrationController::class, 'audit'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\RequireAdmin::class,
+    ]);
+    $router->get('trash.php', [\App\Controllers\AdministrationController::class, 'trash'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\RequireAdmin::class,
+    ]);
+    $router->post('restore_mosque.php', [\App\Controllers\AdministrationController::class, 'restore'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\RequireAdmin::class,
+        \App\Middleware\VerifyCsrf::class,
+    ]);
+    $router->get('backup.php', [\App\Controllers\AdministrationController::class, 'backup'], [
+        \App\Middleware\Authenticate::class,
+        \App\Middleware\RequireAdmin::class,
+    ]);
     // ── Quran programs ───────────────────────────────────────────────────
     $router->get('quran_mosques.php', [\App\Controllers\QuranProgramController::class, 'index'], [
         \App\Middleware\Authenticate::class,
@@ -145,6 +178,11 @@ return function (Router $router): void {
         'delete_mosque.php',
         'bulk_delete_mosques.php',
         'import_export.php',
+        'data_quality.php',
+        'audit.php',
+        'trash.php',
+        'restore_mosque.php',
+        'backup.php',
         'quran_mosques.php',
         'add_quran_mosque.php',
         'edit_quran_mosque.php',

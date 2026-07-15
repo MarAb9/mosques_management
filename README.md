@@ -19,8 +19,10 @@ remain outside the document root.
 
 4. Open `http://localhost:8080` unless `APP_PORT` was changed.
 
-Apache serves `public/`. MariaDB is exposed on host port `3307` by default
-for local database tools, and phpMyAdmin is available on port `8081`.
+Apache serves `public/`. MariaDB is bound to localhost port `3307` by default
+for local database tools. phpMyAdmin is disabled by default; start it only
+when needed with `docker compose --profile tools up -d phpmyadmin`, then use
+localhost port `8081`.
 
 The SQL dump is imported only when the `db_data` volume is empty. Do not
 remove that volume unless discarding the local database is intentional.
@@ -35,6 +37,15 @@ with this project's `public/` directory as the document root and ensure
 
 See `docs/LOCAL_SETUP.md` for detailed setup and
 `docs/DEPLOYMENT_FREEHOST.md` for production/shared-hosting layout guidance.
+
+
+## Frontend assets
+
+Third-party browser assets are self-hosted under `public/assets/vendor/` so the
+application does not depend on public CDNs for government-office use. When
+updating Bootstrap, Font Awesome, Leaflet, Select2, SweetAlert2, Chart.js,
+Animate.css, Hover.css, or jQuery, replace the matching files in that directory
+and rerun the verification commands below.
 
 ## Verification
 

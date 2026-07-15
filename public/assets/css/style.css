@@ -1,9 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+.skip-link {
+    position: fixed;
+    inset-block-start: 0.5rem;
+    inset-inline-start: 0.5rem;
+    z-index: 10000;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #111827;
+    box-shadow: 0 0 0 3px #2563eb;
+    transform: translateY(-150%);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
 
 
 body {
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Tajawal', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background-color: #f8f9fa;
+}
+
+:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
 }
 
 .card {
@@ -30,7 +61,7 @@ body {
 
 /* تخصيصات للواجهة العربية */
 .navbar-brand, .card-title, h1, h2, h3, h4, h5, h6 {
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Tajawal', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-weight: 700;
 }
 
@@ -41,8 +72,16 @@ body {
 
 /* تنسيق الأزرار */
 .btn {
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Tajawal', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-weight: 500;
+}
+
+.btn-icon {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .active-tab-title {
@@ -136,6 +175,24 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .mobile-hidden {
+        display: none !important;
+    }
+
+    .table {
+        font-size: 0.875rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem;
+        vertical-align: middle;
+    }
+
+    .table td .d-flex.gap-2 {
+        gap: 0.35rem !important;
+    }
+
     .input-group {
         max-width: 100% !important;
     }
@@ -192,4 +249,107 @@ body {
 
 .form-control[type="file"]::file-selector-button:hover {
     background-color: #e9ecef;
+}
+
+/* Government UI/UX hardening */
+.app-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f8fafc;
+    box-shadow: inset 0 -1px 0 #dee2e6;
+}
+
+.app-table th:last-child,
+.app-table td:last-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: #fff;
+    box-shadow: -8px 0 12px rgba(15, 23, 42, 0.06);
+}
+
+.app-table thead th:last-child {
+    z-index: 3;
+    background: #f8fafc;
+}
+
+.app-table--compact th,
+.app-table--compact td,
+.table-density-compact .app-table th,
+.table-density-compact .app-table td {
+    padding-top: 0.45rem !important;
+    padding-bottom: 0.45rem !important;
+    font-size: 0.9rem;
+}
+
+.mosque-mobile-cards {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .mosque-table-wrapper {
+        display: none;
+    }
+
+    .mosque-mobile-cards {
+        display: block;
+    }
+
+    .mosque-mobile-card dt {
+        color: #6c757d;
+    }
+
+    .mosque-mobile-card dd {
+        margin-bottom: 0.35rem;
+    }
+}
+
+.column-hidden {
+    display: none !important;
+}
+
+.empty-state {
+    border: 1px dashed #cbd5e1;
+    border-radius: 1rem;
+    padding: 2rem;
+    background: #f8fafc;
+}
+
+body.high-contrast {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+body.high-contrast .card,
+body.high-contrast .modal-content,
+body.high-contrast .navbar,
+body.high-contrast .dropdown-menu,
+body.high-contrast .table,
+body.high-contrast .table td,
+body.high-contrast .table th {
+    background: #050505 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+body.high-contrast a,
+body.high-contrast .text-primary,
+body.high-contrast .nav-link {
+    color: #ffd400 !important;
+}
+
+body.high-contrast .btn-primary,
+body.high-contrast .btn-success,
+body.high-contrast .btn-info {
+    background: #ffd400 !important;
+    border-color: #ffd400 !important;
+    color: #000 !important;
+}
+
+@media (prefers-contrast: more) {
+    :focus-visible {
+        outline-color: #000;
+        outline-width: 4px;
+    }
 }

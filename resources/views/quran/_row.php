@@ -77,6 +77,7 @@ if (($row['responsible_count'] ?? 0) > 3) {
                                                 data-mosque-id="<?= $view->e($row['id']) ?>"
                                                 data-bs-tooltip="tooltip"
                                                 data-bs-placement="top"
+                                                aria-label="عرض تفاصيل مسجد التحفيظ"
                                                 title="عرض التفاصيل">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
@@ -85,16 +86,18 @@ if (($row['responsible_count'] ?? 0) > 3) {
                                                 class="btn btn-sm btn-icon btn-primary rounded-circle"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
+                                                aria-label="تعديل مسجد التحفيظ"
                                                 title="تعديل">
                                                     <i class="fas fa-pen"></i>
                                                 </a>
-                                            <form method="POST" action="delete_quran_mosque.php" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المسجد؟')">
+                                            <form method="POST" action="delete_quran_mosque.php" class="d-inline js-confirm-submit" data-confirm="هل أنت متأكد من حذف هذا المسجد؟">
                                                 <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
                                                 <input type="hidden" name="id" value="<?= $view->e($row['id']) ?>">
                                                 <button type="submit"
                                                     class="btn btn-sm btn-icon btn-danger rounded-circle"
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="top"
+                                                    aria-label="حذف مسجد التحفيظ"
                                                     title="حذف">
                                                         <i class="fas fa-trash-alt"></i>
                                                 </button>

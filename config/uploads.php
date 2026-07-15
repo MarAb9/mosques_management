@@ -27,6 +27,20 @@ return [
 
     // Validation limits (same as legacy validateImageUpload()).
     'max_size' => 2 * 1024 * 1024,
+    'max_pixels' => 25_000_000,
     'allowed_extensions' => ['jpg', 'jpeg', 'png'],
     'allowed_mime_types' => ['image/jpeg', 'image/png'],
+    'imports' => [
+        'max_size' => 5 * 1024 * 1024,
+        'max_uncompressed_size' => 50 * 1024 * 1024,
+        'max_rows' => 5000,
+        'allowed_extensions' => ['xlsx', 'xls'],
+        'allowed_mime_types' => [
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-excel',
+            'application/zip',
+            'application/x-ole-storage',
+            'application/octet-stream',
+        ],
+    ],
 ];

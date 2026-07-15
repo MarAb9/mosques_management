@@ -29,8 +29,7 @@ final class MosqueSearchService
      */
     public function listPage(array $query): array
     {
-        $page = isset($query['page']) ? (int) $query['page'] : 1;
-        $start = ($page - 1) * self::PAGE_SIZE;
+        $requestedPage = max(1, isset($query['page']) ? (int) $query['page'] : 1);
 
         $sort = isset($query['sort']) && in_array($query['sort'], MosqueRepository::LIST_SORT_COLUMNS, true)
             ? (string) $query['sort']
@@ -38,12 +37,15 @@ final class MosqueSearchService
         $order = isset($query['order']) && strtolower((string) $query['order']) === 'asc' ? 'ASC' : 'DESC';
 
         $total = $this->mosques->countForList($query);
+        $pages = max(1, (int) ceil($total / self::PAGE_SIZE));
+        $page = min($requestedPage, $pages);
+        $start = ($page - 1) * self::PAGE_SIZE;
 
         return [
             'mosques' => $this->mosques->searchForList($query, $sort, $order, $start, self::PAGE_SIZE),
             'total' => $total,
             'page' => $page,
-            'pages' => (int) ceil($total / self::PAGE_SIZE),
+            'pages' => $pages,
             'openCount' => $this->mosques->countByStatus('مفتوح'),
             'fridayCount' => $this->mosques->countFridayMosques(),
             'communityCount' => $this->mosques->countDistinctCommunities(),
@@ -60,19 +62,36 @@ final class MosqueSearchService
      *
      * @return array<string, mixed>
      */
-    public function liveSearch(string $searchTerm, string $community, string $status, string $fridayPrayer, int $page): array
+    public function liveSearch(
+        string $searchTerm,
+        string $community,
+        string $status,
+        string $fridayPrayer,
+        string $guideImam,
+        int $page,
+    ): array
     {
+        $page = max(1, $page);
+        $total = $this->mosques->countForLiveSearch($searchTerm, $community, $status, $fridayPrayer, $guideImam);
+        $pages = max(1, (int) ceil((float) $total / self::PAGE_SIZE));
+        $page = min($page, $pages);
         $start = ($page - 1) * self::PAGE_SIZE;
-
-        $total = $this->mosques->countForLiveSearch($searchTerm, $community, $status, $fridayPrayer);
-        $results = $this->mosques->liveSearch($searchTerm, $community, $status, $fridayPrayer, $start, self::PAGE_SIZE);
+        $results = $this->mosques->liveSearch(
+            $searchTerm,
+            $community,
+            $status,
+            $fridayPrayer,
+            $guideImam,
+            $start,
+            self::PAGE_SIZE,
+        );
 
         return [
             'success' => true,
             'data' => $results,
             'total' => $total,
             'page' => $page,
-            'pages' => ceil((float) $total / self::PAGE_SIZE),
+            'pages' => $pages,
         ];
     }
 }

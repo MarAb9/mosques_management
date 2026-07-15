@@ -23,6 +23,7 @@ final class MosqueWriteService
         private readonly MosqueValidator $validator,
         private readonly UploadService $uploads,
         private readonly ErrorHandler $errors,
+        private readonly DeletedMosqueService $deletedMosques,
     ) {
     }
 
@@ -37,10 +38,15 @@ final class MosqueWriteService
     {
         $errors = [];
         $formData = [];
+        $imagePath = null;
 
         try {
             $formData = $this->form->processFormData($post);
             $errors = $this->validator->requiredFields($formData, (string) $formData['admin_type']);
+
+            if (!empty($formData['guide_imam_id']) && empty($formData['guide_imam'])) {
+                $errors['guide_imam_id'] = 'الإمام المرشد المحدد غير موجود';
+            }
 
             // Check for duplicate national code
             if (empty($errors['national_code']) && $this->mosques->nationalCodeExists((string) $formData['national_code'])) {
@@ -48,8 +54,6 @@ final class MosqueWriteService
             }
 
             if (empty($errors)) {
-                $imagePath = null;
-
                 if (!empty($files['main_image']['name'])) {
                     $uploadErrors = $this->uploads->validateImage($files['main_image']);
 
@@ -71,6 +75,9 @@ final class MosqueWriteService
                 }
             }
         } catch (PDOException $e) {
+            if ($imagePath !== null) {
+                $this->uploads->deleteMosqueImage($imagePath);
+            }
             $this->errors->log($e);
             $errors['database'] = 'حدث خطأ في النظام. يرجى المحاولة لاحقاً';
         }
@@ -90,10 +97,16 @@ final class MosqueWriteService
     {
         $errors = [];
         $formData = [];
+        $newPath = null;
+        $oldImagePath = (string) ($mosque['main_image'] ?? '');
 
         try {
             $formData = $this->form->processFormData($post, $mosque['main_image']);
             $errors = $this->validator->requiredFields($formData, (string) $formData['admin_type']);
+
+            if (!empty($formData['guide_imam_id']) && empty($formData['guide_imam'])) {
+                $errors['guide_imam_id'] = 'الإمام المرشد المحدد غير موجود';
+            }
 
             if (empty($errors)) {
                 if (!empty($files['main_image']['name'])) {
@@ -106,9 +119,6 @@ final class MosqueWriteService
                         if ($newPath === null) {
                             $errors['main_image'] = 'فشل تحميل الملف. يرجى المحاولة مرة أخرى';
                         } else {
-                            // Delete old image if it exists (legacy order:
-                            // only after a successful move).
-                            $this->uploads->deleteMosqueImage($formData['main_image']);
                             $formData['main_image'] = $newPath;
                         }
                     }
@@ -116,17 +126,27 @@ final class MosqueWriteService
 
                 // Handle image removal if requested
                 if (isset($post['remove_image'])) {
-                    $this->uploads->deleteMosqueImage($formData['main_image']);
+                    if ($newPath !== null) {
+                        $this->uploads->deleteMosqueImage($newPath);
+                        $newPath = null;
+                    }
                     $formData['main_image'] = null;
                 }
 
                 if (empty($errors)) {
                     $this->mosques->update($mosque['registration_number'], $formData);
 
+                    if ($oldImagePath !== '' && $oldImagePath !== (string) $formData['main_image']) {
+                        $this->uploads->deleteMosqueImage($oldImagePath);
+                    }
+
                     return ['success' => true, 'formData' => $formData, 'errors' => []];
                 }
             }
         } catch (PDOException $e) {
+            if ($newPath !== null) {
+                $this->uploads->deleteMosqueImage($newPath);
+            }
             $this->errors->log($e);
             $errors['database'] = 'حدث خطأ أثناء تحديث البيانات. يرجى المحاولة لاحقاً';
         }
@@ -141,8 +161,13 @@ final class MosqueWriteService
      */
     public function delete(array $registrationNumbers): int
     {
-        $this->mosques->deleteByRegistrationNumbers($registrationNumbers);
+        foreach ($registrationNumbers as $registrationNumber) {
+            $mosque = $this->mosques->find($registrationNumber);
+            if ($mosque !== null) {
+                $this->deletedMosques->archive($mosque);
+            }
+        }
 
-        return count($registrationNumbers);
+        return $this->mosques->deleteByRegistrationNumbers($registrationNumbers);
     }
 }

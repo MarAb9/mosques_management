@@ -6,6 +6,7 @@ namespace App\Core;
 
 use PDO;
 use PDOException;
+use RuntimeException;
 
 /**
  * PDO connection factory.
@@ -42,8 +43,7 @@ final class Database
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             error_log('Database connection error: ' . $e->getMessage());
-            http_response_code(500);
-            die('حدث خطأ في الاتصال بقاعدة البيانات');
+            throw new RuntimeException('Unable to connect to the database.', 0, $e);
         }
 
         return $this->pdo = $pdo;

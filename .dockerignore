@@ -3,5 +3,11 @@
 .gitignore
 node_modules
 vendor
+!public/assets/vendor/
+!public/assets/vendor/**
+*.sql
+backups
+storage/logs/*
+storage/cache/*
 public/uploads/mosques/*
 !public/uploads/mosques/.gitkeep

@@ -104,7 +104,16 @@ final class QuranProgramRepository
                COALESCE(SUM(r.male_students), 0) as total_male_students,
                COALESCE(SUM(r.female_students), 0) as total_female_students,
                COALESCE(SUM(r.weekly_sessions), 0) as total_weekly_sessions,
-               COUNT(r.id) as responsible_count
+               COUNT(r.id) as responsible_count,
+               GROUP_CONCAT(r.responsible_name ORDER BY r.id SEPARATOR \'|||\') as responsible_names_aggregated,
+               (
+                   SELECT r2.has_work_program
+                   FROM quran_program_responsibles r2
+                   WHERE r2.program_id = q.id
+                   GROUP BY r2.has_work_program
+                   ORDER BY COUNT(*) DESC, r2.has_work_program ASC
+                   LIMIT 1
+               ) as top_work_program_status
         ' . self::LIST_BASE . $where . ' GROUP BY q.id';
 
         // Legacy double allowlist: request sort is first narrowed to
@@ -169,7 +178,7 @@ final class QuranProgramRepository
                         ')->fetchColumn();
     }
 
-    // ── Per-row lookups (legacy renderQuranMosqueRow, N+1 preserved) ─────
+    // ── Per-row lookup helpers retained for details/compatibility ─────────
 
     /**
      * Most common has_work_program value among a program's responsibles.
