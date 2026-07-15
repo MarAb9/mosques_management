@@ -12,14 +12,9 @@
 .responsible-item { position: relative; border-inline-start: .25rem solid var(--color-brass) !important; }
 .remove-responsible { color: var(--color-danger); background: transparent; border: 0; }
 .import-workspace .card, .admin-workspace .card { box-shadow: var(--shadow-raised); }
-.audit-context { max-width: 28rem; }
 @media (max-width: 767.98px) {
     .step-label { display: none; }
     .step-progress { gap: .15rem; }
-    .audit-table thead { display: none; }
-    .audit-table, .audit-table tbody, .audit-table tr, .audit-table td { display: block; width: 100%; }
-    .audit-table tr { padding: .9rem; border-block-end: 1px solid var(--color-border-soft); }
-    .audit-table td { padding: .25rem !important; border: 0; }
 }
 
 .atlas-clear-search { border-inline-start: 0 !important; }

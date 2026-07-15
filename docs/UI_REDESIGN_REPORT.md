@@ -11,9 +11,8 @@ Presentation baseline: `6b67b36`
 - Mosque directory, details modal, create form, and edit form
 - Quran program directory, responsive cards, details modal, create form, and edit form
 - Geographic mosque map
-- Import, preview, export, custom-export, and rollback workspace
+- Import, aggregate preview, export, custom-export, and rollback workspace
 - Data-quality dashboard
-- Audit log
 - Trash and restore workspace
 - Backup confirmation flow
 - Shared empty, warning, validation, and error states
@@ -91,22 +90,20 @@ Headless Chrome captured and inspected seven authenticated/guest screenshots at 
 - `guide_imams_test.php`: 9 passed
 - `mosque_crud_http_test.php`: 31 passed
 - `quran_http_test.php`: 33 passed
-- `import_export_http_test.php`: 20 passed
-- Total PHP/feature assertions: 115 passed, 0 failed
+- `import_export_http_test.php`: 21 passed
+- Total PHP/feature assertions: 116 passed, 0 failed
 - `smoke_http.sh`: passed login, dashboard, mosque/Quran/import/map routes, AJAX endpoints, clean route, CSP nonce, private-path boundaries, upload-script blocking, public assets, and logout
 - Browser audit: no JavaScript runtime exceptions and no horizontal overflow; the brand favicon removed the only resource 404
 
 ## 12. Files changed
 
-The redesign changes 65 files from the presentation baseline:
+The current Atlas Noor implementation differs from the presentation baseline across 76 files. The later audit/error-visibility cleanup changes 19 files, including three deliberate deletions: the audit-log reader service, public audit shim, and audit view.
 
-- 4 design/build/report documents
-- `package.json` and lockfile
-- 8 compiled production assets
-- 28 CSS/JavaScript source modules
-- 23 PHP views/partials
+The work is organized into focused design and compatibility commits. Business-data controllers, repositories, database schema, request methods, field names, CSRF handling, AJAX response formats, and permission logic remain intact. A later cleanup deliberately removed the audit-view route and import error-report endpoint while retaining internal security logging.
 
-The work is organized into focused design and compatibility commits. Backend controllers, repositories, database schema, routes, request methods, field names, CSRF handling, AJAX response formats, and permission logic were not redesigned.
+### Post-redesign visibility cleanup
+
+The dashboard recent-activity/import-issue widgets, audit/history page and route, per-row import diagnostics, downloadable import-error report, and UI-visible audit/error logs were subsequently removed. Internal exception and security audit logging remains server-side only; normal validation and concise user feedback remain available.
 
 ## 13. Build command
 

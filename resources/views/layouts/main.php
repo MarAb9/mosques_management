@@ -11,7 +11,6 @@ $pageConfig = [
     'mosque_maps.php' => ['title' => 'الخريطة التشغيلية', 'section' => 'التغطية الجغرافية', 'icon' => 'fa-map-location-dot'],
     'import_export.php' => ['title' => 'الاستيراد والتصدير', 'section' => 'إدارة البيانات', 'icon' => 'fa-arrow-right-arrow-left'],
     'data_quality.php' => ['title' => 'جودة البيانات', 'section' => 'الحوكمة', 'icon' => 'fa-clipboard-check'],
-    'audit.php' => ['title' => 'سجل التدقيق', 'section' => 'الحوكمة', 'icon' => 'fa-clock-rotate-left'],
     'trash.php' => ['title' => 'سلة المحذوفات', 'section' => 'الحوكمة', 'icon' => 'fa-trash-can-arrow-up'],
 ];
 $page = $pageConfig[$currentPage] ?? ['title' => 'نظام مساجد بركان', 'section' => 'الإدارة', 'icon' => 'fa-mosque'];
@@ -67,12 +66,11 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
                         <?php if ($canImportData ?? $isAdmin): ?><li><a class="sidebar-nav__link<?= $navActive(['import_export.php']) ?>" href="import_export.php"><i class="fas fa-arrow-right-arrow-left" aria-hidden="true"></i><span>الاستيراد والتصدير</span></a></li><?php endif; ?>
                     </ul>
                 </section>
-                <?php if ($canViewAudit ?? false): ?>
+                <?php if ($isAdmin): ?>
                 <section class="nav-group" aria-labelledby="nav-governance">
                     <span class="nav-group__label" id="nav-governance">الحوكمة والمتابعة</span>
                     <ul class="sidebar-nav">
                         <li><a class="sidebar-nav__link<?= $navActive(['data_quality.php']) ?>" href="data_quality.php"><i class="fas fa-clipboard-check" aria-hidden="true"></i><span>جودة البيانات</span></a></li>
-                        <li><a class="sidebar-nav__link<?= $navActive(['audit.php']) ?>" href="audit.php"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i><span>سجل التدقيق</span></a></li>
                         <li><a class="sidebar-nav__link<?= $navActive(['trash.php']) ?>" href="trash.php"><i class="fas fa-trash-can-arrow-up" aria-hidden="true"></i><span>سلة المحذوفات</span></a></li>
                         <li><a class="sidebar-nav__link" href="backup.php"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>نسخة احتياطية</span></a></li>
                     </ul>

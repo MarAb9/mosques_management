@@ -30,7 +30,7 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
         </div>
     </section>
 
-    <?php if ($isAdmin && ($qualityIssueCount > 0 || (int) $closedMosques > 0 || (int) $recentImportIssues > 0)): ?>
+    <?php if ($isAdmin && ($qualityIssueCount > 0 || (int) $closedMosques > 0)): ?>
     <section class="alert alert-warning reveal d-flex align-items-start gap-3 mb-0" aria-labelledby="urgentTitle">
         <i class="fas fa-triangle-exclamation fs-4 mt-1" aria-hidden="true"></i>
         <div class="flex-grow-1"><h2 class="h6 mb-1" id="urgentTitle">متابعة تشغيلية مطلوبة</h2><p class="mb-2">توجد سجلات تحتاج المراجعة: <?= number_format((int) ($dataQuality['missing_coordinates'] ?? 0)) ?> بدون إحداثيات، <?= number_format((int) ($dataQuality['missing_imam_phone'] ?? 0)) ?> بدون هاتف إمام، و<?= number_format((int) $closedMosques) ?> مسجد مغلق.</p><a class="alert-link" href="data_quality.php">فتح لوحة جودة البيانات</a></div>
@@ -66,9 +66,8 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
                     <small class="text-muted d-block mt-2"><?= number_format((int) $quranMosques) ?> برنامجاً مرتبطاً بالمساجد</small>
                 </div>
                 <div class="row g-3">
-                    <div class="col-sm-4"><a class="quick-action" href="data_quality.php?issue=missing_coordinates"><i class="fas fa-location-dot" aria-hidden="true"></i><span><strong class="d-block"><?= number_format((int) ($dataQuality['missing_coordinates'] ?? 0)) ?></strong><small>بدون إحداثيات</small></span></a></div>
-                    <div class="col-sm-4"><a class="quick-action" href="data_quality.php?issue=missing_imam_phone"><i class="fas fa-phone-slash" aria-hidden="true"></i><span><strong class="d-block"><?= number_format((int) ($dataQuality['missing_imam_phone'] ?? 0)) ?></strong><small>هاتف ناقص</small></span></a></div>
-                    <div class="col-sm-4"><a class="quick-action" href="audit.php?q=mosque.import"><i class="fas fa-file-circle-exclamation" aria-hidden="true"></i><span><strong class="d-block"><?= number_format((int) $recentImportIssues) ?></strong><small>مشاكل استيراد</small></span></a></div>
+                    <div class="col-sm-6"><a class="quick-action" href="data_quality.php?issue=missing_coordinates"><i class="fas fa-location-dot" aria-hidden="true"></i><span><strong class="d-block"><?= number_format((int) ($dataQuality['missing_coordinates'] ?? 0)) ?></strong><small>بدون إحداثيات</small></span></a></div>
+                    <div class="col-sm-6"><a class="quick-action" href="data_quality.php?issue=missing_imam_phone"><i class="fas fa-phone-slash" aria-hidden="true"></i><span><strong class="d-block"><?= number_format((int) ($dataQuality['missing_imam_phone'] ?? 0)) ?></strong><small>هاتف ناقص</small></span></a></div>
                 </div>
             </div>
         </section>
@@ -79,7 +78,7 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
                 <?php if ($isAdmin): ?><a class="quick-action" href="add_mosque.php"><i class="fas fa-plus" aria-hidden="true"></i><span><strong class="d-block">إضافة مسجد</strong><small class="text-muted">إنشاء سجل جديد</small></span></a><?php endif; ?>
                 <a class="quick-action" href="mosque_maps.php"><i class="fas fa-map-location-dot" aria-hidden="true"></i><span><strong class="d-block">الخريطة</strong><small class="text-muted">فحص التغطية المكانية</small></span></a>
                 <a class="quick-action" href="quran_mosques.php"><i class="fas fa-book-quran" aria-hidden="true"></i><span><strong class="d-block">برامج القرآن</strong><small class="text-muted">المعلمون والطلبة</small></span></a>
-                <?php if ($isAdmin): ?><a class="quick-action" href="audit.php"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i><span><strong class="d-block">سجل التدقيق</strong><small class="text-muted">آخر العمليات</small></span></a><a class="quick-action" href="backup.php"><i class="fas fa-shield-halved" aria-hidden="true"></i><span><strong class="d-block">نسخة احتياطية</strong><small class="text-muted">تنزيل JSON آمن</small></span></a><?php endif; ?>
+                <?php if ($isAdmin): ?><a class="quick-action" href="backup.php"><i class="fas fa-shield-halved" aria-hidden="true"></i><span><strong class="d-block">نسخة احتياطية</strong><small class="text-muted">تنزيل JSON آمن</small></span></a><?php endif; ?>
             </div>
         </aside>
     </div>
@@ -109,14 +108,4 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
         <?php endif; ?>
     </section>
 
-    <?php if (!empty($recentAuditEvents) && $isAdmin): ?>
-    <section class="data-panel reveal" aria-labelledby="activityTitle">
-        <div class="data-panel__header"><div><span class="page-kicker">المساءلة</span><h2 id="activityTitle">النشاط الأخير</h2></div><a class="btn btn-sm btn-outline-primary" href="audit.php">السجل الكامل</a></div>
-        <div class="data-panel__body quick-actions">
-            <?php foreach (array_slice($recentAuditEvents, 0, 5) as $event): ?>
-            <div class="quick-action"><i class="fas fa-wave-square" aria-hidden="true"></i><span class="flex-grow-1"><strong class="d-block"><?= $view->e($event['action'] ?? 'عملية إدارية') ?></strong><small class="text-muted"><?= $view->e($event['actor']['username'] ?? 'غير محدد') ?> · <?= $view->e($event['timestamp'] ?? '') ?></small></span><span class="status-badge <?= ($event['outcome'] ?? '') === 'success' ? 'text-success bg-success-subtle' : 'text-warning bg-warning-subtle' ?>"><?= $view->e($event['outcome'] ?? '') ?></span></div>
-            <?php endforeach; ?>
-        </div>
-    </section>
-    <?php endif; ?>
 </div>

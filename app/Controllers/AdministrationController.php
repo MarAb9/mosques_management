@@ -11,7 +11,6 @@ use App\Core\Session;
 use App\Core\View;
 use App\Repositories\MosqueRepository;
 use App\Services\AuditLogger;
-use App\Services\AuditLogService;
 use App\Services\BackupService;
 use App\Services\DeletedMosqueService;
 
@@ -21,7 +20,6 @@ final class AdministrationController extends Controller
         View $view,
         Session $session,
         private readonly MosqueRepository $mosques,
-        private readonly AuditLogService $auditLog,
         private readonly AuditLogger $audit,
         private readonly DeletedMosqueService $deletedMosques,
         private readonly BackupService $backup,
@@ -40,15 +38,6 @@ final class AdministrationController extends Controller
         ]);
     }
 
-    public function audit(Request $request): Response
-    {
-        $q = trim((string) $request->query('q', ''));
-
-        return $this->render('admin.audit', [
-            'events' => $this->auditLog->recent(80, $q !== '' ? $q : null),
-            'q' => $q,
-        ]);
-    }
 
     public function trash(Request $request): Response
     {

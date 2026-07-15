@@ -123,11 +123,6 @@ final class Session
         return $this->hasRole('admin', 'importer');
     }
 
-    public function canViewAudit(): bool
-    {
-        return $this->hasRole('admin');
-    }
-
     // ── Flash messages (same keys as legacy: 'success' / 'error') ───────
 
     public function flash(string $type, string $message): void

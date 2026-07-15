@@ -39,7 +39,7 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
                             <li>يحتوي الصف الأول على عناوين الأعمدة.</li>
                             <li>الأعمدة الأساسية من B إلى E موجودة.</li>
                             <li>الرمز الوطني في العمود E فريد لكل سجل.</li>
-                            <li>تعرض المعاينة الصفوف الصحيحة والمكررة والناقصة قبل التنفيذ.</li>
+                            <li>تعرض المعاينة أعداد الصفوف الجاهزة والمكررة قبل التنفيذ.</li>
                         </ul>
                     </details>
                 </div>
@@ -61,19 +61,13 @@ $actions = '<button class="btn btn-outline-primary" type="button" data-bs-toggle
 
     <?php if (!empty($importPreview)): ?>
     <section class="data-panel mt-4" aria-labelledby="previewTitle">
-        <div class="data-panel__header"><div><span class="page-kicker">مراجعة قبل التنفيذ</span><h2 id="previewTitle">نتيجة تحليل ملف الاستيراد</h2></div><?php if (!empty($importPreview['errors'])): ?><a class="btn btn-sm btn-outline-danger" href="import_export.php?import_error_report=<?= urlencode((string) $importPreview['token']) ?>"><i class="fas fa-file-csv me-1" aria-hidden="true"></i>تقرير الأخطاء</a><?php endif; ?></div>
+        <div class="data-panel__header"><div><span class="page-kicker">مراجعة قبل التنفيذ</span><h2 id="previewTitle">ملخص ملف الاستيراد</h2></div></div>
         <div class="data-panel__body">
             <div class="metric-grid mb-4">
                 <?= $view->partial('components.metric_card', ['label' => 'إجمالي الصفوف', 'value' => number_format((int) ($importPreview['total_rows'] ?? 0)), 'icon' => 'fa-table-list']) ?>
                 <?= $view->partial('components.metric_card', ['label' => 'جاهزة للاستيراد', 'value' => number_format((int) ($importPreview['valid_rows'] ?? 0)), 'icon' => 'fa-circle-check']) ?>
                 <?= $view->partial('components.metric_card', ['label' => 'صفوف مكررة', 'value' => number_format((int) ($importPreview['duplicate_rows'] ?? 0)), 'icon' => 'fa-copy', 'variant' => 'warning']) ?>
-                <?= $view->partial('components.metric_card', ['label' => 'ناقصة أو خاطئة', 'value' => number_format((int) ($importPreview['skipped_rows'] ?? 0)), 'icon' => 'fa-circle-xmark', 'variant' => 'danger']) ?>
             </div>
-            <div class="table-responsive"><table class="table app-table align-middle"><thead><tr><th>السطر</th><th>المسجد</th><th>الرمز الوطني</th><th>الحالة</th><th>الملاحظة</th></tr></thead><tbody>
-                <?php foreach (($importPreview['preview_rows'] ?? []) as $row): $badge = ($row['status'] ?? '') === 'valid' ? 'success' : ((($row['status'] ?? '') === 'duplicate') ? 'warning' : 'danger'); ?>
-                <tr><td><?= $view->e((string) ($row['row'] ?? '')) ?></td><td><?= $view->e((string) ($row['mosque_name'] ?? '')) ?></td><td><span class="badge bg-light text-dark"><?= $view->e((string) ($row['national_code'] ?? '')) ?></span></td><td><span class="status-badge text-<?= $badge ?> bg-<?= $badge ?>-subtle"><?= $view->e((string) ($row['status'] ?? '')) ?></span></td><td><?= $view->e((string) ($row['message'] ?? '')) ?></td></tr>
-                <?php endforeach; ?>
-            </tbody></table></div>
             <form method="POST" action="import_export.php" class="d-flex justify-content-end gap-2 mt-3 js-confirm-submit" data-confirm="هل تريد تنفيذ الاستيراد الآن؟"><input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>"><input type="hidden" name="import_token" value="<?= $view->e((string) $importPreview['token']) ?>"><a href="import_export.php" class="btn btn-outline-secondary">إلغاء</a><button type="submit" class="btn btn-success"><i class="fas fa-check me-1" aria-hidden="true"></i>تأكيد الاستيراد</button></form>
         </div>
     </section>

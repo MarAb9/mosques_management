@@ -1,11 +1,9 @@
-<?php $actions = '<a href="audit.php?q=mosque.delete" class="btn btn-outline-primary"><i class="fas fa-clock-rotate-left me-2" aria-hidden="true"></i>عمليات الحذف</a>'; ?>
 <div class="admin-workspace">
     <?= $view->partial('components.page_header', [
         'kicker' => 'الاسترجاع الآمن',
         'title' => 'سلة المساجد المحذوفة',
         'subtitle' => 'راجع النسخ المؤرشفة واستعد السجل المناسب دون تغيير بقية بيانات النظام.',
         'icon' => 'fa-trash-can-arrow-up',
-        'actionsHtml' => $actions,
     ]) ?>
 
     <?php if ($successMessage !== null): ?><div class="alert alert-success" role="status"><i class="fas fa-circle-check me-2" aria-hidden="true"></i><?= $view->e($successMessage) ?></div><?php endif; ?>
