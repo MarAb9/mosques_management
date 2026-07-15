@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
-                <h4 class="mb-0">إضافة مسجد جديد</h4>
+                <div><span class="page-kicker">إدارة المساجد</span><h1 class="h4 mt-1 mb-1"><i class="fas fa-circle-plus me-2 text-muted" aria-hidden="true"></i>إضافة مسجد جديد</h1><p class="text-muted mb-0">أدخل بيانات الهوية والموقع والخدمات والطاقم، ثم راجعها قبل الحفظ.</p></div>
             </div>
         </div>
     </div>
@@ -39,7 +39,7 @@
         </div>
     </nav>
 
-    <form method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data"
+    <form data-mosque-form-mode="create" method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data"
           data-guard-unsaved="true"
           data-original-registration-number="<?= $view->e((string) ($formData['registration_number'] ?? '')) ?>"
           data-google-maps-key="<?= $view->e((string) ($googleMapsApiKey ?? '')) ?>"
@@ -63,7 +63,7 @@
                                 <div class="invalid-feedback d-block"><?= $view->e($errors['main_image']) ?></div>
                             <?php endif; ?>
                             <div id="image-preview-container" class="mt-2 d-none">
-                                <img id="image-preview" class="img-thumbnail" style="max-height: 200px;">
+                                <img id="image-preview" class="img-thumbnail" >
                                 <button type="button" id="remove-image" class="btn btn-sm btn-danger mt-2">
                                     <i class="fas fa-trash"></i> إزالة الصورة
                                 </button>
@@ -129,8 +129,8 @@
 
                                         <!-- Map Interface -->
                                         <div class="mt-3">
-                                            <div id="mapContainer" style="height: 300px; display: none;" class="border rounded">
-                                                <div id="map" style="height: 100%;"></div>
+                                            <div id="mapContainer" class="form-map-shell atlas-collapsed-section border rounded">
+                                                <div id="map" class="form-map-canvas"></div>
                                             </div>
                                             <button type="button" id="showMapBtn" class="btn btn-outline-primary btn-sm mt-2">
                                                 <i class="fas fa-map-marker-alt me-2"></i>اختر الموقع على الخريطة
@@ -223,7 +223,7 @@
                         </div>
 
                         <!-- Pashalik Section -->
-                        <div id="pashalik_section" style="display: none;">
+                        <div id="pashalik_section" class="atlas-collapsed-section">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -265,7 +265,7 @@
                         </div>
 
                         <!-- Circle Section -->
-                        <div id="circle_section" style="display: none;">
+                        <div id="circle_section" class="atlas-collapsed-section">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">

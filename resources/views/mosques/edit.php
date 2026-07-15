@@ -5,36 +5,12 @@
  */
 ?>
 
-<!-- Add data attributes to form elements for initialization -->
-<script nonce="<?= $view->e($cspNonce ?? '') ?>">
-    // Pass saved values to JavaScript
-    document.addEventListener('DOMContentLoaded', function() {
-        const adminTypeSelect = document.getElementById('admin_type');
-        if (adminTypeSelect) adminTypeSelect.dataset.savedValue = <?= json_encode((string) ($formData['admin_type'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-
-        const pashalikSelect = document.getElementById('pashalik');
-        if (pashalikSelect) pashalikSelect.dataset.savedValue = <?= json_encode((string) ($formData['pashalik'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-
-        const circleSelect = document.getElementById('circle');
-        if (circleSelect) circleSelect.dataset.savedValue = <?= json_encode((string) ($formData['circle'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-
-        const pashalikCommunitySelect = document.getElementById('pashalik_community');
-        if (pashalikCommunitySelect) pashalikCommunitySelect.dataset.savedValue = <?= json_encode((string) ($formData['community'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-
-        const leadershipSelect = document.getElementById('leadership');
-        if (leadershipSelect) leadershipSelect.dataset.savedValue = <?= json_encode((string) ($formData['leadership'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-
-        const attachmentSelect = document.getElementById('administrative_attachment');
-        if (attachmentSelect) attachmentSelect.dataset.savedValue = <?= json_encode((string) ($formData['administrative_attachment'] ?? ''), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-    });
-</script>
-
 <!-- The HTML form remains the same, but add this before the closing body tag -->
  <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
-                <h4 class="mb-0">تعديل بيانات المسجد</h4>
+                <div><span class="page-kicker">إدارة المساجد</span><h1 class="h4 mt-1 mb-1"><i class="fas fa-pen-to-square me-2 text-muted" aria-hidden="true"></i>تعديل بيانات المسجد</h1><p class="text-muted mb-0">حدّث الحقول المطلوبة مع الحفاظ على الرمز والعلاقات الحالية للسجل.</p></div>
             </div>
         </div>
     </div>
@@ -64,7 +40,7 @@
         </div>
     </nav>
 
-    <form method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data"
+    <form data-mosque-form-mode="edit" method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data"
           data-guard-unsaved="true"
           data-original-registration-number="<?= $view->e((string) ($formData['registration_number'] ?? '')) ?>"
           data-google-maps-key="<?= $view->e((string) ($googleMapsApiKey ?? '')) ?>"
@@ -89,9 +65,9 @@
                             <?php endif; ?>
                             <div id="image-preview-container" class="mt-2 <?= empty($formData['main_image']) ? 'd-none' : '' ?>">
                                 <?php if (!empty($formData['main_image'])): ?>
-                                    <img id="image-preview" class="img-thumbnail" style="max-height: 200px;" src="<?= $view->e($formData['main_image']) ?>" alt="صورة المسجد الحالية">
+                                    <img id="image-preview" class="img-thumbnail"  src="<?= $view->e($formData['main_image']) ?>" alt="صورة المسجد الحالية">
                                 <?php else: ?>
-                                    <img id="image-preview" class="img-thumbnail" style="max-height: 200px;">
+                                    <img id="image-preview" class="img-thumbnail" >
                                 <?php endif; ?>
                                 <button type="button" id="remove-image" class="btn btn-sm btn-danger mt-2">
                                     <i class="fas fa-trash"></i> إزالة الصورة
@@ -149,8 +125,8 @@
                             <small class="text-muted">مثال: -2.325653868551601</small>
                         </div>
                         <div class="col-12 mt-3">
-                            <div id="mapContainer" style="height: 300px; display: none;" class="border rounded">
-                                <div id="map" style="height: 100%;"></div>
+                            <div id="mapContainer" class="form-map-shell atlas-collapsed-section border rounded">
+                                <div id="map" class="form-map-canvas"></div>
                             </div>
                             <button type="button" id="showMapBtn" class="btn btn-outline-primary btn-sm mt-2">
                                 <i class="fas fa-map-marker-alt me-2"></i>اختر الموقع على الخريطة
@@ -224,7 +200,7 @@
                         <div class="mb-3">
                             <label for="admin_type" class="form-label">نوع التقسيم الإداري <span class="text-danger">*</span></label>
                             <select class="form-select <?= isset($errors['admin_type']) ? 'is-invalid' : '' ?>"
-                                    id="admin_type" name="admin_type" required>
+                                    id="admin_type" data-saved-value="<?= $view->e((string) ($formData['admin_type'] ?? '')) ?>" name="admin_type" required>
                                 <option value="">-- اختر النوع --</option>
                                 <option value="pashalik" <?= ($formData['admin_type'] ?? '') == 'pashalik' ? 'selected' : '' ?>>باشوية</option>
                                 <option value="circle" <?= ($formData['admin_type'] ?? '') == 'circle' ? 'selected' : '' ?>>دائرة</option>
@@ -233,13 +209,13 @@
                         </div>
 
                         <!-- Pashalik Section -->
-                        <div id="pashalik_section" style="display: none;">
+                        <div id="pashalik_section" class="atlas-collapsed-section">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="pashalik" class="form-label">الباشوية <span class="text-danger">*</span></label>
                                         <select class="form-select <?= isset($errors['pashalik']) ? 'is-invalid' : '' ?>"
-                                               id="pashalik" name="pashalik" required>
+                                               id="pashalik" data-saved-value="<?= $view->e((string) ($formData['pashalik'] ?? '')) ?>" name="pashalik" required>
                                             <option value="">-- اختر الباشوية --</option>
                                             <option value="بركان" <?= ($formData['pashalik'] ?? '') == 'بركان' ? 'selected' : '' ?>>باشوية بركان</option>
                                             <option value="سيدي سليمان شراعة" <?= ($formData['pashalik'] ?? '') == 'سيدي سليمان شراعة' ? 'selected' : '' ?>>باشوية سيدي سليمان شراعة</option>
@@ -255,18 +231,18 @@
                                     <div class="mb-3">
                                         <label for="pashalik_community" class="form-label">الجماعة <span class="text-danger">*</span></label>
                                         <select class="form-select <?= isset($errors['community']) ? 'is-invalid' : '' ?>"
-                                               id="pashalik_community" name="pashalik_community" required>
+                                               id="pashalik_community" data-saved-value="<?= $view->e((string) ($formData['community'] ?? '')) ?>" name="pashalik_community" required>
                                             <option value="">-- اختر الجماعة --</option>
                                         </select>
                                         <div class="invalid-feedback"><?= $errors['community'] ?? 'يرجى اختيار الجماعة' ?></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row g-3" id="attachment_container" style="display: none;">
+                            <div class="row g-3" id="attachment_container" class="atlas-collapsed-section">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="administrative_attachment" class="form-label">الملحقة/المقاطعة الإدارية</label>
-                                        <select class="form-select" id="administrative_attachment" name="administrative_attachment">
+                                        <select class="form-select" id="administrative_attachment" data-saved-value="<?= $view->e((string) ($formData['administrative_attachment'] ?? '')) ?>" name="administrative_attachment">
                                             <option value="">-- اختر الملحقة/المقاطعة --</option>
                                         </select>
                                     </div>
@@ -275,13 +251,13 @@
                         </div>
 
                         <!-- Circle Section -->
-                        <div id="circle_section" style="display: none;">
+                        <div id="circle_section" class="atlas-collapsed-section">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="circle" class="form-label">الدائرة <span class="text-danger">*</span></label>
                                         <select class="form-select <?= isset($errors['circle']) ? 'is-invalid' : '' ?>"
-                                               id="circle" name="circle" required>
+                                               id="circle" data-saved-value="<?= $view->e((string) ($formData['circle'] ?? '')) ?>" name="circle" required>
                                             <option value="">-- اختر الدائرة --</option>
                                             <option value="أحفير" <?= ($formData['circle'] ?? '') == 'أحفير' ? 'selected' : '' ?>>دائرة أحفير</option>
                                             <option value="أكليم" <?= ($formData['circle'] ?? '') == 'أكليم' ? 'selected' : '' ?>>دائرة أكليم</option>
@@ -293,7 +269,7 @@
                                     <div class="mb-3">
                                         <label for="leadership" class="form-label">القيادة <span class="text-danger">*</span></label>
                                         <select class="form-select <?= isset($errors['leadership']) ? 'is-invalid' : '' ?>"
-                                               id="leadership" name="leadership" required>
+                                               id="leadership" data-saved-value="<?= $view->e((string) ($formData['leadership'] ?? '')) ?>" name="leadership" required>
                                             <option value="">-- اختر القيادة --</option>
                                         </select>
                                         <div class="invalid-feedback"><?= $errors['leadership'] ?? 'يرجى اختيار القيادة' ?></div>
