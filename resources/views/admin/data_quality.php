@@ -1,62 +1,64 @@
 <?php
-$labels = [
-    'missing_coordinates' => 'مساجد بدون إحداثيات',
-    'missing_imam_phone' => 'أرقام هاتف الإمام ناقصة',
-    'incomplete_addresses' => 'عناوين ناقصة',
-    'invalid_years' => 'سنوات بناء غير صالحة',
-    'duplicate_national_codes' => 'رموز وطنية مكررة',
+$issues = [
+    'missing_coordinates' => ['label' => 'إحداثيات ناقصة', 'description' => 'مساجد لا تظهر على الخريطة التشغيلية', 'icon' => 'fa-location-dot', 'severity' => 'warning'],
+    'missing_imam_phone' => ['label' => 'هاتف الإمام ناقص', 'description' => 'بيانات اتصال تحتاج استكمالاً', 'icon' => 'fa-phone-slash', 'severity' => 'danger'],
+    'incomplete_addresses' => ['label' => 'عناوين غير مكتملة', 'description' => 'عناوين يصعب الاعتماد عليها', 'icon' => 'fa-map-pin', 'severity' => 'warning'],
+    'invalid_years' => ['label' => 'سنوات بناء غير صالحة', 'description' => 'قيم زمنية تحتاج المراجعة', 'icon' => 'fa-calendar-xmark', 'severity' => 'danger'],
+    'duplicate_national_codes' => ['label' => 'رموز وطنية مكررة', 'description' => 'تعارض في معرفات السجلات', 'icon' => 'fa-copy', 'severity' => 'danger'],
 ];
+$totalIssues = array_sum(array_map('intval', $summary ?? []));
+$actions = '<a href="import_export.php?export=1&amp;no_location=' . ($issue === 'missing_coordinates' ? '1' : '0') . '" class="btn btn-outline-primary"><i class="fas fa-file-export me-2" aria-hidden="true"></i>تصدير تقرير</a>';
 ?>
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-        <div>
-            <h1 class="h3 mb-1">لوحة جودة البيانات</h1>
-            <p class="text-muted mb-0">مؤشرات قابلة للتنفيذ لتحسين قاعدة بيانات المساجد.</p>
-        </div>
-        <a href="index.php" class="btn btn-outline-secondary"><i class="fas fa-arrow-right me-2"></i>العودة للوحة التحكم</a>
-    </div>
+<div class="admin-workspace">
+    <?= $view->partial('components.page_header', [
+        'kicker' => 'الحوكمة والموثوقية',
+        'title' => 'لوحة جودة البيانات',
+        'subtitle' => 'حوّل مؤشرات النقص والتعارض إلى قائمة إصلاح واضحة وقابلة للتنفيذ.',
+        'icon' => 'fa-clipboard-check',
+        'actionsHtml' => $actions,
+    ]) ?>
 
-    <div class="row g-3 mb-4">
-        <?php foreach ($labels as $key => $label): ?>
-        <div class="col-xl col-md-4 col-sm-6">
-            <a class="card h-100 text-decoration-none <?= $issue === $key ? 'border-primary shadow' : 'border-0 shadow-sm' ?>" href="data_quality.php?issue=<?= urlencode($key) ?>">
-                <div class="card-body">
-                    <div class="text-muted small"><?= $view->e($label) ?></div>
-                    <div class="display-6 fw-bold text-primary"><?= number_format((int) ($summary[$key] ?? 0)) ?></div>
-                </div>
-            </a>
-        </div>
+    <?php if ($totalIssues === 0): ?>
+    <section class="data-panel mb-4">
+        <?= $view->partial('components.empty_state', ['icon' => 'fa-circle-check', 'title' => 'جودة البيانات مستقرة', 'message' => 'لم يرصد النظام أياً من فئات المشاكل المتابعة حالياً.']) ?>
+    </section>
+    <?php else: ?>
+    <div class="alert alert-warning d-flex align-items-start gap-3" role="status"><i class="fas fa-triangle-exclamation fs-4 mt-1" aria-hidden="true"></i><div><strong class="d-block">يوجد <?= number_format($totalIssues) ?> مؤشراً يحتاج المراجعة</strong><span>ابدأ بالفئات الحرجة، ثم صحح السجلات مباشرة من الجدول.</span></div></div>
+    <?php endif; ?>
+
+    <section class="metric-grid mb-4" aria-label="فئات مشاكل جودة البيانات">
+        <?php foreach ($issues as $key => $config): ?>
+        <a class="metric-card metric-card--<?= $view->e($config['severity']) ?><?= $issue === $key ? ' border-primary' : '' ?>" href="data_quality.php?issue=<?= urlencode($key) ?>" aria-current="<?= $issue === $key ? 'true' : 'false' ?>">
+            <div class="metric-card__top"><span class="metric-card__label"><?= $view->e($config['label']) ?></span><span class="metric-card__icon"><i class="fas <?= $view->e($config['icon']) ?>" aria-hidden="true"></i></span></div>
+            <div><div class="metric-card__value"><?= number_format((int) ($summary[$key] ?? 0)) ?></div><div class="metric-card__context"><?= $view->e($config['description']) ?></div></div>
+        </a>
         <?php endforeach; ?>
-    </div>
+    </section>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0"><?= $view->e($labels[$issue] ?? 'عينات جودة البيانات') ?></h2>
-            <a class="btn btn-sm btn-success" href="import_export.php?export=1&no_location=<?= $issue === 'missing_coordinates' ? '1' : '0' ?>">
-                <i class="fas fa-file-export me-1"></i>تصدير تقرير
-            </a>
-        </div>
+    <section class="data-panel" aria-labelledby="qualitySamplesTitle">
+        <div class="data-panel__header"><div><span class="page-kicker">السجلات المتأثرة</span><h2 id="qualitySamplesTitle"><?= $view->e($issues[$issue]['label'] ?? 'عينات جودة البيانات') ?></h2></div><span class="status-badge <?= empty($samples) ? 'text-success bg-success-subtle' : 'text-warning bg-warning-subtle' ?>"><?= count($samples) ?> نتيجة معروضة</span></div>
+        <?php if (empty($samples)): ?>
+            <?= $view->partial('components.empty_state', ['icon' => 'fa-circle-check', 'title' => 'لا توجد مشاكل في هذه الفئة', 'message' => 'جميع السجلات المطابقة اجتازت هذا الفحص.']) ?>
+        <?php else: ?>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 app-table app-table--compact">
-                <thead><tr><th>ر.ت.ع</th><th>الرمز الوطني</th><th>المسجد</th><th>الجماعة</th><th>العنوان</th><th>الإمام/الهاتف</th><th>الموقع/السنة</th><th>إجراء</th></tr></thead>
+            <table class="table app-table app-table--compact align-middle mb-0">
+                <thead><tr><th>ر.ت.ع</th><th>الرمز الوطني</th><th>المسجد</th><th>الجماعة</th><th>العنوان</th><th>الإمام والاتصال</th><th>الموقع / السنة</th><th>الإجراء</th></tr></thead>
                 <tbody>
-                <?php if (empty($samples)): ?>
-                    <tr><td colspan="8" class="text-center text-muted py-5"><i class="fas fa-check-circle fa-2x d-block mb-2 text-success"></i>لا توجد مشاكل في هذا التصنيف.</td></tr>
-                <?php endif; ?>
                 <?php foreach ($samples as $row): ?>
                     <tr>
-                        <td><?= $view->e($row['registration_number'] ?? '') ?></td>
+                        <td class="fw-bold"><?= $view->e($row['registration_number'] ?? '') ?></td>
                         <td><span class="badge bg-light text-dark"><?= $view->e($row['national_code'] ?? '') ?></span></td>
-                        <td><?= $view->e($row['mosque_name'] ?? '') ?></td>
+                        <td><strong><?= $view->e($row['mosque_name'] ?? '') ?></strong></td>
                         <td><?= $view->e($row['community'] ?? '') ?></td>
                         <td class="text-muted small"><?= $view->e($row['address'] ?? '') ?></td>
-                        <td><?= $view->e($row['imam_name'] ?? '') ?><br><span class="text-muted small"><?= $view->e($row['imam_phone'] ?? '') ?></span></td>
-                        <td class="small"><?= $view->e(trim((string)($row['latitude'] ?? '') . ', ' . (string)($row['longitude'] ?? ''), ', ')) ?><br><?= $view->e($row['construction_date'] ?? '') ?></td>
-                        <td><a class="btn btn-sm btn-primary" href="edit_mosque.php?id=<?= urlencode((string) ($row['registration_number'] ?? '')) ?>">تصحيح</a></td>
+                        <td><?= $view->e($row['imam_name'] ?? 'غير محدد') ?><br><span class="text-muted small"><?= $view->e($row['imam_phone'] ?? 'بدون هاتف') ?></span></td>
+                        <td class="small"><?= $view->e(trim((string) ($row['latitude'] ?? '') . ', ' . (string) ($row['longitude'] ?? ''), ', ')) ?><br><?= $view->e($row['construction_date'] ?? '') ?></td>
+                        <td><a class="btn btn-sm btn-primary" href="edit_mosque.php?id=<?= urlencode((string) ($row['registration_number'] ?? '')) ?>"><i class="fas fa-wrench me-1" aria-hidden="true"></i>تصحيح</a></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-    </div>
+        <?php endif; ?>
+    </section>
 </div>

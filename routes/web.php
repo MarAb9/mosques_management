@@ -105,10 +105,6 @@ return function (Router $router): void {
         \App\Middleware\Authenticate::class,
         \App\Middleware\RequireAdmin::class,
     ]);
-    $router->get('audit.php', [\App\Controllers\AdministrationController::class, 'audit'], [
-        \App\Middleware\Authenticate::class,
-        \App\Middleware\RequireAdmin::class,
-    ]);
     $router->get('trash.php', [\App\Controllers\AdministrationController::class, 'trash'], [
         \App\Middleware\Authenticate::class,
         \App\Middleware\RequireAdmin::class,
@@ -179,7 +175,6 @@ return function (Router $router): void {
         'bulk_delete_mosques.php',
         'import_export.php',
         'data_quality.php',
-        'audit.php',
         'trash.php',
         'restore_mosque.php',
         'backup.php',

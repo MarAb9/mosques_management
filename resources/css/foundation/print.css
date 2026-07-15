@@ -1,0 +1,27 @@
+@media print {
+    @page { size: A4; margin: 14mm; }
+    html, body { min-width: 0 !important; color: #000 !important; background: #fff !important; font-size: 10.5pt; }
+    .app-sidebar, .app-topbar, .sidebar-overlay, .mobile-nav-toggle, .footer-section, .btn, button, .dropdown, .form-stepper, .decorative-scene, .no-print { display: none !important; }
+    .app-main, .app-content, #main-content { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    .card, .data-panel { break-inside: avoid; border: 1px solid #aaa !important; box-shadow: none !important; background: #fff !important; }
+    .table { font-size: 9pt; }
+    .table thead { display: table-header-group; }
+    .table tr { break-inside: avoid; }
+    a { color: #000 !important; text-decoration: none !important; }
+}
+
+.mosque-detail-image { max-height: 15.625rem; object-fit: cover; }
+.print-header { text-align: center; margin-bottom: 1.75rem; padding-bottom: 1rem; border-bottom: 2px solid var(--color-brand-900); }
+.print-header h1 { margin: 0; font-size: 1.5rem; }
+.print-header .subtitle { margin: .25rem 0 0; color: var(--color-text-muted); }
+.print-header .logo { width: auto; max-width: 18.75rem; height: 9.375rem; object-fit: contain; }
+.info-table { width: 100%; margin-bottom: 1.25rem; border-collapse: collapse; break-inside: avoid; }
+.info-table th, .info-table td { padding: .625rem .9rem; border: 1px solid var(--color-border-strong); text-align: start; }
+.info-table th { width: 30%; background: #f4f1e8; }
+.section-title { margin: 1.5rem 0 .8rem; padding-bottom: .35rem; color: var(--color-brand-900); font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--color-border-soft); }
+.print-watermark { position: fixed; inset-block-end: 20%; inset-inline: 0; z-index: -1; color: #999; font-size: 5rem; text-align: center; opacity: .08; transform: rotate(-30deg); pointer-events: none; }
+.mosque-image { display: block; max-width: 100%; max-height: 18.75rem; margin: 0 auto 1.25rem; border-radius: var(--radius-sm); }
+.no-image { padding: 1.25rem; margin-bottom: 1.25rem; color: var(--color-text-muted); text-align: center; border: 1px dashed var(--color-border-strong); }
+.staff-section { margin-bottom: 1rem; }
+.staff-title { padding-bottom: .2rem; margin-bottom: .35rem; color: var(--color-brand-900); font-weight: 800; border-bottom: 1px solid var(--color-border-soft); }
+.print-actions { display: flex; justify-content: center; gap: .6rem; margin-top: 1.25rem; }

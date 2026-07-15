@@ -37,10 +37,6 @@ final class ImportExportController extends Controller
     /** GET import_export.php — page, or export when ?export is present. */
     public function handle(Request $request): Response
     {
-        if ($request->query('import_error_report') !== null) {
-            return $this->errorReport($request);
-        }
-
         if ($request->query('export') !== null) {
             return $this->export($request);
         }
@@ -165,24 +161,6 @@ final class ImportExportController extends Controller
     }
 
 
-    private function errorReport(Request $request): Response
-    {
-        try {
-            $token = (string) $request->query('import_error_report', '');
-            $csv = $this->importer->errorReportCsv($token);
-
-            return Response::stream(static function () use ($csv): void {
-                echo $csv;
-            }, [
-                'Content-Type' => 'text/csv; charset=UTF-8',
-                'Content-Disposition' => 'attachment;filename="import_errors.csv"',
-                'Cache-Control' => 'no-store',
-            ]);
-        } catch (\Exception $e) {
-            $this->errors->log($e);
-            return $this->redirectWithFlash('import_export.php', 'error', 'تعذر تنزيل تقرير أخطاء الاستيراد.');
-        }
-    }
     private function page(?array $importPreview = null): Response
     {
         return $this->render('import_export.index', [

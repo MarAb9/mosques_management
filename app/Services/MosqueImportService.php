@@ -17,7 +17,7 @@ use ZipArchive;
  *
  * Same sheet layout (columns B..AA), same duplicate policy (skip existing
  * national codes), same transaction + per-row error tolerance, and the
- * same result message counters.
+ * same successful import behavior.
  */
 final class MosqueImportService
 {
@@ -198,7 +198,6 @@ final class MosqueImportService
         $preview = $this->preview($path, (string) ($file['name'] ?? basename($path)));
         $preview['token'] = $token;
         $preview['stored_name'] = basename($path);
-        file_put_contents($this->previewDir() . DIRECTORY_SEPARATOR . $token . '.errors.json', json_encode($preview['errors'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
         return $preview;
     }
@@ -212,70 +211,39 @@ final class MosqueImportService
             throw new RuntimeException('Spreadsheet row limit exceeded.');
         }
 
-        $previewRows = [];
-        $errors = [];
         $valid = 0;
         $duplicates = 0;
-        $skipped = 0;
 
         for ($rowNumber = 2; $rowNumber <= $highestRow; $rowNumber++) {
             $row = $sheet->rangeToArray("A{$rowNumber}:AA{$rowNumber}", null, false, true, true)[$rowNumber] ?? [];
             $mosqueName = $this->cell($row, 'B');
             $nationalCode = $this->cell($row, 'E');
-            $status = 'valid';
-            $message = 'جاهز للاستيراد';
 
             if ($mosqueName === '' || $nationalCode === '') {
-                $status = 'skipped';
-                $message = 'اسم المسجد أو الرمز الوطني فارغ';
-                $skipped++;
-            } elseif ($this->mosques->nationalCodeExists($nationalCode)) {
-                $status = 'duplicate';
-                $message = 'رمز وطني مكرر داخل قاعدة البيانات';
+                continue;
+            }
+            if ($this->mosques->nationalCodeExists($nationalCode)) {
                 $duplicates++;
-            } else {
-                $adminType = $this->cell($row, 'X') !== '' ? 'pashalik' : ($this->cell($row, 'Z') !== '' ? 'circle' : '');
-                $validationData = [
-                    'mosque_name' => $mosqueName,
-                    'address' => $this->cell($row, 'C'),
-                    'construction_date' => $this->normalizeConstructionDate($this->cell($row, 'D')),
-                    'national_code' => $nationalCode,
-                    'admin_type' => $adminType,
-                    'pashalik' => $this->cell($row, 'X'),
-                    'circle' => $this->cell($row, 'Z'),
-                    'leadership' => $this->cell($row, 'AA'),
-                    'community' => $this->cell($row, 'H'),
-                ];
-                $validationErrors = $this->validator->requiredFields($validationData, $adminType);
-                if ($validationErrors !== []) {
-                    $status = 'error';
-                    $message = implode('، ', $validationErrors);
-                    $skipped++;
-                } else {
-                    $valid++;
-                }
+                continue;
             }
 
-            if ($status !== 'valid') {
-                $errors[] = [
-                    'row' => $rowNumber,
-                    'national_code' => $nationalCode,
-                    'mosque_name' => $mosqueName,
-                    'status' => $status,
-                    'message' => $message,
-                ];
+            $adminType = $this->cell($row, 'X') !== '' ? 'pashalik' : ($this->cell($row, 'Z') !== '' ? 'circle' : '');
+            $validationData = [
+                'mosque_name' => $mosqueName,
+                'address' => $this->cell($row, 'C'),
+                'construction_date' => $this->normalizeConstructionDate($this->cell($row, 'D')),
+                'national_code' => $nationalCode,
+                'admin_type' => $adminType,
+                'pashalik' => $this->cell($row, 'X'),
+                'circle' => $this->cell($row, 'Z'),
+                'leadership' => $this->cell($row, 'AA'),
+                'community' => $this->cell($row, 'H'),
+            ];
+            if ($this->validator->requiredFields($validationData, $adminType) !== []) {
+                continue;
             }
 
-            if (count($previewRows) < 20) {
-                $previewRows[] = [
-                    'row' => $rowNumber,
-                    'mosque_name' => $mosqueName,
-                    'national_code' => $nationalCode,
-                    'address' => $this->cell($row, 'C'),
-                    'status' => $status,
-                    'message' => $message,
-                ];
-            }
+            $valid++;
         }
 
         return [
@@ -283,9 +251,6 @@ final class MosqueImportService
             'total_rows' => max(0, $highestRow - 1),
             'valid_rows' => $valid,
             'duplicate_rows' => $duplicates,
-            'skipped_rows' => $skipped,
-            'preview_rows' => $previewRows,
-            'errors' => array_slice($errors, 0, 500),
         ];
     }
 
@@ -328,32 +293,6 @@ final class MosqueImportService
         if (!is_array($payload)) return null;
 
         return $payload;
-    }
-
-    public function errorReportCsv(string $token): string
-    {
-        if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
-            throw new RuntimeException('Invalid import token.');
-        }
-        $path = $this->previewDir() . DIRECTORY_SEPARATOR . $token . '.errors.json';
-        $errors = is_file($path) ? (array) json_decode((string) file_get_contents($path), true) : [];
-
-        $stream = fopen('php://temp', 'r+');
-        fputcsv($stream, ['row', 'national_code', 'mosque_name', 'status', 'message']);
-        foreach ($errors as $error) {
-            fputcsv($stream, [
-                $error['row'] ?? '',
-                $error['national_code'] ?? '',
-                $error['mosque_name'] ?? '',
-                $error['status'] ?? '',
-                $error['message'] ?? '',
-            ]);
-        }
-        rewind($stream);
-        $csv = stream_get_contents($stream);
-        fclose($stream);
-
-        return (string) $csv;
     }
 
     /** @return array{0: \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet, 1: int} */
@@ -455,17 +394,9 @@ final class MosqueImportService
         return true;
     }
 
-    /** Legacy success message, including the optional counters. */
+    /** Concise user-facing result without row diagnostics. */
     public function successMessage(array $result): string
     {
-        $message = "تم استيراد {$result['imported']} مسجد بنجاح";
-        if ($result['skipped'] > 0) {
-            $message .= " (تم تخطي {$result['skipped']} سجلات)";
-        }
-        if ($result['duplicates'] > 0) {
-            $message .= " (تم تجاهل {$result['duplicates']} مسجد مكرر)";
-        }
-
-        return $message;
+        return "تم استيراد {$result['imported']} مسجد بنجاح";
     }
 }

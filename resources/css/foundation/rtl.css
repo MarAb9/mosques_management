@@ -1,0 +1,8 @@
+[dir="rtl"] .dropdown-menu { text-align: start; }
+[dir="rtl"] .form-check { padding-inline-start: 0; padding-inline-end: 1.8em; }
+[dir="rtl"] .form-check .form-check-input { float: right; margin-inline-start: 0; margin-inline-end: -1.8em; }
+[dir="rtl"] .input-group > :not(:first-child) { margin-inline-start: -1px; margin-inline-end: 0; }
+.me-1, .me-2, .me-3 { margin-left: 0 !important; }
+.ms-1, .ms-2, .ms-3 { margin-right: 0 !important; }
+.me-1 { margin-inline-end: .25rem !important; } .me-2 { margin-inline-end: .5rem !important; } .me-3 { margin-inline-end: 1rem !important; }
+.ms-1 { margin-inline-start: .25rem !important; } .ms-2 { margin-inline-start: .5rem !important; } .ms-3 { margin-inline-start: 1rem !important; }

@@ -33,7 +33,7 @@ if (($row['responsible_count'] ?? 0) > 3) {
     $responsibleText .= ' +' . ($row['responsible_count'] - 3) . ' أكثر';
 }
 ?>
-                                    <tr class="animate__animated animate__fadeInUp" style="animation-delay: <?= $animationDelay ?>s">
+                                    <tr class="animate__animated animate__fadeInUp">
                                         <td>
                                             <input type="checkbox" name="selected_mosques[]" value="<?= $view->e($row['id']) ?>" class="form-check-input mosque-checkbox">
                                         </td>

@@ -1,0 +1,8 @@
+.quran-record-card { overflow: hidden; border: 1px solid rgba(199,161,90,.3); border-inline-start: .25rem solid var(--quran-accent, var(--color-brass)); box-shadow: var(--shadow-soft); }
+.quran-mobile-cards { display: none; }
+.directory-page-header { margin-block-end: 1.25rem; }
+.directory-page-header + .row { position: relative; }
+@media (max-width: 991.98px) {
+    .quran-table-wrapper { display: none; }
+    .quran-mobile-cards { display: block; }
+}

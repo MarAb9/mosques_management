@@ -145,6 +145,21 @@ $r = req('import_export.php', [CURLOPT_POSTFIELDS => [
 ]]);
 check('Import without CSRF rejected', $r['status'] === 403 && str_contains($r['body'], 'طلب غير صالح'));
 
+// Preview exposes aggregate counts only: no row diagnostics or error report.
+$r = req('import_export.php', [CURLOPT_POSTFIELDS => [
+    'csrf_token' => $token,
+    'preview_import' => '1',
+    'import_file' => new CURLFile($importFile, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'data.xlsx'),
+]]);
+preg_match('/name="import_token" value="([a-f0-9]{32})"/', $r['body'], $previewMatch);
+$previewToken = $previewMatch[1] ?? '';
+check('Preview hides error logs and row details', $r['status'] === 200
+    && str_contains($r['body'], 'ملخص ملف الاستيراد')
+    && $previewToken !== ''
+    && !str_contains($r['body'], 'import_error_report')
+    && !str_contains($r['body'], '<th>السطر</th>')
+    && !str_contains($r['body'], 'تقرير الأخطاء'));
+
 // Import with CSRF
 $r = req('import_export.php', [CURLOPT_POSTFIELDS => [
     'csrf_token' => $token,
@@ -153,9 +168,9 @@ $r = req('import_export.php', [CURLOPT_POSTFIELDS => [
 check('Import redirects back', $r['status'] === 302);
 
 $r = req('import_export.php');
-check('Import success message with counters', str_contains($r['body'], 'تم استيراد 1 مسجد بنجاح')
-    && str_contains($r['body'], 'تم تخطي 1 سجلات')
-    && str_contains($r['body'], 'تم تجاهل 1 مسجد مكرر'), 'flash rendered');
+check('Import success omits row diagnostics', str_contains($r['body'], 'تم استيراد 1 مسجد بنجاح')
+    && !str_contains($r['body'], 'تم تخطي')
+    && !str_contains($r['body'], 'تم تجاهل'), 'concise flash rendered');
 
 $row = $pdo->query("SELECT * FROM mosques WHERE national_code = '" . CODE_NEW . "'")->fetch(PDO::FETCH_ASSOC);
 check('Imported row exists', is_array($row));
@@ -169,11 +184,16 @@ $r = req('import_export.php', [CURLOPT_POSTFIELDS => [
     'import_file' => new CURLFile($importFile, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'data.xlsx'),
 ]]);
 $r = req('import_export.php');
-check('Re-import ignores duplicates', str_contains($r['body'], 'تم استيراد 0 مسجد بنجاح')
-    && str_contains($r['body'], 'تم تجاهل 2 مسجد مكرر'));
+check('Re-import stays concise', str_contains($r['body'], 'تم استيراد 0 مسجد بنجاح')
+    && !str_contains($r['body'], 'تم تجاهل'));
 
 // cleanup
 $pdo->prepare('DELETE FROM mosques WHERE national_code = ?')->execute([CODE_NEW]);
+if ($previewToken !== '') {
+    foreach (glob('/var/www/html/storage/cache/import-previews/' . $previewToken . '.*') ?: [] as $previewPath) {
+        @unlink($previewPath);
+    }
+}
 
 echo "\n--- $pass passed, $fail failed ---\n";
 exit($fail > 0 ? 1 : 0);

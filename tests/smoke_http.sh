@@ -68,6 +68,7 @@ assert_status "PrivateApp" "/app/Core/App.php" "404"
 assert_status "PrivateConfig" "/config/database.php" "404"
 assert_status "PrivateScripts" "/scripts/fix_coordinates.php" "404"
 assert_status "PrivateVendor" "/vendor/autoload.php" "404"
+assert_status "AuditRemoved" "/audit.php" "404"
 assert_status "UploadScript" "/uploads/test.php" "403"
 assert_status "PublicAsset" "/assets/css/style.css" "200"
 

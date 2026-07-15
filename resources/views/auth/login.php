@@ -2,213 +2,66 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - مساجد إقليم بركان</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0c342b">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <title>تسجيل الدخول — نظام مساجد بركان</title>
     <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css">
-    <link rel="stylesheet" href="assets/vendor/animate/animate.min.css">
     <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
-    <style nonce="<?= $view->e($cspNonce ?? '') ?>">
-        :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --dark-color: #212529;
-            --light-color: #f8f9fa;
-            --success-color: #4cc9f0;
-            --overlay-color: rgba(67, 97, 238, 0.85);
-        }
-
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', 'Segoe UI', sans-serif;
-        }
-
-        .full-page-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('assets/images/1.jpg') no-repeat center center;
-            background-size: cover;
-            z-index: -1;
-        }
-
-        .login-container {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .login-form-container {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 15px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: fadeInRight 0.8s ease-out;
-        }
-
-        .login-content {
-            text-align: center;
-            color: white;
-            margin-bottom: 2rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .login-content h2 {
-            font-weight: 700;
-            margin-bottom: 1rem;
-            font-size: 2rem;
-            color: var(--dark-color);
-        }
-
-        .login-content p {
-            font-size: 1rem;
-            color: var(--dark-color);
-            opacity: 0.8;
-        }
-
-        .form-title {
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--dark-color);
-            font-size: 1.8rem;
-            text-align: center;
-            position: relative;
-            padding-bottom: 1rem;
-        }
-
-        .form-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 50%;
-            transform: translateX(50%);
-            width: 60px;
-            height: 4px;
-            background: var(--primary-color);
-            border-radius: 2px;
-        }
-
-        .form-control {
-            padding: 0.85rem 1.25rem;
-            margin-bottom: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            background: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
-            background: white;
-        }
-
-        .btn-login {
-            padding: 0.85rem;
-            font-weight: 600;
-            margin-top: 1rem;
-            border-radius: 8px;
-            background: var(--primary-color);
-            border: none;
-            transition: all 0.3s ease;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .btn-login:hover {
-            background: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        .testimonial {
-            margin-top: 2rem;
-            font-style: italic;
-            font-size: 0.9rem;
-            position: relative;
-            padding: 1rem;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: var(--dark-color);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 767.98px) {
-            .login-form-container {
-                padding: 2rem;
-                margin: 1rem;
-                backdrop-filter: blur(5px);
-            }
-
-            .login-content h2 {
-                font-size: 1.8rem;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .login-form-container {
-                padding: 1.5rem;
-            }
-
-            .form-title {
-                font-size: 1.6rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/dist/app.min.css">
 </head>
-<body>
-    <!-- Full page background image -->
-    <div class="full-page-bg animate__animated animate__fadeIn"></div>
+<body class="login-page">
+    <a class="skip-link" href="#loginForm">الانتقال إلى نموذج الدخول</a>
+    <main class="login-shell">
+        <section class="login-panel" aria-labelledby="loginTitle">
+            <div class="login-card">
+                <div class="login-brand">
+                    <span class="login-brand__mark" aria-hidden="true"><i class="fas fa-mosque"></i></span>
+                    <div>
+                        <strong class="d-block">نظام مساجد بركان</strong>
+                        <small class="text-muted">المجلس العلمي المحلي</small>
+                    </div>
+                </div>
 
-    <!-- Login container -->
-    <div class="container login-container">
-        <div class="login-form-container">
-            <div class="login-content animate__animated animate__fadeIn">
-                <h2>مرحبًا بعودتك!</h2>
-                <p>أدخل بيانات الدخول للوصول إلى لوحة التحكم الخاصة بمساجد إقليم بركان</p>
-            </div>
-
-            <div class="login-form">
-                <h3 class="form-title">تسجيل الدخول</h3>
+                <span class="page-kicker">بوابة الإدارة المؤمنة</span>
+                <h1 id="loginTitle">مرحباً بعودتك</h1>
+                <p class="login-card__intro">أدخل بيانات حسابك للوصول إلى لوحة القيادة وإدارة السجلات التشغيلية للمساجد.</p>
 
                 <?php if (!empty($error)): ?>
-                    <div class="alert alert-danger animate__animated animate__shakeX" role="alert" aria-live="assertive"><?= $view->e($error) ?></div>
+                    <div class="alert alert-danger" role="alert" aria-live="assertive"><i class="fas fa-circle-exclamation me-2" aria-hidden="true"></i><?= $view->e($error) ?></div>
                 <?php endif; ?>
 
-                <form method="POST" action="">
+                <form method="POST" action="" id="loginForm">
                     <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
-                    <div class="mb-3">
+                    <div class="login-field mb-3">
                         <label for="username" class="form-label">اسم المستخدم</label>
-                        <input type="text" class="form-control animate__animated animate__fadeIn animate__delay-1s" id="username" name="username" required autocomplete="username" autocapitalize="none" placeholder="أدخل اسم المستخدم">
+                        <i class="fas fa-user" aria-hidden="true"></i>
+                        <input type="text" class="form-control" id="username" name="username" required autofocus autocomplete="username" autocapitalize="none" placeholder="أدخل اسم المستخدم">
                     </div>
-                    <div class="mb-3">
+                    <div class="login-field mb-3">
                         <label for="password" class="form-label">كلمة المرور</label>
-                        <input type="password" class="form-control animate__animated animate__fadeIn animate__delay-1s" id="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور">
+                        <i class="fas fa-lock" aria-hidden="true"></i>
+                        <input type="password" class="form-control" id="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور">
+                        <button type="button" class="btn btn-sm btn-link position-absolute top-50 end-0 mt-2 me-2 text-muted" id="passwordToggle" aria-label="إظهار كلمة المرور" aria-pressed="false"><i class="fas fa-eye" aria-hidden="true"></i></button>
                     </div>
-                    <button type="submit" name="login" class="btn btn-primary w-100 btn-login animate__animated animate__fadeInUp animate__delay-2s">
-                        <i class="fas fa-sign-in-alt me-2"></i> تسجيل الدخول
-                    </button>
+                    <button type="submit" name="login" value="1" class="btn btn-primary w-100 login-submit"><i class="fas fa-arrow-left-to-bracket me-2" aria-hidden="true"></i>دخول آمن إلى النظام</button>
                 </form>
 
-               <!-- <div class="testimonial animate__animated animate__fadeIn animate__delay-3s">
-                    "هذا النظام سهل عملية إدارة المساجد بشكل كبير ووفر علينا الكثير من الوقت والجهد"
-                </div>  -->
+                <p class="login-security"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>جلسة محمية ومخصصة للمستخدمين المخولين فقط</span></p>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <section class="login-visual" aria-label="هوية أطلس نور البصرية">
+            <div class="login-visual__content">
+                <div class="arch-scene decorative-scene" aria-hidden="true">
+                    <span class="arch-scene__layer"></span><span class="arch-scene__layer"></span><span class="arch-scene__layer"></span>
+                </div>
+                <span class="page-kicker">Atlas Noor · أطلس نور</span>
+                <h2>معرفة موثوقة لخدمة بيوت الله</h2>
+                <p>منصة مؤسساتية تجمع وضوح الإدارة مع هوية معمارية مغربية مستلهمة من أقواس المساجد ونور الشرق.</p>
+            </div>
+        </section>
+    </main>
+    <script src="assets/dist/login.min.js"></script>
 </body>
 </html>
