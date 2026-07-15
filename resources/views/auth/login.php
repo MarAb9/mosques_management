@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0c342b">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     <title>تسجيل الدخول — نظام مساجد بركان</title>
     <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css">
     <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">

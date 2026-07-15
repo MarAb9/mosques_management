@@ -25,6 +25,7 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0c342b">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     <meta name="csrf-token" content="<?= $view->e($csrfToken) ?>">
     <meta name="csp-nonce" content="<?= $view->e($cspNonce ?? '') ?>">
     <title><?= $view->e($page['title']) ?> — نظام مساجد بركان</title>
