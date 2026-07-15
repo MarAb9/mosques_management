@@ -1,0 +1,23 @@
+.operational-dashboard .card, .row.mb-4.g-4 > [class*="col-"] > .card, .row.mb-4.g-4 > [class*="col-"] > a > .card { border: 1px solid var(--color-border-soft) !important; background: linear-gradient(145deg, #fff, #f8f4e9) !important; color: var(--color-text-primary) !important; box-shadow: var(--shadow-soft) !important; }
+.bg-primary-gradient, .bg-success-gradient, .bg-info-gradient, .bg-warning-gradient { background: linear-gradient(135deg, var(--color-brand-800), var(--color-brand-600)) !important; }
+.bg-warning-gradient { background: linear-gradient(135deg, #8b5c1c, #bd8a3e) !important; }
+.glass-effect { background: rgba(255,255,255,.88) !important; backdrop-filter: blur(16px); }
+.mosque-list-toolbar { border: 1px solid var(--color-border-soft) !important; background: #f8f5ed !important; }
+.mosque-mobile-card { overflow: hidden; border: 1px solid var(--color-border-soft) !important; border-inline-start: .25rem solid var(--color-brand-600) !important; }
+.step-progress { display: flex; align-items: center; justify-content: space-between; gap: .4rem; margin-block-end: 1.5rem; }
+.step { position: relative; flex: 1; color: var(--color-text-muted); text-align: center; }
+.step-number { display: grid; width: 2.4rem; height: 2.4rem; place-items: center; margin-inline: auto; color: var(--color-text-secondary); background: #ece8dd; border-radius: 50%; font-weight: 800; }
+.step.active .step-number, .step.completed .step-number { color: #fff; background: var(--color-brand-700); }
+.step-label { display: block; margin-top: .35rem; font-size: .72rem; font-weight: 750; }
+.responsible-item { position: relative; border-inline-start: .25rem solid var(--color-brass) !important; }
+.remove-responsible { color: var(--color-danger); background: transparent; border: 0; }
+.import-workspace .card, .admin-workspace .card { box-shadow: var(--shadow-raised); }
+.audit-context { max-width: 28rem; }
+@media (max-width: 767.98px) {
+    .step-label { display: none; }
+    .step-progress { gap: .15rem; }
+    .audit-table thead { display: none; }
+    .audit-table, .audit-table tbody, .audit-table tr, .audit-table td { display: block; width: 100%; }
+    .audit-table tr { padding: .9rem; border-block-end: 1px solid var(--color-border-soft); }
+    .audit-table td { padding: .25rem !important; border: 0; }
+}

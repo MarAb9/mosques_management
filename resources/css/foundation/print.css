@@ -1,0 +1,11 @@
+@media print {
+    @page { size: A4; margin: 14mm; }
+    html, body { min-width: 0 !important; color: #000 !important; background: #fff !important; font-size: 10.5pt; }
+    .app-sidebar, .app-topbar, .sidebar-overlay, .mobile-nav-toggle, .footer-section, .btn, button, .dropdown, .form-stepper, .decorative-scene, .no-print { display: none !important; }
+    .app-main, .app-content, #main-content { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    .card, .data-panel { break-inside: avoid; border: 1px solid #aaa !important; box-shadow: none !important; background: #fff !important; }
+    .table { font-size: 9pt; }
+    .table thead { display: table-header-group; }
+    .table tr { break-inside: avoid; }
+    a { color: #000 !important; text-decoration: none !important; }
+}

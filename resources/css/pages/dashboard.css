@@ -1,0 +1,17 @@
+.dashboard-page { display: grid; gap: 1.35rem; }
+.dashboard-hero { min-height: 14.5rem; color: #f7f3e8; background: radial-gradient(circle at 15% 0, rgba(199,161,90,.28), transparent 18rem), linear-gradient(135deg, var(--color-brand-800), var(--color-brand-950)); border-color: rgba(234,217,184,.2); }
+.dashboard-hero h1 { max-width: 44rem; color: #fff; font-size: clamp(1.55rem, 3vw, 2.35rem); }
+.dashboard-hero p { max-width: 43rem; color: rgba(255,255,255,.67); }
+.dashboard-hero__content { position: relative; z-index: 1; width: min(62%, 48rem); }
+.dashboard-hero__actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-block-start: 1.25rem; }
+.dashboard-hero__scene { position: absolute; inset-block: .7rem; inset-inline-end: 1rem; width: 34%; color: var(--color-brass-soft); opacity: .78; }
+.metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(18rem, .75fr); gap: 1.15rem; }
+.quick-actions { display: grid; gap: .65rem; }
+.quick-action { display: flex; align-items: center; gap: .75rem; min-height: 3.5rem; padding: .7rem .8rem; color: var(--color-text-primary); border: 1px solid var(--color-border-soft); border-radius: var(--radius-md); background: #fff; text-decoration: none; transition: transform var(--duration-fast), border-color var(--duration-normal), background var(--duration-normal); }
+.quick-action:hover { color: var(--color-brand-900); background: var(--color-brand-50); border-color: rgba(43,146,117,.25); transform: translateX(-2px); }
+.quick-action i { display: grid; width: 2.4rem; height: 2.4rem; place-items: center; color: var(--color-brand-700); background: var(--color-brand-50); border-radius: .75rem; }
+@media (max-width: 1199.98px) { .metric-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 991.98px) { .dashboard-grid { grid-template-columns: 1fr; } .dashboard-hero__content { width: 72%; } }
+@media (max-width: 767.98px) { .metric-grid { grid-template-columns: repeat(2, 1fr); } .dashboard-hero__content { width: 100%; } .dashboard-hero__scene { display: none; } }
+@media (max-width: 430px) { .metric-grid { grid-template-columns: 1fr; } }

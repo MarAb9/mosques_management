@@ -1,0 +1,10 @@
+.map-workspace { position: relative; }
+.map-workspace #map { width: 100%; height: clamp(31rem, 67vh, 48rem); background: linear-gradient(145deg, #dce6df, #cbd9d1); }
+.map-workspace #mosquesList { max-height: clamp(26rem, 60vh, 42rem); overflow-y: auto; }
+.map-workspace .mosque-list-item { transition: background var(--duration-fast), transform var(--duration-fast); }
+.map-workspace .mosque-list-item:hover { background: var(--color-brand-50); transform: translateX(-2px); }
+.map-loading-spinner { width: 3rem; height: 3rem; }
+.map-legend { position: absolute; inset-block-end: 1rem; inset-inline-start: 1rem; z-index: 2; padding: .7rem .8rem; background: rgba(255,255,255,.92); border: 1px solid var(--color-border-soft); border-radius: var(--radius-sm); box-shadow: var(--shadow-floating); }
+#activeFiltersContainer[hidden] { display: none !important; }
+@media (max-width: 991.98px) { .map-workspace #map { height: 32rem; } .map-workspace #mosquesList { max-height: 24rem; } }
+@media (max-width: 575.98px) { .map-workspace #map { height: 27rem; } }
