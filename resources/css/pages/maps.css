@@ -1,58 +1,517 @@
-.map-workspace { position: relative; }
-.map-workspace .page-header { margin-block-end: 1rem; }
-.map-workspace .header-icon, .map-workspace .stat-icon { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; color: var(--color-brand-700); background: var(--color-brand-50) !important; border-radius: var(--radius-sm) !important; }
-.map-workspace .stat-card { overflow: hidden; border: 1px solid var(--color-border-soft) !important; background: #fff; box-shadow: var(--shadow-soft) !important; }
-.map-workspace #map { width: 100%; height: clamp(30rem, 64vh, 44rem); overflow: hidden; background: #dfe8e3; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
-.map-workspace #mosquesList { max-height: clamp(25rem, 58vh, 39rem); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--color-border-strong) transparent; }
-.map-workspace .mosque-list-item { border-color: var(--color-border-soft) !important; transition: background-color var(--duration-fast); }
-.map-workspace .mosque-list-item:hover, .map-workspace .mosque-list-item.is-active, .map-workspace .mosque-list-item[aria-current="true"] { background: var(--color-brand-50); box-shadow: inset .1875rem 0 var(--color-brass); }
-.map-workspace .mosque-name { cursor: pointer; }
-.map-workspace .mosque-name:hover { color: var(--color-brand-900) !important; }
-.map-workspace .search-widget, .map-workspace .filter-widget { position: relative; }
-.map-workspace .search-suggestions { position: absolute; inset-block-start: 100%; inset-inline: 0; z-index: 1000; display: none; max-height: 13rem; overflow-y: auto; background: #fff; border: 1px solid var(--color-border-soft); border-block-start: 0; border-radius: 0 0 var(--radius-sm) var(--radius-sm); box-shadow: var(--shadow-floating); }
-.map-workspace .search-suggestions.show { display: block; }
-.map-workspace .suggestion-header { padding: .5rem .75rem; background: var(--color-surface-base); border-block-end: 1px solid var(--color-border-soft); }
-.map-workspace .suggestion-item { cursor: pointer; transition: background-color var(--duration-fast); }
-.map-workspace .suggestion-item:hover { background: var(--color-brand-50); }
-.map-workspace #activeFilters .badge { padding: .5rem .75rem; }
-.map-workspace #activeFilters .btn-close { padding: .25rem; font-size: .6875rem; }
-.map-workspace .pagination-container { border: 1px solid var(--color-border-soft) !important; background: #fff; }
-.map-workspace #mapLoading { z-index: 3; padding: 1.5rem; background: rgba(255, 255, 255, .95); border: 1px solid var(--color-border-soft); border-radius: var(--radius-md); box-shadow: var(--shadow-raised); }
-.map-workspace .map-loading-spinner { width: 3rem; height: 3rem; }
-.map-workspace .gm-style { font-family: inherit; background: #e6eee9; }
-.map-workspace .custom-mosque-marker { background: transparent !important; border: 0 !important; }
-.map-workspace .selected-mosque-panel { position: absolute; inset-inline-start: 1rem; inset-block-end: 2.25rem; z-index: 4; display: grid; width: min(22rem, calc(100% - 2rem)); max-height: calc(100% - 4rem); overflow: hidden; background: #fff; border: 1px solid var(--color-border-soft); border-radius: var(--radius-md); box-shadow: var(--shadow-floating); }
-.map-workspace .selected-mosque-panel[hidden] { display: none; }
-.map-workspace .selected-mosque-panel__header { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem; border-block-end: 1px solid var(--color-border-soft); }
-.map-workspace .selected-mosque-panel__eyebrow { color: var(--color-brand-700); font-size: .75rem; font-weight: 700; }
-.map-workspace .selected-mosque-panel h2 { margin: .25rem 0 0; font-size: 1rem; }
-.map-workspace .selected-mosque-panel__close { width: 2rem; height: 2rem; color: var(--color-text-secondary); background: transparent; border: 1px solid var(--color-border-soft); border-radius: 50%; }
-.map-workspace .selected-mosque-panel__body { overflow-y: auto; padding: .75rem 1rem; }
-.map-workspace .selected-mosque-details { display: grid; gap: .625rem; margin: 0; }
-.map-workspace .selected-mosque-details div { display: grid; grid-template-columns: 6.25rem 1fr; gap: .5rem; }
-.map-workspace .selected-mosque-details dt { color: var(--color-text-secondary); font-size: .75rem; }
-.map-workspace .selected-mosque-details dd { margin: 0; font-size: .8125rem; font-weight: 600; }
-.map-workspace .selected-mosque-panel__actions { display: flex; gap: .5rem; padding: .75rem 1rem 1rem; border-block-start: 1px solid var(--color-border-soft); }
-.map-workspace mark { padding: .125rem .25rem; background: #fff0bc; border-radius: .25rem; }
-.map-workspace .status-indicator { display: inline-block; width: .5rem; height: .5rem; margin-inline-end: .375rem; border-radius: 50%; }
-.map-workspace .status-open { background: var(--color-success); }
-.map-workspace .status-closed { background: var(--color-danger); }
-.map-workspace .status-unauthorized { background: var(--color-warning); }
-.map-loading-spinner { width: 3rem; height: 3rem; }
-.map-legend { position: absolute; inset-block-end: 1rem; inset-inline-start: 1rem; z-index: 2; padding: .625rem .75rem; background: rgba(255, 255, 255, .95); border: 1px solid var(--color-border-soft); border-radius: var(--radius-sm); box-shadow: var(--shadow-soft); }
-#activeFiltersContainer[hidden] { display: none !important; }
-.map-summary { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 0 1rem; }
-.map-summary span { display: inline-flex; align-items: baseline; gap: .375rem; padding: .375rem .625rem; color: var(--color-text-secondary); background: #fff; border: 1px solid var(--color-border-soft); border-radius: var(--radius-sm); font-size: .75rem; }
-.map-summary strong { color: var(--color-brand-800); font-size: .875rem; }
-@media (max-width: 991.98px) {
-    .map-workspace #map { height: 32rem; }
-    .map-workspace #mosquesList { max-height: 24rem; }
+.map-workspace {
+    --map-height: clamp(38.75rem, 65vh, 44rem);
+    --map-panel-border: #d7e1dc;
+    --map-panel-muted: #64756d;
+    --map-panel-soft: #f5f8f6;
+    max-width: 112rem;
+    margin-inline: auto;
+    padding-block-end: 1.5rem;
 }
-@media (max-width: 767.98px) {
-    .map-workspace #map { height: 28rem; }
-    .map-workspace .search-suggestions { position: fixed; inset-block: auto 0; inset-inline: 0; max-height: 50vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
-    .map-workspace .filter-widget { margin-block-end: .5rem; }
-    .map-workspace .page-header { align-items: flex-start !important; }
-    .map-workspace .pagination-container .d-flex { flex-wrap: wrap; gap: .5rem; justify-content: center !important; }
+
+.map-workspace .page-header {
+    min-height: auto;
+    margin-block-end: .75rem;
+    padding-block: .875rem;
 }
-@media (max-width: 430px) { .map-workspace #map { height: 24rem; } }
+
+.map-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-block-end: .75rem;
+}
+
+.map-summary span {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .35rem;
+    padding: .3rem .6rem;
+    color: var(--map-panel-muted);
+    background: #fff;
+    border: 1px solid var(--map-panel-border);
+    border-radius: .5rem;
+    font-size: .75rem;
+}
+
+.map-summary strong {
+    color: var(--color-brand-800);
+    font-size: .875rem;
+}
+
+.map-filter-row,
+.map-main-row {
+    margin-inline: 0;
+}
+
+.map-filter-row > *,
+.map-main-row > * {
+    padding-inline: 0;
+}
+
+.map-toolbar-card,
+.map-canvas-card,
+.map-list-card {
+    border: 1px solid var(--map-panel-border);
+    box-shadow: none;
+}
+
+.map-toolbar-card {
+    border-radius: .875rem .875rem 0 0;
+}
+
+.map-toolbar-card .card-body {
+    padding: .875rem 1rem;
+}
+
+.map-toolbar-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-block-end: .75rem;
+}
+
+.map-toolbar-heading > div {
+    display: flex;
+    align-items: baseline;
+    gap: .6rem;
+}
+
+.map-toolbar-heading strong {
+    color: var(--color-brand-900);
+    font-size: .875rem;
+}
+
+.map-toolbar-heading span {
+    color: var(--map-panel-muted);
+    font-size: .75rem;
+}
+
+.map-toolbar-actions,
+.map-visible-count {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.map-visible-count {
+    padding-inline: .35rem;
+    color: var(--map-panel-muted);
+    font-size: .75rem;
+}
+
+.map-visible-count strong {
+    color: var(--color-brand-800);
+}
+
+.map-filter-toggle {
+    display: none;
+    align-items: center;
+    gap: .4rem;
+    min-height: 2.25rem;
+    padding-inline: .7rem;
+    color: var(--color-brand-800);
+    background: #fff;
+    border: 1px solid var(--map-panel-border);
+    border-radius: .5rem;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.map-filter-grid {
+    display: grid;
+    grid-template-columns: minmax(16rem, 1.35fr) repeat(3, minmax(10rem, 1fr));
+    gap: .75rem;
+    margin: 0;
+}
+
+.map-filter-grid > * {
+    width: auto;
+    padding: 0;
+}
+
+.map-workspace .form-label {
+    margin-block-end: .3rem;
+    color: #405149;
+    font-size: .75rem;
+}
+
+.map-workspace .form-label i {
+    display: none;
+}
+
+.map-workspace .input-group {
+    min-height: 2.55rem;
+}
+
+.map-workspace .input-group-text,
+.map-workspace .form-control,
+.map-workspace .form-select,
+.map-workspace .input-group .btn {
+    border-color: #c9d5cf;
+    font-size: .8125rem;
+}
+
+.map-workspace .input-group-text {
+    color: var(--map-panel-muted);
+}
+
+.map-workspace .search-widget,
+.map-workspace .filter-widget {
+    position: relative;
+}
+
+.map-workspace .search-suggestions {
+    position: absolute;
+    inset-block-start: calc(100% + .25rem);
+    inset-inline: 0;
+    z-index: 20;
+    display: none;
+    max-height: 15rem;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--map-panel-border);
+    border-radius: .625rem;
+    box-shadow: var(--shadow-floating);
+}
+
+.map-workspace .search-suggestions.show {
+    display: block;
+}
+
+.map-workspace .suggestion-header {
+    padding: .5rem .75rem;
+    background: var(--map-panel-soft);
+    border-block-end: 1px solid var(--map-panel-border);
+}
+
+.map-workspace .suggestion-item {
+    cursor: pointer;
+}
+
+.map-workspace .suggestion-item:hover,
+.map-workspace .suggestion-item:focus-visible {
+    background: var(--color-brand-50) !important;
+}
+
+#activeFiltersContainer {
+    margin-block-start: .75rem !important;
+    padding-block-start: .75rem;
+    border-block-start: 1px solid #e5ece8;
+}
+
+#activeFiltersContainer[hidden] {
+    display: none !important;
+}
+
+.map-main-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    direction: ltr;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--map-panel-border);
+    border-block-start: 0;
+    border-radius: 0 0 .875rem .875rem;
+}
+
+.map-canvas-column,
+.map-list-column {
+    min-width: 0;
+    direction: rtl;
+}
+
+.map-canvas-card,
+.map-list-card {
+    height: calc(var(--map-height) + 3.5rem);
+    border: 0;
+    border-radius: 0;
+}
+
+.map-list-card {
+    border-inline-start: 1px solid var(--map-panel-border);
+}
+
+.map-canvas-toolbar,
+.map-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    min-height: 3.5rem;
+    padding: .65rem .875rem;
+    background: #fff;
+    border-block-end: 1px solid var(--map-panel-border);
+}
+
+.map-canvas-toolbar h5,
+.map-list-header h5 {
+    margin: 0;
+    font-size: .925rem;
+}
+
+.map-canvas-shell {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.map-workspace #map {
+    width: 100%;
+    height: var(--map-height);
+    overflow: hidden;
+    background: #dfe8e3;
+}
+
+.map-list-card .card-body {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    min-height: 0;
+}
+
+.map-list-card .card-body > .p-3 {
+    padding: .65rem .75rem !important;
+    background: var(--map-panel-soft) !important;
+}
+
+.map-workspace #mosquesList {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: #a7b8b0 transparent;
+    scrollbar-width: thin;
+}
+
+.map-workspace .mosque-list-item {
+    padding: .75rem;
+    border-block-end: 1px solid #e2e9e5;
+    transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.map-workspace .mosque-list-item:hover,
+.map-workspace .mosque-list-item:focus-within,
+.map-workspace .mosque-list-item.is-active,
+.map-workspace .mosque-list-item[aria-current=true] {
+    background: #f1f7f4;
+}
+
+.map-workspace .mosque-list-item.is-active,
+.map-workspace .mosque-list-item[aria-current=true] {
+    box-shadow: inset -.2rem 0 var(--color-brass);
+}
+
+.mosque-list-item__heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.map-workspace .mosque-name {
+    margin: 0;
+    color: #153f33;
+    font-size: .84rem;
+    font-weight: 800;
+    line-height: 1.45;
+}
+
+.map-workspace .mosque-name > span {
+    color: #7a8982;
+    font-size: .7rem;
+}
+
+.mosque-list-item__heading .badge {
+    flex: 0 0 auto;
+    padding: .3rem .42rem;
+    font-size: .65rem;
+}
+
+.mosque-list-item__address {
+    display: flex;
+    gap: .4rem;
+    margin: .4rem 0;
+    color: #53645c;
+    font-size: .73rem;
+    line-height: 1.45;
+}
+
+.mosque-list-item__address i,
+.mosque-list-item__meta i {
+    width: .8rem;
+    color: #84928c;
+    text-align: center;
+}
+
+.mosque-list-item__meta {
+    display: grid;
+    gap: .2rem;
+    color: #6b7a73;
+    font-size: .7rem;
+}
+
+.mosque-list-item__meta span {
+    display: flex;
+    gap: .4rem;
+    min-width: 0;
+}
+
+.mosque-list-item__actions {
+    display: flex;
+    gap: .4rem;
+    margin-block-start: .55rem;
+}
+
+.mosque-list-item__actions .zoom-to-mosque {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+}
+
+.map-workspace mark {
+    padding: .05rem .15rem;
+    background: #fff0bc;
+    border-radius: .2rem;
+}
+
+.map-workspace #mapLoading {
+    z-index: 3;
+    width: min(18rem, calc(100% - 2rem));
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, .96);
+    border: 1px solid var(--map-panel-border);
+    border-radius: .75rem;
+    box-shadow: var(--shadow-raised);
+}
+
+.map-workspace .map-loading-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.map-workspace .gm-style {
+    font-family: inherit;
+    background: #e6eee9;
+}
+
+.map-selection-panel {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-end: 2.25rem;
+    z-index: 4;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    width: min(22rem, calc(100% - 2rem));
+    max-height: calc(100% - 4.5rem);
+    overflow: hidden;
+    color: #24342d;
+    background: rgba(255, 255, 255, .98);
+    border: 1px solid #cad8d1;
+    border-radius: .8rem;
+    box-shadow: 0 1rem 2.5rem rgba(18, 53, 42, .2);
+    backdrop-filter: blur(.5rem);
+}
+
+.map-selection-panel[hidden] {
+    display: none;
+}
+
+.map-selection-panel__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .85rem 1rem;
+    background: #f7faf8;
+    border-block-end: 1px solid #dce5e0;
+}
+
+.map-selection-panel__eyebrow {
+    color: var(--color-brand-700);
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.map-selection-panel h2 {
+    margin: .2rem 0 0;
+    color: #123c30;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.map-selection-panel__close {
+    flex: 0 0 auto;
+    width: 2rem;
+    height: 2rem;
+    color: #56675f;
+    background: #fff;
+    border: 1px solid #d4dfda;
+    border-radius: 50%;
+}
+
+.map-selection-panel__close:hover,
+.map-selection-panel__close:focus-visible {
+    color: #fff;
+    background: var(--color-brand-800);
+    border-color: var(--color-brand-800);
+}
+
+.map-selection-panel__body {
+    min-height: 0;
+    overflow-y: auto;
+    padding: .75rem 1rem;
+}
+
+.map-selection-panel__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    padding: .6rem 1rem 0;
+}
+
+.map-selection-panel__meta > span {
+    padding: .25rem .45rem;
+    color: #41534a;
+    background: #eef4f1;
+    border: 1px solid #d9e4df;
+    border-radius: 999px;
+    font-size: .66rem;
+    font-weight: 700;
+}
+
+.map-selection-panel__details {
+    display: grid;
+    gap: .55rem;
+    margin: 0;
+}
+
+.map-selection-panel__details div {
+    display: grid;
+    grid-template-columns: 5.75rem minmax(0, 1fr);
+    gap: .6rem;
+}
+
+.map-selection-panel__details dt {
+    color: #718078;
+    font-size: .7rem;
+    font-weight: 500;
+}
+
+.map-selection-panel__details dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: #2d3d36;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.map-selection-panel__actions {
+    display: flex;
+    gap: .5rem;
+    padding: .7rem 1rem .9rem;
+    background: #fff;
+    border-block-start: 1px solid #dce5e0;
+}
+
+.map-selection-panel__actions > * {
+    flex: 1;
+}

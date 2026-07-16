@@ -139,6 +139,7 @@ function addMosqueMarkers() {
             if (cluster.bounds) clusterMap.fitBounds(cluster.bounds, { top: 64, right: 64, bottom: 64, left: 64 });
         }
     });
+    applyFilters();
 }
 
 function refreshMarkerCluster() {
@@ -360,8 +361,10 @@ function resetAllFilters() {
 function updateSidebarList(filteredMosques) {
     const mosquesList = document.getElementById('mosquesList');
     const sidebarCount = document.getElementById('sidebarMosqueCount');
+    const toolbarCount = document.getElementById('toolbarMosqueCount');
     const resultsSummary = document.getElementById('resultsSummary');
     if (!mosquesList || !sidebarCount || !resultsSummary) return;
+    if (toolbarCount) toolbarCount.textContent = String(filteredMosques.length);
 
     if (filteredMosques.length === 0) {
         mosquesList.innerHTML = `
@@ -378,25 +381,30 @@ function updateSidebarList(filteredMosques) {
     mosquesList.innerHTML = filteredMosques.map((mosque, index) => {
         const safeId = escapeHtml(mosque.id);
         const safeCode = encodeURIComponent(String(mosque.national_code || mosque.id || ''));
+        const isSelected = String(selectedMarker?.mosqueData.id || '') === String(mosque.id);
         return `
-            <div class="mosque-list-item p-3 border-bottom" data-mosque-id="${safeId}">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="mb-0 text-primary cursor-pointer mosque-name fw-bold">${index + 1}. ${highlightText(mosque.name, activeFilters.search)}</h6>
-                    <span class="badge bg-${statusBadgeClass(mosque.status)} px-2 py-1">${escapeHtml(mosque.status)}</span>
+            <article class="mosque-list-item${isSelected ? ' is-active' : ''}"
+                     data-mosque-id="${safeId}" data-community="${escapeHtml(mosque.community)}"
+                     ${isSelected ? 'aria-current="true"' : ''}>
+                <div class="mosque-list-item__heading">
+                    <h3 class="mosque-name"><span>${index + 1}.</span> ${highlightText(mosque.name, activeFilters.search)}</h3>
+                    <span class="badge bg-${statusBadgeClass(mosque.status)}">${escapeHtml(mosque.status)}</span>
                 </div>
-                <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt me-1"></i>${highlightText(mosque.address, activeFilters.search)}</p>
-                <p class="text-muted small mb-1"><i class="fas fa-user me-1"></i>${escapeHtml(mosque.imam || 'غير محدد')}</p>
-                ${mosque.community ? `<p class="text-muted small mb-2"><i class="fas fa-users me-1"></i>${escapeHtml(mosque.community)}</p>` : ''}
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-primary flex-fill zoom-to-mosque d-flex align-items-center justify-content-center"
+                <p class="mosque-list-item__address"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>${highlightText(mosque.address, activeFilters.search)}</p>
+                <div class="mosque-list-item__meta">
+                    <span><i class="fas fa-user" aria-hidden="true"></i>${escapeHtml(mosque.imam || 'غير محدد')}</span>
+                    ${mosque.community ? `<span><i class="fas fa-users" aria-hidden="true"></i>${escapeHtml(mosque.community)}</span>` : ''}
+                </div>
+                <div class="mosque-list-item__actions">
+                    <button type="button" class="btn btn-sm btn-outline-primary zoom-to-mosque"
                             data-lat="${mosque.lat}" data-lng="${mosque.lng}" data-name="${escapeHtml(mosque.name)}">
-                        <i class="fas fa-search-location me-1"></i>تحديد
+                        <i class="fas fa-location-crosshairs" aria-hidden="true"></i><span>تحديد</span>
                     </button>
-                    <a href="mosques.php?national_code=${safeCode}&from_map=${safeCode}" class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" title="عرض التفاصيل">
-                        <i class="fas fa-info-circle"></i>
+                    <a href="mosques.php?national_code=${safeCode}&from_map=${safeCode}" class="btn btn-sm btn-light" title="عرض التفاصيل" aria-label="عرض تفاصيل ${escapeHtml(mosque.name)}">
+                        <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
                     </a>
                 </div>
-            </div>`;
+            </article>`;
     }).join('');
 
     sidebarCount.textContent = String(filteredMosques.length);
@@ -442,6 +450,16 @@ function openMarker(marker, trigger = null) {
     refreshMarkerCluster();
     renderSelectedMosque(marker.mosqueData);
     highlightSidebarItem(marker.mosqueData.id);
+}
+
+function setupFilterToggle() {
+    const button = document.getElementById('mapFilterToggle');
+    const panel = document.getElementById('mapFilterPanel');
+    if (!button || !panel) return;
+    button.addEventListener('click', () => {
+        const collapsed = panel.classList.toggle('is-collapsed');
+        button.setAttribute('aria-expanded', String(!collapsed));
+    });
 }
 
 function zoomToMosque(lat, lng, name, trigger = null) {
@@ -583,6 +601,7 @@ function highlightText(text, searchTerm) {
 function bootMapPage() {
     setupSearchFunctionality();
     setupFilters();
+    setupFilterToggle();
 
     document.addEventListener('click', function(event) {
         const target = event.target instanceof Element ? event.target.closest('.js-open-google-maps') : null;

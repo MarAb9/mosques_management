@@ -11,7 +11,6 @@
         'title' => 'خريطة المساجد',
         'subtitle' => number_format((int) $totalWithCoords) . ' مسجد محدد الموقع من ' . number_format((int) $totalMosques),
         'icon' => 'fa-map-location-dot',
-        'illustration' => 'assets/images/institutional/map-location-3d.svg',
     ]) ?>
 
     <div class="map-summary reveal" aria-label="ملخص التغطية الجغرافية">
@@ -21,11 +20,26 @@
     </div>
 
     <!-- Enhanced Search and Filters Section -->
-    <div class="row mb-4">
+    <div class="row mb-0 map-filter-row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <div class="row g-4">
+            <div class="card map-toolbar-card">
+                <div class="card-body">
+                    <div class="map-toolbar-heading">
+                        <div>
+                            <strong>البحث والتصفية</strong>
+                            <span>تتحدث الخريطة والقائمة مباشرة</span>
+                        </div>
+                        <div class="map-toolbar-actions">
+                            <span class="map-visible-count"><strong id="toolbarMosqueCount"><?= number_format((int) $totalWithCoords) ?></strong> نتيجة</span>
+                            <button type="button" id="clearAllFilters" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-rotate-left" aria-hidden="true"></i><span>إعادة ضبط</span>
+                            </button>
+                            <button type="button" id="mapFilterToggle" class="map-filter-toggle" aria-expanded="true" aria-controls="mapFilterPanel">
+                                <i class="fas fa-sliders-h" aria-hidden="true"></i><span>التصفية</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-3 map-filter-grid" id="mapFilterPanel">
                         <!-- Main Search -->
                         <div class="col-lg-4 col-md-6">
                             <div class="search-widget">
@@ -112,9 +126,6 @@
                             <div class="d-flex align-items-center flex-wrap gap-2">
                                 <span class="text-muted me-2">التصفيات النشطة:</span>
                                 <div id="activeFilters" class="d-flex flex-wrap gap-2"></div>
-                                <button id="clearAllFilters" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-times me-1"></i>مسح الكل
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -123,11 +134,11 @@
         </div>
     </div>
 <!-- Main Map Section -->
-    <div class="row">
+    <div class="row map-main-row">
         <!-- Map Container -->
-        <div class="col-lg-9 col-md-8 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
+        <div class="map-canvas-column">
+            <div class="card map-canvas-card">
+                <div class="card-header map-canvas-toolbar">
                     <h5 class="mb-0 fw-bold">
                         <i class="fas fa-map me-2 text-primary"></i>المواقع
                     </h5>
@@ -142,30 +153,32 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body p-0 position-relative">
+                <div class="card-body p-0 position-relative map-canvas-shell">
                     <div id="map"></div>
-                    <aside id="selectedMosquePanel" class="selected-mosque-panel" aria-labelledby="selectedMosqueTitle" aria-hidden="true" hidden>
-                        <div class="selected-mosque-panel__header">
+                    <aside id="selectedMosquePanel" class="map-selection-panel" aria-live="polite" aria-labelledby="selectedMosqueTitle" aria-hidden="true" hidden>
+                        <div class="map-selection-panel__header">
                             <div>
-                                <span class="selected-mosque-panel__eyebrow">المسجد المحدد</span>
+                                <span class="map-selection-panel__eyebrow">المسجد المحدد</span>
                                 <h2 id="selectedMosqueTitle">-</h2>
                             </div>
-                            <button type="button" id="selectedMosqueClose" class="selected-mosque-panel__close" aria-label="إغلاق بطاقة المسجد">
+                            <button type="button" id="selectedMosqueClose" class="map-selection-panel__close" aria-label="إغلاق بطاقة المسجد">
                                 <i class="fas fa-times" aria-hidden="true"></i>
                             </button>
                         </div>
-                        <div class="selected-mosque-panel__body">
-                            <dl class="selected-mosque-details">
+                        <div class="map-selection-panel__meta" aria-label="حالة المسجد">
+                            <span id="selectedMosqueStatus">-</span>
+                            <span id="selectedMosqueCode">-</span>
+                            <span>الجمعة: <strong id="selectedMosqueFriday">-</strong></span>
+                        </div>
+                        <div class="map-selection-panel__body">
+                            <dl class="map-selection-panel__details">
                                 <div><dt>العنوان</dt><dd id="selectedMosqueAddress">-</dd></div>
                                 <div><dt>الإمام</dt><dd id="selectedMosqueImam">-</dd></div>
                                 <div><dt>الإمام المرشد</dt><dd id="selectedMosqueGuideImam">-</dd></div>
                                 <div><dt>الجماعة</dt><dd id="selectedMosqueCommunity">-</dd></div>
-                                <div><dt>الرمز الوطني</dt><dd id="selectedMosqueCode">-</dd></div>
-                                <div><dt>الوضعية</dt><dd id="selectedMosqueStatus">-</dd></div>
-                                <div><dt>صلاة الجمعة</dt><dd id="selectedMosqueFriday">-</dd></div>
                             </dl>
                         </div>
-                        <div class="selected-mosque-panel__actions">
+                        <div class="map-selection-panel__actions">
                             <a id="selectedMosqueDetails" class="btn btn-primary btn-sm" href="mosques.php">عرض التفاصيل</a>
                             <button type="button" id="selectedMosqueGoogleMaps" class="btn btn-outline-secondary btn-sm js-open-google-maps">فتح في Google Maps</button>
                         </div>
@@ -188,9 +201,9 @@
         </div>
 
          <!-- Mosque List Sidebar -->
-        <div class="col-lg-3 col-md-4 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <div class="map-list-column">
+            <div class="card map-list-card">
+                <div class="card-header map-list-header">
                     <h5 class="mb-0 fw-bold">
                         <i class="fas fa-list me-2 text-primary"></i>قائمة المساجد
                     </h5>
@@ -268,26 +281,6 @@
         </div>
     </div>
 
-    <!-- Bottom Pagination -->
-    <?php if ($totalPages > 1): ?>
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="pagination-container card border-0 shadow-sm">
-                <div class="card-body py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-muted">
-                            الصفحة <?= $page ?> من <?= $totalPages ?>
-                        </div>
-                        <?= renderPagination($page, $totalPages) ?>
-                        <div class="text-muted">
-                            عرض <?= number_format(count($mosques)) ?> مسجد
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
 </div>
 
 <!-- Google Maps API-ready implementation. Add GOOGLE_MAPS_API_KEY to .env to activate. -->
