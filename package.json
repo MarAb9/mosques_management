@@ -1,5 +1,5 @@
 {
-  "name": "atlas-noor-ui",
+  "name": "mosques-management-ui",
   "private": true,
   "scripts": {
     "build": "npm run build:css && npm run build:js",

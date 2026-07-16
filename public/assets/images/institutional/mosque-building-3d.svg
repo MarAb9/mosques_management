@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 192" fill="none" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="a" x1="71" y1="62" x2="176" y2="168" gradientUnits="userSpaceOnUse"><stop stop-color="#FAF5EC"/><stop offset="1" stop-color="#D8C7AA"/></linearGradient>
+    <linearGradient id="b" x1="178" y1="91" x2="211" y2="155" gradientUnits="userSpaceOnUse"><stop stop-color="#1A7458"/><stop offset="1" stop-color="#0A3B2E"/></linearGradient>
+    <linearGradient id="c" x1="97" y1="40" x2="158" y2="103" gradientUnits="userSpaceOnUse"><stop stop-color="#26A57A"/><stop offset="1" stop-color="#0B4B39"/></linearGradient>
+    <filter id="s" x="30" y="24" width="205" height="160" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#123B30" flood-opacity=".18"/></filter>
+  </defs>
+  <ellipse cx="129" cy="165" rx="91" ry="13" fill="#163F34" opacity=".12"/>
+  <g filter="url(#s)">
+    <path d="m55 105 72-36 73 37-72 38-73-39Z" fill="#F3E8D5"/>
+    <path d="m55 105 73 39v28l-73-39v-28Z" fill="url(#a)"/>
+    <path d="m128 144 72-38v28l-72 38v-28Z" fill="url(#b)"/>
+    <path d="M83 94h91v47l-46 24-45-24V94Z" fill="url(#a)"/>
+    <path d="m128 118 46-24v47l-46 24v-47Z" fill="#C9B796"/>
+    <path d="M96 93c2-26 16-43 32-43s30 17 32 43H96Z" fill="url(#c)"/>
+    <path d="M105 91c3-18 12-31 23-37-16 2-28 17-32 39h64l-3-8-52 6Z" fill="#45B58F" opacity=".55"/>
+    <path d="M125 47h6v7h-6z" fill="#B88935"/><path d="m128 38 4 9h-8l4-9Z" fill="#D8B56A"/>
+    <path d="M112 165v-27c0-10 7-18 16-18s16 8 16 18v27l-16 8-16-8Z" fill="#0C3B2E"/>
+    <path d="M117 161v-23c0-7 5-12 11-12v41l-11-6Z" fill="#17664E"/>
+    <path d="M66 112h11v30l-11-6v-24Zm22 12 11 6v23l-11-6v-23Z" fill="#1A7458"/>
+    <path d="M189 42h13v92l-13 7V42Z" fill="#E4D6BD"/>
+    <path d="m202 42 9 5v82l-9 5V42Z" fill="#BFAE8F"/>
+    <path d="m182 42 13-7 16 8-9 5-20-6Z" fill="#F7F0E4"/>
+    <path d="M188 30c0-8 5-14 8-14s8 6 8 14h-16Z" fill="url(#c)"/>
+    <path d="M194 10h4v8h-4z" fill="#B88935"/><path d="m196 5 3 6h-6l3-6Z" fill="#D8B56A"/>
+    <path d="M183 57h27v6l-14 7-13-7v-6Z" fill="#B88935"/>
+  </g>
+</svg>

@@ -1,6 +1,6 @@
-# Atlas Noor frontend build and deployment
+# Institutional frontend build and deployment
 
-The Atlas Noor interface is compiled locally and committed to `public/assets/dist/` so it can run on standard shared hosting without Node.js.
+The institutional interface is compiled locally and committed to `public/assets/dist/` so it can run on standard shared hosting without Node.js.
 
 ## Requirements
 
@@ -25,7 +25,7 @@ The build produces the following minified, cacheable assets:
 - `public/assets/dist/import-export.min.js`
 - `public/assets/dist/backup-confirm.min.js`
 
-Tailwind is compiled with the `tw` prefix and without Preflight. Bootstrap remains the compatibility layer for the existing server-rendered markup. The Atlas Noor stylesheet is loaded last so its tokens and components can refine Bootstrap without changing backend contracts.
+Tailwind is compiled with the `tw` prefix and without Preflight. Bootstrap remains the compatibility layer for the existing server-rendered markup. The institutional stylesheet is loaded last so its tokens and components can refine Bootstrap without changing backend contracts.
 
 ## Shared-hosting deployment
 

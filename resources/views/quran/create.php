@@ -1,34 +1,21 @@
 <?php
 /**
- * Add Quran program form (legacy add_quran_mosque.php markup, verbatim —
- * including the nested document structure the legacy page produced).
+ * Add Quran program form.
  * Expects: $mosques, $scheduleOptions, $positionOptions
  */
 ?>
 
 
 <div class="container-fluid py-4">
+    <?php $formActions = '<img src="assets/images/institutional/quran-book-3d.svg" width="64" height="64" alt="" aria-hidden="true">'
+        . '<a href="quran_mosques.php" class="btn btn-outline-secondary align-self-center"><i class="fas fa-arrow-left me-1" aria-hidden="true"></i>رجوع</a>'; ?>
+    <?= $view->partial('components.page_header', ['title' => 'إضافة مسجد تحفيظ', 'actionsHtml' => $formActions]) ?>
     <?php if (!empty($errorMessage)): ?>
         <div class="alert alert-danger" role="alert"><?= $view->e($errorMessage) ?></div>
     <?php endif; ?>
-    <div class="row animate__animated animate__fadeIn">
+    <div class="row">
         <div class="col-lg-10 col-xl-8 mx-auto">
             <div class="card border-0">
-                <div class="card-header text-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="card-title mb-1 fw-bold">
-                                <i class="fas fa-plus-circle me-2"></i>إضافة مسجد تحفيظ
-                            </h3>
-                            <small class="text-white-80">إضافة مسجد تحفيظ جديد إلى النظام</small>
-                        </div>
-                        <div>
-                            <a href="quran_mosques.php" class="btn btn-light btn-sm rounded-pill px-3">
-                                <i class="fas fa-arrow-left me-1"></i> عودة
-                            </a>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="card-body p-4">
                     <form method="post" action="add_quran_mosque.php" id="quranForm" data-quran-mode="create">
@@ -39,15 +26,15 @@
                             <div class="steps">
                                 <div class="step active" data-step="1">
                                     <div class="step-icon">1</div>
-                                    <div class="step-label">المعلومات الأساسية</div>
+                                    <div class="step-label">البيانات</div>
                                 </div>
                                 <div class="step" data-step="2">
                                     <div class="step-icon">2</div>
-                                    <div class="step-label">تفاصيل البرنامج</div>
+                                    <div class="step-label">المسؤولون</div>
                                 </div>
                                 <div class="step" data-step="3">
                                     <div class="step-icon">3</div>
-                                    <div class="step-label">الطلاب والتحديات</div>
+                                    <div class="step-label">الطلبة</div>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +62,7 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <h6 class="mb-3 text-muted"><i class="fas fa-star-of-life me-2 text-primary"></i>المميزات المتوفرة</h6>
+                                    <h2 class="h6 mb-3 text-muted">خصائص البرنامج</h2>
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-floating mb-3">
@@ -84,7 +71,7 @@
                                                     <option value="نعم">نعم</option>
                                                     <option value="مركز تحفيظ">مركز تحفيظ</option>
                                                 </select>
-                                                <label for="has_quran_school">المسجد به كتاب قرآني</label>
+                                                <label for="has_quran_school">البرنامج القرآني</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -93,17 +80,14 @@
                                                     <option value="لا">لا</option>
                                                     <option value="نعم">نعم</option>
                                                 </select>
-                                                <label for="has_accommodation">يتوفر على إقامة</label>
+                                                <label for="has_accommodation">الإقامة</label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-between mt-5 pt-3 border-top">
-                                <button type="button" class="btn btn-outline-secondary disabled">
-                                    <i class="fas fa-arrow-right me-1"></i> السابق
-                                </button>
+                            <div class="d-flex justify-content-end mt-5 pt-3 border-top">
                                 <button type="button" class="btn btn-primary px-4 next-step">
                                     التالي <i class="fas fa-arrow-left me-1"></i>
                                 </button>
@@ -123,7 +107,7 @@
 
                                     <div id="responsibles-container">
                                         <div class="alert alert-info text-center">
-                                            <i class="fas fa-info-circle me-2"></i>لم يتم إضافة أي مسؤولين بعد
+                                            <i class="fas fa-info-circle me-2" aria-hidden="true"></i>لا يوجد مسؤولون.
                                         </div>
                                     </div>
                                 </div>
@@ -149,7 +133,7 @@
                                 <div class="col-12">
                                     <div class="card border-0 shadow-sm mb-3">
                                         <div class="card-body">
-                                            <h5 class="mb-3 text-primary"><i class="fas fa-check-circle me-2"></i>مراجعة المعلومات</h5>
+                                            <h2 class="h6 mb-3 text-primary">المراجعة</h2>
                                             <div class="review-summary p-3 bg-light rounded" id="reviewSummary"></div>
                                         </div>
                                     </div>
@@ -161,7 +145,7 @@
                                     <i class="fas fa-arrow-right me-1"></i> السابق
                                 </button>
                                 <button type="submit" class="btn btn-success px-4">
-                                    <i class="fas fa-save me-2"></i>حفظ البيانات
+                                    <i class="fas fa-save me-2" aria-hidden="true"></i>حفظ
                                 </button>
                             </div>
                         </div>

@@ -7,87 +7,17 @@
 ?>
 
 <div class="container-fluid map-workspace">
-    <!-- Modern Header Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="page-header d-flex align-items-center justify-content-between py-4">
-                <div class="d-flex align-items-center">
-                    <div class="header-icon bg-primary bg-opacity-10 rounded-3 p-3 me-3">
-                        <i class="fas fa-map-marked-alt text-primary fa-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-1 fw-bold">خريطة المساجد</h1>
-                        <p class="text-muted mb-0">تصور جغرافي لمواقع المساجد على الخريطة</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?= $view->partial('components.page_header', [
+        'title' => 'خريطة المساجد',
+        'subtitle' => number_format((int) $totalWithCoords) . ' مسجد محدد الموقع من ' . number_format((int) $totalMosques),
+        'icon' => 'fa-map-location-dot',
+        'illustration' => 'assets/images/institutional/map-location-3d.svg',
+    ]) ?>
 
-    <!-- Enhanced Statistics Cards -->
-    <div class="row mb-5">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon bg-primary bg-opacity-10 rounded-3 p-3 me-3">
-                            <i class="fas fa-mosque text-primary fa-lg"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="card-title text-muted mb-1">إجمالي المساجد</h6>
-                            <h3 class="mb-0 fw-bold"><?= number_format($totalMosques) ?></h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon bg-success bg-opacity-10 rounded-3 p-3 me-3">
-                            <i class="fas fa-map-marker-alt text-success fa-lg"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="card-title text-muted mb-1">مساجد محددة الموقع</h6>
-                            <h3 class="mb-0 fw-bold"><?= number_format($totalWithCoords) ?></h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon bg-info bg-opacity-10 rounded-3 p-3 me-3">
-                            <i class="fas fa-percentage text-info fa-lg"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="card-title text-muted mb-1">نسبة التحديد</h6>
-                            <h3 class="mb-0 fw-bold">
-                                <?= $totalMosques > 0 ? number_format(($totalWithCoords / $totalMosques) * 100, 1) : 0 ?>%
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon bg-warning bg-opacity-10 rounded-3 p-3 me-3">
-                            <i class="fas fa-map text-warning fa-lg"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="card-title text-muted mb-1">المساجد بدون موقع</h6>
-                            <h3 class="mb-0 fw-bold"><?= number_format($totalMosques - $totalWithCoords) ?></h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="map-summary reveal" aria-label="ملخص التغطية الجغرافية">
+        <span><strong><?= number_format((int) $totalMosques) ?></strong> مسجد</span>
+        <span><strong><?= number_format((int) $totalWithCoords) ?></strong> محدد الموقع</span>
+        <span><strong><?= $totalMosques > 0 ? number_format(($totalWithCoords / $totalMosques) * 100, 1) : 0 ?>%</strong> تغطية</span>
     </div>
 
     <!-- Enhanced Search and Filters Section -->
@@ -100,7 +30,7 @@
                         <div class="col-lg-4 col-md-6">
                             <div class="search-widget">
                                 <label class="form-label fw-semibold">
-                                    <i class="fas fa-search me-2 text-primary"></i>بحث متقدم
+                                    <i class="fas fa-search me-2 text-primary"></i>بحث
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0 ps-3">
@@ -108,7 +38,7 @@
                                     </span>
                                     <input type="text" id="globalSearch" class="form-control border-start-0 ps-0"
                                            placeholder="ابحث في المساجد، العناوين، الأئمة...">
-                                    <button class="btn btn-outline-secondary border-start-0" type="button" id="clearGlobalSearch">
+                                    <button class="btn btn-outline-secondary border-start-0" type="button" id="clearGlobalSearch" aria-label="مسح البحث" title="مسح البحث">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -120,7 +50,7 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="filter-widget">
                                 <label class="form-label fw-semibold mb-2">
-                                    <i class="fas fa-filter me-2 text-primary"></i>تصفية حسب الجماعة
+                                    <i class="fas fa-filter me-2 text-primary"></i>الجماعة
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0">
@@ -140,7 +70,7 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="filter-widget">
                                 <label class="form-label fw-semibold mb-2">
-                                    <i class="fas fa-info-circle me-2 text-primary"></i>حالة المسجد
+                                    <i class="fas fa-info-circle me-2 text-primary"></i>الوضعية
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0">
@@ -192,43 +122,21 @@
             </div>
         </div>
     </div>
-
-    <!-- Top Pagination -->
-    <?php if ($totalPages > 1): ?>
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="pagination-container card border-0 shadow-sm">
-                <div class="card-body py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-muted">
-                            الصفحة <?= $page ?> من <?= $totalPages ?>
-                        </div>
-                        <?= renderPagination($page, $totalPages) ?>
-                        <div class="text-muted">
-                            <?= number_format($start + 1) ?> - <?= number_format(min($start + $limit, $totalWithCoords)) ?> من <?= number_format($totalWithCoords) ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
-
-    <!-- Main Map Section -->
+<!-- Main Map Section -->
     <div class="row">
         <!-- Map Container -->
         <div class="col-lg-9 col-md-8 mb-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
                     <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-map me-2 text-primary"></i>خريطة تواجد المساجد
+                        <i class="fas fa-map me-2 text-primary"></i>المواقع
                     </h5>
                     <div class="d-flex gap-2 flex-wrap">
                         <button id="fitToMarkers" class="btn btn-outline-primary btn-sm d-flex align-items-center">
                             <i class="fas fa-expand-alt me-2"></i>عرض الكل
                         </button>
                         <div class="header-actions">
-                            <button id="refreshMap" class="btn btn-light btn-icon">
+                            <button id="refreshMap" class="btn btn-light btn-icon" aria-label="تحديث الخريطة" title="تحديث الخريطة">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>

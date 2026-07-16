@@ -53,6 +53,16 @@ const mosqueFormData = {
     }
 };
 
+function setElementHidden(element, hidden) {
+    if (!element) return;
+
+    Array.from(element.classList)
+        .filter(className => className.endsWith('-collapsed-section'))
+        .forEach(className => element.classList.remove(className));
+    element.hidden = hidden;
+    element.classList.toggle('d-none', hidden);
+}
+
 function initializeMosqueForm() {
     // DOM Elements
     const adminTypeSelect = document.getElementById('admin_type');
@@ -61,7 +71,7 @@ function initializeMosqueForm() {
     const pashalikSelect = document.getElementById('pashalik');
     const pashalikCommunitySelect = document.getElementById('pashalik_community');
     const attachmentSelect = document.getElementById('administrative_attachment');
-    const attachmentContainer = document.getElementById('attachment_container') || { style: { display: 'none' } };
+    const attachmentContainer = document.getElementById('attachment_container');
     const circleSelect = document.getElementById('circle');
     const leadershipSelect = document.getElementById('leadership');
     const circleCommunitySelect = document.getElementById('circle_community');
@@ -145,24 +155,24 @@ function initializeMosqueForm() {
             const selectedType = this.value;
             
             // Hide both sections first
-            pashalikSection.style.display = 'none';
-            circleSection.style.display = 'none';
-            if (attachmentContainer) attachmentContainer.style.display = 'none';
+            setElementHidden(pashalikSection, true);
+            setElementHidden(circleSection, true);
+            setElementHidden(attachmentContainer, true);
             
             // Show the selected section
             if (selectedType === 'pashalik') {
-                pashalikSection.style.display = 'block';
+                setElementHidden(pashalikSection, false);
                 // Reset circle section
                 if (circleSelect) circleSelect.value = '';
                 if (leadershipSelect) leadershipSelect.innerHTML = '<option value="">-- اختر القيادة --</option>';
                 if (circleCommunitySelect) circleCommunitySelect.innerHTML = '<option value="">-- اختر الجماعة --</option>';
             } else if (selectedType === 'circle') {
-                circleSection.style.display = 'block';
+                setElementHidden(circleSection, false);
                 // Reset pashalik section
                 if (pashalikSelect) pashalikSelect.value = '';
                 if (pashalikCommunitySelect) pashalikCommunitySelect.innerHTML = '<option value="">-- اختر الجماعة --</option>';
                 if (attachmentSelect) attachmentSelect.innerHTML = '<option value="">-- اختر الملحقة/المقاطعة --</option>';
-                if (attachmentContainer) attachmentContainer.style.display = 'none';
+                setElementHidden(attachmentContainer, true);
             }
         });
     }
@@ -183,7 +193,7 @@ function initializeMosqueForm() {
             
             // Reset attachments
             if (attachmentSelect) attachmentSelect.innerHTML = '<option value="">-- اختر الملحقة/المقاطعة --</option>';
-            if (attachmentContainer) attachmentContainer.style.display = 'none';
+            setElementHidden(attachmentContainer, true);
         });
     }
 
@@ -203,12 +213,12 @@ function initializeMosqueForm() {
                         const option = new Option(attachment, attachment);
                         attachmentSelect.add(option);
                     });
-                    if (attachmentContainer) attachmentContainer.style.display = 'block';
+                    setElementHidden(attachmentContainer, false);
                 } else {
-                    if (attachmentContainer) attachmentContainer.style.display = 'none';
+                    setElementHidden(attachmentContainer, true);
                 }
             } else {
-                if (attachmentContainer) attachmentContainer.style.display = 'none';
+                setElementHidden(attachmentContainer, true);
             }
         });
     }
@@ -252,7 +262,7 @@ function initializeMosqueForm() {
     }
 
     // Initialize based on existing values (for edit mode)
-    const savedAdminType = adminTypeSelect ? adminTypeSelect.dataset.savedValue || '' : '';
+    const savedAdminType = adminTypeSelect ? adminTypeSelect.dataset.savedValue || adminTypeSelect.value || '' : '';
     const savedPashalik = pashalikSelect ? pashalikSelect.dataset.savedValue || '' : '';
     const savedCircle = circleSelect ? circleSelect.dataset.savedValue || '' : '';
     const savedCommunity = pashalikCommunitySelect ? pashalikCommunitySelect.dataset.savedValue || '' : '';
@@ -417,7 +427,8 @@ let mosqueFormMarker;
 let pendingMapOpen = false;
 
 window.initMosqueFormMapPicker = function initMosqueFormMapPicker() {
-    if (pendingMapOpen || document.getElementById('mapContainer')?.style.display !== 'none') {
+    const mapContainer = document.getElementById('mapContainer');
+    if (pendingMapOpen || mapContainer?.dataset.mapOpen === 'true') {
         initializeFormMap();
     }
 };
@@ -428,9 +439,17 @@ function setupGpsPicker(form) {
     const mapContainer = document.getElementById('mapContainer');
     if (!showMapBtn || !mapContainer) return;
 
+    mapContainer.dataset.mapOpen = 'false';
+    showMapBtn.setAttribute('aria-expanded', 'false');
+    showMapBtn.setAttribute('aria-controls', mapContainer.id);
+    setElementHidden(mapContainer, true);
+
     showMapBtn.addEventListener('click', function() {
-        mapContainer.style.display = mapContainer.style.display === 'none' || mapContainer.style.display === '' ? 'block' : 'none';
-        if (mapContainer.style.display === 'none') return;
+        const opening = mapContainer.dataset.mapOpen !== 'true';
+        mapContainer.dataset.mapOpen = opening ? 'true' : 'false';
+        showMapBtn.setAttribute('aria-expanded', opening ? 'true' : 'false');
+        setElementHidden(mapContainer, !opening);
+        if (!opening) return;
 
         if (!form.dataset.googleMapsKey) {
             mapContainer.innerHTML = '<div class="h-100 d-flex align-items-center justify-content-center text-muted p-3 text-center">مفتاح Google Maps غير مضبوط بعد. يمكن إدخال الإحداثيات يدويا الآن.</div>';

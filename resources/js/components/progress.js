@@ -1,8 +1,13 @@
 export function initProgress(root = document) {
     root.querySelectorAll('[data-progress]').forEach((meter) => {
         const value = Math.min(100, Math.max(0, Number(meter.getAttribute('data-progress')) || 0));
-        meter.style.setProperty('--progress', String(value));
         meter.setAttribute('aria-valuenow', String(value));
+        meter.setAttribute('data-progress', String(value));
+
+        if (typeof HTMLProgressElement !== 'undefined' && meter instanceof HTMLProgressElement) {
+            meter.max = 100;
+            meter.value = value;
+        }
     });
 
     root.querySelectorAll('[data-count-up]').forEach((element) => {

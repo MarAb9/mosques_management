@@ -2,6 +2,22 @@ const quranPageData = (() => { try { return JSON.parse(document.getElementById('
 const escapeOption = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character]);
 const buildOptions = (options = []) => options.map((option) => `<option value="${escapeOption(option)}">${escapeOption(option)}</option>`).join('');
 
+function setupTextareaRows(root = document) {
+    const syncRows = (textarea) => {
+        const visualLines = textarea.value.split(/\r?\n/).reduce((total, line) => {
+            return total + Math.max(1, Math.ceil(line.length / 58));
+        }, 0);
+        textarea.rows = Math.min(12, Math.max(3, visualLines));
+    };
+
+    root.querySelectorAll('textarea').forEach(syncRows);
+    if (document.documentElement.dataset.quranTextareaRowsInitialized === 'true') return;
+    document.documentElement.dataset.quranTextareaRowsInitialized = 'true';
+    root.addEventListener('input', (event) => {
+        if (event.target instanceof HTMLTextAreaElement) syncRows(event.target);
+    });
+}
+
 if (document.body.dataset.page === 'quran_mosques') {
 function escapeHtml(value) {
     if (value === null || value === undefined) return '';
@@ -50,7 +66,7 @@ function loadQuranMosqueDetails(mosqueId) {
     const modalBody = document.getElementById('modal-body-content');
 
     modalBody.innerHTML = `
-        <div class="text-center py-5 animate__animated animate__fadeIn">
+        <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">جاري التحميل...</span>
             </div>
@@ -91,7 +107,7 @@ function formatQuranMosqueDetails(mosque) {
             totalSessionsAll += parseInt(responsible.weekly_sessions || 0);
 
             responsiblesHtml += `
-            <div class="card mb-3 animate__animated animate__fadeInUp">
+            <div class="card mb-3">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h6 class="mb-0"><i class="fas fa-user-tie me-2"></i>${responsible.responsible_name}</h6>
                     ${responsible.responsible_position ? `<span class="badge bg-info">${responsible.responsible_position}</span>` : ''}
@@ -121,9 +137,9 @@ function formatQuranMosqueDetails(mosque) {
     }
 
     return `
-    <div class="row animate__animated animate__fadeIn">
+    <div class="row">
         <div class="col-md-6">
-            <div class="card mb-4 animate__animated animate__fadeInLeft">
+            <div class="card mb-4">
                 <div class="card-header bg-light">
                     <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>المعلومات الأساسية</h6>
                 </div>
@@ -141,7 +157,7 @@ function formatQuranMosqueDetails(mosque) {
                 </div>
             </div>
 
-            <div class="card mb-4 animate__animated animate__fadeInLeft animate__delay-1s">
+            <div class="card mb-4">
                 <div class="card-header bg-light">
                     <h6 class="mb-0"><i class="fas fa-users me-2"></i>المسؤولون (${mosque.responsibles ? mosque.responsibles.length : 0})</h6>
                 </div>
@@ -152,7 +168,7 @@ function formatQuranMosqueDetails(mosque) {
         </div>
 
         <div class="col-md-6">
-            <div class="card mb-4 animate__animated animate__fadeInRight">
+            <div class="card mb-4">
                 <div class="card-header bg-light">
                     <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>الإحصائيات</h6>
                 </div>
@@ -204,7 +220,7 @@ function formatQuranMosqueDetails(mosque) {
 function showModalError(message) {
     const safeMessage = escapeHtml(message);
     document.getElementById('modal-body-content').innerHTML = `
-        <div class="alert alert-danger animate__animated animate__shakeX" role="alert">
+        <div class="alert alert-danger" role="alert">
             <i class="fas fa-exclamation-triangle me-2"></i>
             ${safeMessage}
         </div>`;
@@ -266,6 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteBtn = document.getElementById('deleteSelected');
     const selectedCountBtn = document.getElementById('selectedCountBtn');
     const selectedCountSpan = document.getElementById('selectedCount');
+    const bulkSelectionBar = document.getElementById('quranBulkSelectionBar');
 
     // Only initialize checkbox functionality if elements exist
     if (selectAll) {
@@ -295,6 +312,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (selectedCountBtn) {
             selectedCountBtn.disabled = selectedCount === 0;
+        }
+
+        if (bulkSelectionBar) {
+            bulkSelectionBar.hidden = selectedCount === 0;
         }
     }
 
@@ -439,11 +460,7 @@ $(document).ready(function() {
         $('html, body').animate({ scrollTop: $('.step-progress').offset().top - 20 }, 300);
     }
 
-    // Auto-resize textareas
-    $('textarea').on('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    }).trigger('input');
+    setupTextareaRows();
 
     // Form validation for each step
     function validateStep(step) {
@@ -762,11 +779,7 @@ $(document).ready(function() {
         $('html, body').animate({ scrollTop: $('.step-progress').offset().top - 20 }, 300);
     }
 
-    // Auto-resize textareas
-    $('textarea').on('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    }).trigger('input');
+    setupTextareaRows();
 
     // Form validation for each step
     function validateStep(step) {

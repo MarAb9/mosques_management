@@ -1,8 +1,16 @@
-.quran-record-card { overflow: hidden; border: 1px solid rgba(199,161,90,.3); border-inline-start: .25rem solid var(--quran-accent, var(--color-brass)); box-shadow: var(--shadow-soft); }
+.quran-record-card { overflow: hidden; border: 1px solid var(--color-border-soft); border-inline-start: .25rem solid var(--color-brass); box-shadow: var(--shadow-soft); }
 .quran-mobile-cards { display: none; }
-.directory-page-header { margin-block-end: 1.25rem; }
+.directory-page-header { margin-block-end: 1rem; }
 .directory-page-header + .row { position: relative; }
+.btn-icon { display: inline-grid; width: 2.125rem; height: 2.125rem; place-items: center; padding: 0; }
 @media (max-width: 991.98px) {
     .quran-table-wrapper { display: none; }
     .quran-mobile-cards { display: block; }
+}
+@media (max-width: 575.98px) {
+    .quran-record-card .card-body { padding: .875rem; }
+    .quran-record-card .card-body > .d-flex:last-child { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .quran-record-card .card-body > .d-flex:last-child .btn,
+    .quran-record-card .card-body > .d-flex:last-child form { width: 100%; }
+    .quran-record-card .card-body > .d-flex:last-child form .btn { width: 100%; }
 }

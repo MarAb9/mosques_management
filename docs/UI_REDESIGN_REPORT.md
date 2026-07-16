@@ -1,7 +1,7 @@
-# Atlas Noor UI redesign implementation report
+# Institutional UI redesign implementation report
 
 Completed: 2026-07-15  
-Branch: `redesign/atlas-noor-ui`  
+Branch: `fix/institutional-ui-polish`  
 Presentation baseline: `6b67b36`
 
 ## 1. Redesigned pages
@@ -24,7 +24,7 @@ Presentation baseline: `6b67b36`
 - Reusable PHP partials: `page_header`, `metric_card`, `progress`, and `empty_state`
 - Shared JavaScript modules for navigation, focus/accessibility behavior, feedback/confirmations, progress, and motion
 - Page adapters for login, dashboard, Quran management, map, import/export, and backup confirmation
-- CSS-only Atlas Noor arch/zellij scenes with reduced-motion/static fallbacks
+- CSS-only institutional geometric scenes with reduced-motion/static fallbacks
 
 ## 3. Removed inline CSS
 
@@ -42,7 +42,7 @@ Presentation baseline: `6b67b36`
 
 ## 5. Tailwind and Bootstrap coexistence
 
-Tailwind CSS 4.3.2 compiles only theme and utilities, uses the `tw` prefix, and omits Preflight. Bootstrap RTL remains the compatibility layer for the existing markup and JavaScript components. Bootstrap and third-party styles load first; `app.min.css` loads last and maps Bootstrap variables to Atlas Noor tokens. This prevents global reset conflicts and preserves the current MVC and form contracts.
+Tailwind CSS 4.3.2 compiles only theme and utilities, uses the `tw` prefix, and omits Preflight. Bootstrap RTL remains the compatibility layer for the existing markup and JavaScript components. Bootstrap and third-party styles load first; `app.min.css` loads last and maps Bootstrap variables to institutional tokens. This prevents global reset conflicts and preserves the current MVC and form contracts.
 
 ## 6. Libraries kept
 
@@ -97,7 +97,7 @@ Headless Chrome captured and inspected seven authenticated/guest screenshots at 
 
 ## 12. Files changed
 
-The current Atlas Noor implementation differs from the presentation baseline across 76 files. The later audit/error-visibility cleanup changes 19 files, including three deliberate deletions: the audit-log reader service, public audit shim, and audit view.
+The current institutional implementation differs from the presentation baseline across 76 files. The later audit/error-visibility cleanup changes 19 files, including three deliberate deletions: the audit-log reader service, public audit shim, and audit view.
 
 The work is organized into focused design and compatibility commits. Business-data controllers, repositories, database schema, request methods, field names, CSRF handling, AJAX response formats, and permission logic remain intact. A later cleanup deliberately removed the audit-view route and import error-report endpoint while retaining internal security logging.
 

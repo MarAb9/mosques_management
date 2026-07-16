@@ -14,7 +14,7 @@ if (!empty($filteredParams)) {
     $queryString = '&' . http_build_query($filteredParams);
 }
 ?>
-<nav aria-label="التنقل بين صفحات النتائج" class="mt-4 animate__animated animate__fadeIn">
+<nav aria-label="التنقل بين صفحات النتائج" class="mt-4">
     <ul class="pagination justify-content-center">
 <?php if ($currentPage > 1): ?>
         <li class="page-item">

@@ -1,0 +1,5 @@
+.institutional-pattern { position: absolute; inset: 0; pointer-events: none; opacity: .08; }
+.reveal { opacity: 1; transform: none; }
+.reveal.is-visible { animation: interface-reveal var(--duration-normal) var(--ease-standard); }
+@keyframes interface-reveal { from { opacity: .75; transform: translateY(.375rem); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .reveal.is-visible { animation: none; } }

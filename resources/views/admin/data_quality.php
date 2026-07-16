@@ -11,10 +11,10 @@ $actions = '<a href="import_export.php?export=1&amp;no_location=' . ($issue === 
 ?>
 <div class="admin-workspace">
     <?= $view->partial('components.page_header', [
-        'kicker' => 'الحوكمة والموثوقية',
-        'title' => 'لوحة جودة البيانات',
-        'subtitle' => 'حوّل مؤشرات النقص والتعارض إلى قائمة إصلاح واضحة وقابلة للتنفيذ.',
+        'title' => 'جودة البيانات',
+        'subtitle' => number_format((int) $totalIssues) . ' مؤشر يحتاج المراجعة',
         'icon' => 'fa-clipboard-check',
+        'illustration' => 'assets/images/institutional/database-quality-3d.svg',
         'actionsHtml' => $actions,
     ]) ?>
 
@@ -23,7 +23,7 @@ $actions = '<a href="import_export.php?export=1&amp;no_location=' . ($issue === 
         <?= $view->partial('components.empty_state', ['icon' => 'fa-circle-check', 'title' => 'جودة البيانات مستقرة', 'message' => 'لم يرصد النظام أياً من فئات المشاكل المتابعة حالياً.']) ?>
     </section>
     <?php else: ?>
-    <div class="alert alert-warning d-flex align-items-start gap-3" role="status"><i class="fas fa-triangle-exclamation fs-4 mt-1" aria-hidden="true"></i><div><strong class="d-block">يوجد <?= number_format($totalIssues) ?> مؤشراً يحتاج المراجعة</strong><span>ابدأ بالفئات الحرجة، ثم صحح السجلات مباشرة من الجدول.</span></div></div>
+    <div class="alert alert-warning d-flex align-items-start gap-3" role="status"><i class="fas fa-triangle-exclamation fs-4 mt-1" aria-hidden="true"></i><div><strong class="d-block">يوجد <?= number_format($totalIssues) ?> مؤشراً يحتاج المراجعة</strong></div></div>
     <?php endif; ?>
 
     <section class="metric-grid mb-4" aria-label="فئات مشاكل جودة البيانات">
@@ -36,7 +36,7 @@ $actions = '<a href="import_export.php?export=1&amp;no_location=' . ($issue === 
     </section>
 
     <section class="data-panel" aria-labelledby="qualitySamplesTitle">
-        <div class="data-panel__header"><div><span class="page-kicker">السجلات المتأثرة</span><h2 id="qualitySamplesTitle"><?= $view->e($issues[$issue]['label'] ?? 'عينات جودة البيانات') ?></h2></div><span class="status-badge <?= empty($samples) ? 'text-success bg-success-subtle' : 'text-warning bg-warning-subtle' ?>"><?= count($samples) ?> نتيجة معروضة</span></div>
+        <div class="data-panel__header"><h2 id="qualitySamplesTitle"><?= $view->e($issues[$issue]['label'] ?? 'عينات جودة البيانات') ?></h2><span class="status-badge <?= empty($samples) ? 'text-success bg-success-subtle' : 'text-warning bg-warning-subtle' ?>"><?= count($samples) ?> نتيجة</span></div>
         <?php if (empty($samples)): ?>
             <?= $view->partial('components.empty_state', ['icon' => 'fa-circle-check', 'title' => 'لا توجد مشاكل في هذه الفئة', 'message' => 'جميع السجلات المطابقة اجتازت هذا الفحص.']) ?>
         <?php else: ?>

@@ -3,6 +3,7 @@ import { initAccessibility } from './core/accessibility.js';
 import { initProgress } from './components/progress.js';
 import { initConfirmations, initTooltips } from './components/feedback.js';
 import { initMotion } from './effects/motion.js';
+import { initGlobalSearch } from './components/global-search.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
@@ -11,4 +12,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initConfirmations();
     initTooltips();
     initMotion();
+    initGlobalSearch();
 });
