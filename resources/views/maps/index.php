@@ -134,9 +134,17 @@
         </div>
     </div>
 <!-- Main Map Section -->
-    <div class="row map-main-row">
+    <div class="map-view-switcher" role="tablist" aria-label="اختيار عرض الخريطة أو القائمة">
+        <button type="button" role="tab" data-map-view="map" aria-selected="true" aria-controls="mapCanvasColumn">
+            <i class="fas fa-map" aria-hidden="true"></i><span>الخريطة</span>
+        </button>
+        <button type="button" role="tab" data-map-view="list" aria-selected="false" aria-controls="mapListColumn">
+            <i class="fas fa-list" aria-hidden="true"></i><span>القائمة</span>
+        </button>
+    </div>
+    <div class="row map-main-row" id="mapMainRow">
         <!-- Map Container -->
-        <div class="map-canvas-column">
+        <div class="map-canvas-column" id="mapCanvasColumn">
             <div class="card map-canvas-card">
                 <div class="card-header map-canvas-toolbar">
                     <h5 class="mb-0 fw-bold">
@@ -201,7 +209,7 @@
         </div>
 
          <!-- Mosque List Sidebar -->
-        <div class="map-list-column">
+        <div class="map-list-column" id="mapListColumn">
             <div class="card map-list-card">
                 <div class="card-header map-list-header">
                     <h5 class="mb-0 fw-bold">
@@ -285,6 +293,7 @@
 
 <!-- Google Maps API-ready implementation. Add GOOGLE_MAPS_API_KEY to .env to activate. -->
 <?php $hasGoogleMapsKey = trim((string) ($googleMapsApiKey ?? '')) !== ''; ?>
+<style nonce="<?= $view->e($cspNonce ?? '') ?>">/* Nonce seed used by Google Maps for API-injected styles. */</style>
 <script type="application/json" id="mapPageData" nonce="<?= $view->e($cspNonce ?? '') ?>"><?= json_encode(['mosques' => $mosques, 'allMosques' => $allMosques, 'mapDefaults' => $mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9], 'hasGoogleMapsKey' => $hasGoogleMapsKey], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?></script>
 <script src="assets/dist/maps.min.js"></script>
 <?php if ($hasGoogleMapsKey): ?>

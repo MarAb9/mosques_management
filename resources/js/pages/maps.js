@@ -76,6 +76,9 @@ window.initGoogleMosqueMap = function initGoogleMosqueMap() {
             mapTypeControl: false,
             streetViewControl: false,
             fullscreenControl: true,
+            cameraControl: true,
+            cameraControlOptions: { position: google.maps.ControlPosition.TOP_LEFT },
+            zoomControlOptions: { position: google.maps.ControlPosition.TOP_LEFT },
             gestureHandling: 'greedy'
         });
         addMosqueMarkers();
@@ -450,15 +453,45 @@ function openMarker(marker, trigger = null) {
     refreshMarkerCluster();
     renderSelectedMosque(marker.mosqueData);
     highlightSidebarItem(marker.mosqueData.id);
+    if (window.matchMedia('(max-width: 1199.98px)').matches) setMapWorkspaceView('map');
 }
 
 function setupFilterToggle() {
     const button = document.getElementById('mapFilterToggle');
     const panel = document.getElementById('mapFilterPanel');
     if (!button || !panel) return;
+    const mobileQuery = window.matchMedia('(max-width: 767.98px)');
+    const syncViewport = event => {
+        panel.classList.toggle('is-collapsed', event.matches);
+        button.setAttribute('aria-expanded', String(!event.matches));
+    };
+    syncViewport(mobileQuery);
+    mobileQuery.addEventListener('change', syncViewport);
     button.addEventListener('click', () => {
         const collapsed = panel.classList.toggle('is-collapsed');
         button.setAttribute('aria-expanded', String(!collapsed));
+    });
+}
+
+function setMapWorkspaceView(view) {
+    const row = document.getElementById('mapMainRow');
+    if (!row) return;
+    const listView = view === 'list';
+    row.classList.toggle('is-list-view', listView);
+    document.querySelectorAll('[data-map-view]').forEach(button => {
+        button.setAttribute('aria-selected', String(button.dataset.mapView === view));
+    });
+    if (!listView && map) {
+        window.setTimeout(() => {
+            google.maps.event.trigger(map, 'resize');
+            if (selectedMarker) map.panTo(selectedMarker.getPosition());
+        }, 0);
+    }
+}
+
+function setupMapViewSwitcher() {
+    document.querySelectorAll('[data-map-view]').forEach(button => {
+        button.addEventListener('click', () => setMapWorkspaceView(button.dataset.mapView || 'map'));
     });
 }
 
@@ -602,6 +635,7 @@ function bootMapPage() {
     setupSearchFunctionality();
     setupFilters();
     setupFilterToggle();
+    setupMapViewSwitcher();
 
     document.addEventListener('click', function(event) {
         const target = event.target instanceof Element ? event.target.closest('.js-open-google-maps') : null;
