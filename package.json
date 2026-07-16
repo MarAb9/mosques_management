@@ -4,7 +4,7 @@
   "scripts": {
     "build": "npm run build:css && npm run build:js",
     "build:css": "tailwindcss -i ./resources/css/app.css -o ./public/assets/dist/app.min.css --minify",
-    "build:js": "esbuild ./resources/js/app.js ./resources/js/pages/login.js ./resources/js/pages/dashboard.js ./resources/js/pages/quran.js ./resources/js/pages/maps.js ./resources/js/pages/import-export.js ./resources/js/components/backup-confirm.js --bundle --minify --format=iife --target=es2020 --outdir=./public/assets/dist --entry-names=[name].min",
+    "build:js": "esbuild ./resources/js/app.js ./resources/js/pages/login.js ./resources/js/pages/dashboard.js ./resources/js/pages/quran.js ./resources/js/pages/maps.js ./resources/js/pages/mosque-form-map.js ./resources/js/pages/import-export.js ./resources/js/components/backup-confirm.js --bundle --minify --format=iife --target=es2020 --outdir=./public/assets/dist --entry-names=[name].min",
     "watch:css": "tailwindcss -i ./resources/css/app.css -o ./public/assets/dist/app.min.css --watch"
   },
   "devDependencies": {
@@ -13,6 +13,6 @@
     "tailwindcss": "4.3.2"
   },
   "dependencies": {
-    "@googlemaps/markerclusterer": "^2.6.2"
+    "maplibre-gl": "^5.24.0"
   }
 }

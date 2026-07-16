@@ -438,8 +438,7 @@ function renderLocationCell(row) {
         const mosqueName = escapeHtml(row.mosque_name || 'المسجد');
         return `
         <button type="button" class="row-action view-on-map"
-                data-lat="${escapeHtml(row.latitude)}"
-                data-lng="${escapeHtml(row.longitude)}"
+                data-mosque-id="${escapeHtml(row.registration_number)}"
                 data-mosque="${mosqueName}"
                 title="عرض على الخريطة"
                 aria-label="عرض ${mosqueName} على الخريطة">
@@ -466,13 +465,8 @@ function setupMapButtons() {
         if (button.dataset.mapButtonInitialized === 'true') return;
         button.dataset.mapButtonInitialized = 'true';
         button.addEventListener('click', function() {
-            const lat = this.getAttribute('data-lat');
-            const lng = this.getAttribute('data-lng');
-            const mosqueName = this.getAttribute('data-mosque');
-
-            // Open in new tab with Google Maps
-            const url = `https://www.google.com/maps?q=${lat},${lng}&z=15`;
-            window.open(url, '_blank', 'noopener,noreferrer');
+            const mosqueId = this.getAttribute('data-mosque-id');
+            if (mosqueId) window.location.href = `mosque_maps.php?mosque=${encodeURIComponent(mosqueId)}`;
         });
     });
 }
@@ -1190,7 +1184,7 @@ function formatMosqueDetails(mosque) {
     const constructionYear = mosque.construction_year || fallback;
     const hasCoordinates = mosque.latitude && mosque.longitude;
     const mapLink = hasCoordinates
-        ? `<a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps?q=${mosque.latitude},${mosque.longitude}&z=17"><i class="fas fa-map-location-dot me-1"></i>فتح في خرائط Google</a>`
+        ? `<a class="btn btn-sm btn-outline-primary" href="mosque_maps.php?mosque=${encodeURIComponent(mosque.registration_number)}"><i class="fas fa-map-location-dot me-1"></i>عرض على خريطة المساجد</a>`
         : fallback;
 
     const imageDisplay = mosque.main_image ? `

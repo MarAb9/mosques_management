@@ -1,7 +1,7 @@
 <?php
 /**
  * Mosque map page (legacy mosque_maps.php markup, moved verbatim).
- * Expects: $mosques, $allMosques, $totalMosques, $totalWithCoords,
+ * Expects: $mosques, $mosqueGeoJson, $totalMosques, $totalWithCoords,
  *          $totalPages, $page, $communities, $statuses
  */
 ?>
@@ -150,13 +150,14 @@
                     <h5 class="mb-0 fw-bold">
                         <i class="fas fa-map me-2 text-primary"></i>المواقع
                     </h5>
-                    <div class="d-flex gap-2 flex-wrap">
+                    <div class="map-canvas-actions">
+                        <span class="map-provider-badge"><i class="fas fa-layer-group" aria-hidden="true"></i>OpenFreeMap</span>
                         <button id="fitToMarkers" class="btn btn-outline-primary btn-sm d-flex align-items-center">
                             <i class="fas fa-expand-alt me-2"></i>عرض الكل
                         </button>
                         <div class="header-actions">
-                            <button id="refreshMap" class="btn btn-light btn-icon" aria-label="تحديث الخريطة" title="تحديث الخريطة">
-                                <i class="fas fa-sync-alt"></i>
+                            <button id="resetMapView" class="btn btn-light btn-icon" aria-label="إعادة ضبط عرض الخريطة" title="إعادة ضبط عرض الخريطة">
+                                <i class="fas fa-house"></i>
                             </button>
                         </div>
                     </div>
@@ -187,8 +188,7 @@
                             </dl>
                         </div>
                         <div class="map-selection-panel__actions">
-                            <a id="selectedMosqueDetails" class="btn btn-primary btn-sm" href="mosques.php">عرض التفاصيل</a>
-                            <button type="button" id="selectedMosqueGoogleMaps" class="btn btn-outline-secondary btn-sm js-open-google-maps">فتح في Google Maps</button>
+                            <a id="selectedMosqueDetails" class="btn btn-primary btn-sm" href="mosques.php">عرض التفاصيل في الدليل</a>
                         </div>
                     </aside>
                     <div id="mapLoading" class="position-absolute top-50 start-50 translate-middle text-center">
@@ -291,14 +291,8 @@
 
 </div>
 
-<!-- Google Maps API-ready implementation. Add GOOGLE_MAPS_API_KEY to .env to activate. -->
-<?php $hasGoogleMapsKey = trim((string) ($googleMapsApiKey ?? '')) !== ''; ?>
-<style nonce="<?= $view->e($cspNonce ?? '') ?>">/* Nonce seed used by Google Maps for API-injected styles. */</style>
-<script type="application/json" id="mapPageData" nonce="<?= $view->e($cspNonce ?? '') ?>"><?= json_encode(['mosques' => $mosques, 'allMosques' => $allMosques, 'mapDefaults' => $mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9], 'hasGoogleMapsKey' => $hasGoogleMapsKey], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?></script>
+<script type="application/json" id="mapPageData" nonce="<?= $view->e($cspNonce ?? '') ?>"><?= json_encode(['mosques' => $mosques, 'mosqueGeoJson' => $mosqueGeoJson, 'mapConfig' => $mapConfig ?? ['provider' => 'maplibre', 'styleUrl' => 'https://tiles.openfreemap.org/styles/liberty'], 'mapDefaults' => $mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9]], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?></script>
 <script src="assets/dist/maps.min.js"></script>
-<?php if ($hasGoogleMapsKey): ?>
-<script nonce="<?= $view->e($cspNonce ?? '') ?>" src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode((string) $googleMapsApiKey) ?>&callback=initGoogleMosqueMap&loading=async" async defer></script>
-<?php endif; ?>
 
 
 

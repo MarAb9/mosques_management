@@ -386,7 +386,6 @@ try {
             ['map', 'mosque_maps.php'],
             ['import-export', 'import_export.php'],
             ['data-quality', 'data_quality.php'],
-            ['trash', 'trash.php'],
         ];
 
         for (const [label, url] of pages) {

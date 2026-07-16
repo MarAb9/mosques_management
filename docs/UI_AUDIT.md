@@ -13,7 +13,7 @@ The application has 18 PHP view files and exposes the following authenticated wo
 - Quran program directory, details modal, create and edit forms
 - Geographic mosque map
 - Excel/Word import and export
-- Data quality, audit log, trash and JSON backup actions
+- Data quality and JSON backup actions
 - Standalone login
 
 All legacy public URLs, field names, methods, CSRF inputs, permission checks, AJAX response formats, and controller-supplied variables are presentation contracts and must remain unchanged.
@@ -38,7 +38,7 @@ The redesign moves visual rules to `resources/css`, behavior to `resources/js` o
 | Select2 | Keep, restyle | Mosque and Quran selectors rely on it. A replacement would expand scope and regression risk. |
 | SweetAlert2 | Keep, restyle | Used for destructive and logout confirmation; it receives institutional tokens. |
 | Chart.js | Keep conditionally | Used by the mosque quick-statistics modal and loaded only where needed. |
-| Google Maps API | Keep conditionally | This is the map engine actually used by the current views and mosque form picker. |
+| MapLibre GL JS + OpenFreeMap | Keep conditionally | MapLibre is bundled locally for the map workspace and coordinate picker; OpenFreeMap supplies keyless vector tiles through a configurable style URL. |
 | Leaflet | Not loaded | Vendor files exist but no application code references Leaflet. Files remain untouched pending a separate dependency cleanup. |
 | Animate.css | Remove from runtime | Replaced by a small internal transform/opacity motion layer with reduced-motion support. |
 | Hover.css | Remove from runtime | Replaced by component focus/hover states in the design system. |

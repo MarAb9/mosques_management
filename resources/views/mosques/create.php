@@ -41,7 +41,8 @@
     <form data-mosque-form-mode="create" method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data"
           data-guard-unsaved="true"
           data-original-registration-number="<?= $view->e((string) ($formData['registration_number'] ?? '')) ?>"
-          data-google-maps-key="<?= $view->e((string) ($googleMapsApiKey ?? '')) ?>"
+          data-map-provider="<?= $view->e((string) ($mapProvider ?? 'maplibre')) ?>"
+          data-map-style-url="<?= $view->e((string) ($mapStyleUrl ?? 'https://tiles.openfreemap.org/styles/liberty')) ?>"
           data-map-defaults="<?= $view->e(json_encode($mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)) ?>">
         <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
         <div class="row g-4">
@@ -486,6 +487,4 @@
 </div>
 
 <script src="assets/js/mosque_form.js"></script>
-<?php if (!empty($googleMapsApiKey)): ?>
-<script nonce="<?= $view->e($cspNonce ?? '') ?>" src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode((string) $googleMapsApiKey) ?>&callback=initMosqueFormMapPicker&loading=async" async defer></script>
-<?php endif; ?>
+<script src="assets/dist/mosque-form-map.min.js"></script>

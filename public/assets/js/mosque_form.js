@@ -319,7 +319,6 @@ function initializeEnhancedMosqueFormUx() {
     setupUnsavedChangesWarning(form);
     setupValidationSummary(form);
     setupNationalCodeDuplicateCheck(form);
-    setupGpsPicker(form);
     setupImageCompression();
 
     const existingSummary = document.getElementById('validationSummary');
@@ -420,130 +419,6 @@ function setupNationalCodeDuplicateCheck(form) {
         feedback.className = 'invalid-feedback d-block';
         feedback.textContent = 'لا يمكن الحفظ قبل تصحيح الرمز الوطني المكرر.';
     }, true);
-}
-
-let mosqueFormMap;
-let mosqueFormMarker;
-let pendingMapOpen = false;
-
-window.initMosqueFormMapPicker = function initMosqueFormMapPicker() {
-    const mapContainer = document.getElementById('mapContainer');
-    if (pendingMapOpen || mapContainer?.dataset.mapOpen === 'true') {
-        initializeFormMap();
-    }
-};
-
-function setupGpsPicker(form) {
-    const showMapBtn = document.getElementById('showMapBtn');
-    const currentLocationBtn = document.getElementById('getCurrentLocationBtn');
-    const mapContainer = document.getElementById('mapContainer');
-    if (!showMapBtn || !mapContainer) return;
-
-    mapContainer.dataset.mapOpen = 'false';
-    showMapBtn.setAttribute('aria-expanded', 'false');
-    showMapBtn.setAttribute('aria-controls', mapContainer.id);
-    setElementHidden(mapContainer, true);
-
-    showMapBtn.addEventListener('click', function() {
-        const opening = mapContainer.dataset.mapOpen !== 'true';
-        mapContainer.dataset.mapOpen = opening ? 'true' : 'false';
-        showMapBtn.setAttribute('aria-expanded', opening ? 'true' : 'false');
-        setElementHidden(mapContainer, !opening);
-        if (!opening) return;
-
-        if (!form.dataset.googleMapsKey) {
-            mapContainer.innerHTML = '<div class="h-100 d-flex align-items-center justify-content-center text-muted p-3 text-center">مفتاح Google Maps غير مضبوط بعد. يمكن إدخال الإحداثيات يدويا الآن.</div>';
-            return;
-        }
-
-        pendingMapOpen = true;
-        if (window.google && google.maps) initializeFormMap();
-    });
-
-    if (currentLocationBtn) {
-        currentLocationBtn.addEventListener('click', function() {
-            if (!navigator.geolocation) {
-                alert('المتصفح لا يدعم تحديد الموقع الحالي.');
-                return;
-            }
-            navigator.geolocation.getCurrentPosition(position => {
-                setCoordinateValues(position.coords.latitude, position.coords.longitude);
-                if (window.google && google.maps) {
-                    if (!mosqueFormMap) initializeFormMap();
-                    moveFormMarker(position.coords.latitude, position.coords.longitude);
-                }
-            }, () => alert('تعذر الحصول على الموقع الحالي. تحقق من صلاحيات المتصفح.'));
-        });
-    }
-}
-
-function initializeFormMap() {
-    const mapElement = document.getElementById('map');
-    const form = document.querySelector('form[data-guard-unsaved="true"]');
-    if (!mapElement || !form || !window.google || !google.maps) return;
-
-    const defaults = parseMapDefaults(form.dataset.mapDefaults);
-    const latitudeInput = form.querySelector('[name="latitude"]');
-    const longitudeInput = form.querySelector('[name="longitude"]');
-    const lat = Number.parseFloat(latitudeInput?.value || '') || defaults.latitude;
-    const lng = Number.parseFloat(longitudeInput?.value || '') || defaults.longitude;
-    const center = { lat, lng };
-
-    if (!mosqueFormMap) {
-        mosqueFormMap = new google.maps.Map(mapElement, {
-            center,
-            zoom: Number(defaults.zoom) || 12,
-            mapTypeControl: false,
-            streetViewControl: false,
-            fullscreenControl: true
-        });
-        mosqueFormMap.addListener('click', event => {
-            const clickedLat = event.latLng.lat();
-            const clickedLng = event.latLng.lng();
-            setCoordinateValues(clickedLat, clickedLng);
-            moveFormMarker(clickedLat, clickedLng);
-        });
-    }
-
-    google.maps.event.trigger(mosqueFormMap, 'resize');
-    mosqueFormMap.setCenter(center);
-    moveFormMarker(center.lat, center.lng);
-}
-
-function moveFormMarker(lat, lng) {
-    if (!mosqueFormMap || !window.google || !google.maps) return;
-    const position = { lat: Number(lat), lng: Number(lng) };
-    if (!mosqueFormMarker) {
-        mosqueFormMarker = new google.maps.Marker({ map: mosqueFormMap, position, draggable: true });
-        mosqueFormMarker.addListener('dragend', event => {
-            setCoordinateValues(event.latLng.lat(), event.latLng.lng());
-        });
-    } else {
-        mosqueFormMarker.setPosition(position);
-    }
-    mosqueFormMap.setCenter(position);
-}
-
-function setCoordinateValues(lat, lng) {
-    const latitudeInput = document.querySelector('[name="latitude"]');
-    const longitudeInput = document.querySelector('[name="longitude"]');
-    if (latitudeInput) latitudeInput.value = Number(lat).toFixed(8);
-    if (longitudeInput) longitudeInput.value = Number(lng).toFixed(8);
-    latitudeInput?.dispatchEvent(new Event('input', { bubbles: true }));
-    longitudeInput?.dispatchEvent(new Event('input', { bubbles: true }));
-}
-
-function parseMapDefaults(value) {
-    try {
-        const parsed = JSON.parse(value || '{}');
-        return {
-            latitude: Number(parsed.latitude) || 34.6814,
-            longitude: Number(parsed.longitude) || -1.9086,
-            zoom: Number(parsed.zoom) || 12
-        };
-    } catch (error) {
-        return { latitude: 34.6814, longitude: -1.9086, zoom: 12 };
-    }
 }
 
 function setupImageCompression() {
