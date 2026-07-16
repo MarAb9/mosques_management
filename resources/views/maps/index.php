@@ -144,6 +144,32 @@
                 </div>
                 <div class="card-body p-0 position-relative">
                     <div id="map"></div>
+                    <aside id="selectedMosquePanel" class="selected-mosque-panel" aria-labelledby="selectedMosqueTitle" aria-hidden="true" hidden>
+                        <div class="selected-mosque-panel__header">
+                            <div>
+                                <span class="selected-mosque-panel__eyebrow">المسجد المحدد</span>
+                                <h2 id="selectedMosqueTitle">-</h2>
+                            </div>
+                            <button type="button" id="selectedMosqueClose" class="selected-mosque-panel__close" aria-label="إغلاق بطاقة المسجد">
+                                <i class="fas fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="selected-mosque-panel__body">
+                            <dl class="selected-mosque-details">
+                                <div><dt>العنوان</dt><dd id="selectedMosqueAddress">-</dd></div>
+                                <div><dt>الإمام</dt><dd id="selectedMosqueImam">-</dd></div>
+                                <div><dt>الإمام المرشد</dt><dd id="selectedMosqueGuideImam">-</dd></div>
+                                <div><dt>الجماعة</dt><dd id="selectedMosqueCommunity">-</dd></div>
+                                <div><dt>الرمز الوطني</dt><dd id="selectedMosqueCode">-</dd></div>
+                                <div><dt>الوضعية</dt><dd id="selectedMosqueStatus">-</dd></div>
+                                <div><dt>صلاة الجمعة</dt><dd id="selectedMosqueFriday">-</dd></div>
+                            </dl>
+                        </div>
+                        <div class="selected-mosque-panel__actions">
+                            <a id="selectedMosqueDetails" class="btn btn-primary btn-sm" href="mosques.php">عرض التفاصيل</a>
+                            <button type="button" id="selectedMosqueGoogleMaps" class="btn btn-outline-secondary btn-sm js-open-google-maps">فتح في Google Maps</button>
+                        </div>
+                    </aside>
                     <div id="mapLoading" class="position-absolute top-50 start-50 translate-middle text-center">
                         <div class="spinner-border text-primary mb-3 map-loading-spinner" role="status">
                             <span class="visually-hidden">جاري التحميل...</span>

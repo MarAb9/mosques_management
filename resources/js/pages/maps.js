@@ -2,10 +2,10 @@ import { MarkerClusterer, SuperClusterAlgorithm } from '@googlemaps/markercluste
 
 const mapPageData = (() => { try { return JSON.parse(document.getElementById('mapPageData')?.textContent || '{}'); } catch (_) { return {}; } })();
 let map;
-let infoWindow;
 let markers = [];
 let markerClusterer;
 let selectedMarker;
+let selectedTrigger;
 let mosquesData = mapPageData.mosques || [];
 let allMosquesData = mapPageData.allMosques || [];
 const mapDefaults = mapPageData.mapDefaults || { latitude: 34.6814, longitude: -1.9086, zoom: 9 };
@@ -49,14 +49,14 @@ function statusBadgeClass(status) {
     return 'secondary';
 }
 
-function markerIcon(status) {
+function markerIcon(status, isSelected = false) {
     return {
         path: google.maps.SymbolPath.CIRCLE,
         fillColor: statusColor(status),
         fillOpacity: 0.95,
-        strokeColor: '#ffffff',
-        strokeWeight: 2,
-        scale: 9
+        strokeColor: isSelected ? '#b88a3b' : '#ffffff',
+        strokeWeight: isSelected ? 4 : 2,
+        scale: isSelected ? 12 : 9
     };
 }
 
@@ -78,8 +78,6 @@ window.initGoogleMosqueMap = function initGoogleMosqueMap() {
             fullscreenControl: true,
             gestureHandling: 'greedy'
         });
-        infoWindow = new google.maps.InfoWindow();
-
         addMosqueMarkers();
         setupMapButtons();
         hideMapLoading();
@@ -178,8 +176,7 @@ function applyFilters() {
     updateSidebarList(filteredMosques);
     fitToVisibleMarkers(false);
     if (selectedMarker && !selectedMarker.filteredVisible) {
-        infoWindow?.close();
-        selectedMarker = undefined;
+        closeSelectedMosque({ restoreFocus: false });
     }
     refreshMarkerCluster();
 }
@@ -276,7 +273,7 @@ function showSearchSuggestions(searchTerm) {
 
     searchSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
         item.addEventListener('click', function() {
-            zoomToMosque(Number.parseFloat(this.dataset.lat || ''), Number.parseFloat(this.dataset.lng || ''), this.dataset.name || '');
+            zoomToMosque(Number.parseFloat(this.dataset.lat || ''), Number.parseFloat(this.dataset.lng || ''), this.dataset.name || '', this);
             searchSuggestions.classList.remove('show');
         });
     });
@@ -407,37 +404,6 @@ function updateSidebarList(filteredMosques) {
     reattachZoomEventListeners();
 }
 
-function createPopupContent(mosque) {
-    const data = mosque.raw || mosque;
-    const lat = Number.parseFloat(data.latitude || mosque.lat);
-    const lng = Number.parseFloat(data.longitude || mosque.lng);
-    const nationalCode = data.national_code || mosque.national_code || mosque.id || '';
-    const nationalCodeQuery = encodeURIComponent(String(nationalCode));
-    const fridayBadge = data.friday_prayer === 'نعم' ? '<span class="badge bg-info me-1">صلاة الجمعة</span>' : '';
-
-    return `
-        <div class="mosque-popup text-start">
-            <div class="popup-header bg-primary text-white text-center p-3 rounded-top">
-                <h6 class="mb-0"><i class="fas fa-mosque me-2"></i>${escapeHtml(data.mosque_name || mosque.name)}</h6>
-            </div>
-            <div class="popup-body p-3">
-                <div class="mb-3">
-                    <span class="badge bg-${statusBadgeClass(data.status || mosque.status)} me-2">${escapeHtml(data.status || mosque.status)}</span>
-                    ${fridayBadge}
-                    <span class="badge bg-secondary">${escapeHtml(nationalCode)}</span>
-                </div>
-                <div class="mb-2"><i class="fas fa-map-marker-alt text-muted me-2"></i><strong>العنوان:</strong> ${escapeHtml(data.address || mosque.address)}</div>
-                <div class="mb-2"><i class="fas fa-user text-muted me-2"></i><strong>الإمام:</strong> ${escapeHtml(data.imam_name || mosque.imam || 'غير محدد')}</div>
-                <div class="mb-2"><i class="fas fa-user-tie text-muted me-2"></i><strong>الإمام المرشد:</strong> ${escapeHtml(data.guide_imam || mosque.guide_imam || 'غير محدد')}</div>
-                ${data.community || mosque.community ? `<div class="mb-2"><i class="fas fa-users text-muted me-2"></i><strong>الجماعة:</strong> ${escapeHtml(data.community || mosque.community)}</div>` : ''}
-                <div class="d-flex gap-2 mt-3">
-                    <a href="mosques.php?national_code=${nationalCodeQuery}&from_map=${nationalCodeQuery}" class="btn btn-sm btn-primary text-white flex-fill"><i class="fas fa-info-circle me-1"></i>عرض التفاصيل</a>
-                    <button class="btn btn-sm btn-outline-secondary js-open-google-maps" data-lat="${lat}" data-lng="${lng}" title="فتح في خرائط Google"><i class="fas fa-external-link-alt"></i></button>
-                </div>
-            </div>
-        </div>`;
-}
-
 function setupMapButtons() {
     document.getElementById('fitToMarkers')?.addEventListener('click', () => fitToVisibleMarkers(true));
     document.getElementById('refreshMap')?.addEventListener('click', () => window.location.reload());
@@ -456,35 +422,120 @@ function reattachZoomEventListeners() {
             if (event.target instanceof Element && event.target.closest('a,button')) return;
             const id = this.dataset.mosqueId;
             const marker = markers.find(candidate => String(candidate.mosqueData.id) === String(id));
-            if (marker) openMarker(marker);
+            if (marker) openMarker(marker, this);
         });
     });
 }
 
-function openMarker(marker) {
+function openMarker(marker, trigger = null) {
     if (!map || !marker) return;
+
+    if (selectedMarker && selectedMarker !== marker) {
+        selectedMarker.setIcon(markerIcon(selectedMarker.mosqueData.status));
+        selectedMarker.setZIndex(undefined);
+    }
+
     selectedMarker = marker;
+    selectedTrigger = trigger instanceof HTMLElement ? trigger : null;
+    marker.setIcon(markerIcon(marker.mosqueData.status, true));
+    marker.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
     refreshMarkerCluster();
-    infoWindow.setContent(createPopupContent(marker.mosqueData));
-    infoWindow.open({ map, anchor: marker });
+    renderSelectedMosque(marker.mosqueData);
     highlightSidebarItem(marker.mosqueData.id);
 }
 
-function zoomToMosque(lat, lng, name) {
+function zoomToMosque(lat, lng, name, trigger = null) {
     if (!map || !Number.isFinite(lat) || !Number.isFinite(lng)) return;
     map.setCenter({ lat, lng });
     map.setZoom(16);
     const marker = markers.find(candidate => Math.abs(candidate.getPosition().lat() - lat) < 0.000001 && Math.abs(candidate.getPosition().lng() - lng) < 0.000001);
-    if (marker) openMarker(marker);
+    if (marker) openMarker(marker, trigger);
 }
 
 function highlightSidebarItem(id) {
-    document.querySelectorAll('.mosque-list-item').forEach(item => item.classList.remove('is-active'));
+    document.querySelectorAll('.mosque-list-item').forEach(item => {
+        item.classList.remove('is-active');
+        item.removeAttribute('aria-current');
+    });
     const item = document.querySelector(`.mosque-list-item[data-mosque-id="${CSS.escape(String(id))}"]`);
     if (item) {
         item.classList.add('is-active');
-        item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        item.setAttribute('aria-current', 'true');
+        revealListItem(item);
     }
+}
+
+function revealListItem(item) {
+    const list = document.getElementById('mosquesList');
+    if (!list) return;
+    const itemTop = item.offsetTop;
+    const itemBottom = itemTop + item.offsetHeight;
+    if (itemTop < list.scrollTop) list.scrollTo({ top: itemTop, behavior: 'smooth' });
+    else if (itemBottom > list.scrollTop + list.clientHeight) {
+        list.scrollTo({ top: itemBottom - list.clientHeight, behavior: 'smooth' });
+    }
+}
+
+function setPanelText(id, value, fallback = 'غير محدد') {
+    const element = document.getElementById(id);
+    if (element) element.textContent = String(value || fallback);
+}
+
+function renderSelectedMosque(mosque) {
+    const data = mosque.raw || mosque;
+    const nationalCode = data.national_code || mosque.national_code || mosque.id || '';
+    const codeQuery = encodeURIComponent(String(nationalCode));
+    const panel = document.getElementById('selectedMosquePanel');
+    if (!panel) return;
+
+    setPanelText('selectedMosqueTitle', data.mosque_name || mosque.name);
+    setPanelText('selectedMosqueAddress', data.address || mosque.address);
+    setPanelText('selectedMosqueImam', data.imam_name || mosque.imam);
+    setPanelText('selectedMosqueGuideImam', data.guide_imam || mosque.guide_imam);
+    setPanelText('selectedMosqueCommunity', data.community || mosque.community);
+    setPanelText('selectedMosqueCode', nationalCode);
+    setPanelText('selectedMosqueStatus', data.status || mosque.status);
+    setPanelText('selectedMosqueFriday', data.friday_prayer === 'نعم' || mosque.friday === '1' ? 'نعم' : 'لا');
+
+    const detailsLink = document.getElementById('selectedMosqueDetails');
+    if (detailsLink) detailsLink.href = `mosques.php?national_code=${codeQuery}&from_map=${codeQuery}`;
+    const mapsButton = document.getElementById('selectedMosqueGoogleMaps');
+    if (mapsButton) {
+        mapsButton.dataset.lat = String(mosque.lat);
+        mapsButton.dataset.lng = String(mosque.lng);
+    }
+    panel.hidden = false;
+    panel.setAttribute('aria-hidden', 'false');
+}
+
+function closeSelectedMosque({ restoreFocus = true } = {}) {
+    const previousMarker = selectedMarker;
+    const previousTrigger = selectedTrigger;
+    selectedMarker = undefined;
+    selectedTrigger = undefined;
+
+    if (previousMarker) {
+        previousMarker.setIcon(markerIcon(previousMarker.mosqueData.status));
+        previousMarker.setZIndex(undefined);
+    }
+
+    const panel = document.getElementById('selectedMosquePanel');
+    if (panel) {
+        panel.hidden = true;
+        panel.setAttribute('aria-hidden', 'true');
+    }
+    document.querySelectorAll('.mosque-list-item').forEach(item => {
+        item.classList.remove('is-active');
+        item.removeAttribute('aria-current');
+    });
+    refreshMarkerCluster();
+
+    if (!restoreFocus) return;
+    const fallback = previousMarker
+        ? document.querySelector(`.mosque-list-item[data-mosque-id=${CSS.escape(String(previousMarker.mosqueData.id))}] .zoom-to-mosque`)
+        : null;
+    const focusTarget = previousTrigger?.isConnected ? previousTrigger : fallback;
+    focusTarget?.focus({ preventScroll: true });
 }
 
 function clearMarkers() {
@@ -539,6 +590,11 @@ function bootMapPage() {
         const lat = Number.parseFloat(target.dataset.lat || '');
         const lng = Number.parseFloat(target.dataset.lng || '');
         if (Number.isFinite(lat) && Number.isFinite(lng)) openInGoogleMaps(lat, lng);
+    });
+
+    document.getElementById('selectedMosqueClose')?.addEventListener('click', () => closeSelectedMosque());
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && selectedMarker) closeSelectedMosque();
     });
 
     if (!hasGoogleMapsKey) {
