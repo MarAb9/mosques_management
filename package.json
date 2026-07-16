@@ -11,5 +11,8 @@
     "@tailwindcss/cli": "4.3.2",
     "esbuild": "^0.25.0",
     "tailwindcss": "4.3.2"
+  },
+  "dependencies": {
+    "@googlemaps/markerclusterer": "^2.6.2"
   }
 }

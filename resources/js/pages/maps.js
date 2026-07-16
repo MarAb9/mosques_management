@@ -1,8 +1,11 @@
+import { MarkerClusterer, SuperClusterAlgorithm } from '@googlemaps/markerclusterer';
+
 const mapPageData = (() => { try { return JSON.parse(document.getElementById('mapPageData')?.textContent || '{}'); } catch (_) { return {}; } })();
 let map;
 let infoWindow;
 let markers = [];
-let clusterMarkers = [];
+let markerClusterer;
+let selectedMarker;
 let mosquesData = mapPageData.mosques || [];
 let allMosquesData = mapPageData.allMosques || [];
 const mapDefaults = mapPageData.mapDefaults || { latitude: 34.6814, longitude: -1.9086, zoom: 9 };
@@ -130,62 +133,24 @@ function addMosqueMarkers() {
         map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
     }
 
-    google.maps.event.addListener(map, 'idle', renderClusters);
-    renderClusters();
+    markerClusterer = new MarkerClusterer({
+        map,
+        markers,
+        algorithm: new SuperClusterAlgorithm({ radius: 64, maxZoom: 15 }),
+        onClusterClick: (_event, cluster, clusterMap) => {
+            if (cluster.bounds) clusterMap.fitBounds(cluster.bounds, { top: 64, right: 64, bottom: 64, left: 64 });
+        }
+    });
 }
 
-function renderClusters() {
-    if (!map || !window.google) return;
+function refreshMarkerCluster() {
+    if (!markerClusterer) return;
 
-    clearClusterMarkers();
+    markerClusterer.clearMarkers(true);
     markers.forEach(marker => marker.setMap(null));
+    markerClusterer.addMarkers(markers.filter(marker => marker.filteredVisible && marker !== selectedMarker));
 
-    const visibleMarkers = markers.filter(marker => marker.filteredVisible);
-    const zoom = map.getZoom() || Number(mapDefaults.zoom) || 9;
-
-    if (zoom >= 15 || visibleMarkers.length < 60) {
-        visibleMarkers.forEach(marker => marker.setMap(map));
-        return;
-    }
-
-    const gridSize = Math.max(0.0005, 360 / Math.pow(2, zoom + 4));
-    const groups = new Map();
-
-    visibleMarkers.forEach(marker => {
-        const position = marker.getPosition();
-        const key = `${Math.floor(position.lat() / gridSize)}:${Math.floor(position.lng() / gridSize)}`;
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key).push(marker);
-    });
-
-    groups.forEach(group => {
-        if (group.length < 3) {
-            group.forEach(marker => marker.setMap(map));
-            return;
-        }
-
-        const lat = group.reduce((sum, marker) => sum + marker.getPosition().lat(), 0) / group.length;
-        const lng = group.reduce((sum, marker) => sum + marker.getPosition().lng(), 0) / group.length;
-        const cluster = new google.maps.Marker({
-            map,
-            position: { lat, lng },
-            label: { text: String(group.length), color: '#ffffff', fontWeight: '700' },
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                fillColor: '#0d6efd',
-                fillOpacity: 0.9,
-                strokeColor: '#ffffff',
-                strokeWeight: 3,
-                scale: 17
-            },
-            title: `${group.length} مسجد`
-        });
-        cluster.addListener('click', () => {
-            map.setCenter(cluster.getPosition());
-            map.setZoom(Math.min((map.getZoom() || 9) + 2, 18));
-        });
-        clusterMarkers.push(cluster);
-    });
+    if (selectedMarker?.filteredVisible) selectedMarker.setMap(map);
 }
 
 function applyFilters() {
@@ -212,7 +177,11 @@ function applyFilters() {
     updateActiveFiltersDisplay();
     updateSidebarList(filteredMosques);
     fitToVisibleMarkers(false);
-    renderClusters();
+    if (selectedMarker && !selectedMarker.filteredVisible) {
+        infoWindow?.close();
+        selectedMarker = undefined;
+    }
+    refreshMarkerCluster();
 }
 
 function fitToVisibleMarkers(force = true) {
@@ -494,7 +463,8 @@ function reattachZoomEventListeners() {
 
 function openMarker(marker) {
     if (!map || !marker) return;
-    marker.setMap(map);
+    selectedMarker = marker;
+    refreshMarkerCluster();
     infoWindow.setContent(createPopupContent(marker.mosqueData));
     infoWindow.open({ map, anchor: marker });
     highlightSidebarItem(marker.mosqueData.id);
@@ -518,14 +488,12 @@ function highlightSidebarItem(id) {
 }
 
 function clearMarkers() {
+    markerClusterer?.clearMarkers(true);
+    markerClusterer?.setMap(null);
+    markerClusterer = undefined;
+    selectedMarker = undefined;
     markers.forEach(marker => marker.setMap(null));
     markers = [];
-    clearClusterMarkers();
-}
-
-function clearClusterMarkers() {
-    clusterMarkers.forEach(marker => marker.setMap(null));
-    clusterMarkers = [];
 }
 
 function openInGoogleMaps(lat, lng) {
