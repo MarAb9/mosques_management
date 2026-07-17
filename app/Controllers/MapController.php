@@ -32,6 +32,11 @@ final class MapController extends Controller
     public function index(Request $request): Response
     {
         $requestedPage = max(1, (int) $request->query('page', 1));
+        $mapConfig = [
+            'provider' => (string) $this->config->get('maps.provider', 'maplibre'),
+            'styleUrl' => (string) $this->config->get('maps.style_url', 'https://tiles.openfreemap.org/styles/liberty'),
+            'satellite' => (array) $this->config->get('maps.satellite', []),
+        ];
 
         try {
             $totalWithCoords = $this->mosques->countWithCoordinates();
@@ -47,10 +52,7 @@ final class MapController extends Controller
                 'totalMosques' => $this->mosques->countAll(),
                 'communities' => $this->mosques->distinctCommunitiesForMap(),
                 'statuses' => $this->mosques->distinctStatuses(),
-                'mapConfig' => [
-                    'provider' => (string) $this->config->get('maps.provider', 'maplibre'),
-                    'styleUrl' => (string) $this->config->get('maps.style_url', 'https://tiles.openfreemap.org/styles/liberty'),
-                ],
+                'mapConfig' => $mapConfig,
                 'mapDefaults' => [
                     'latitude' => (float) $this->config->get('maps.default_latitude', 34.6814),
                     'longitude' => (float) $this->config->get('maps.default_longitude', -1.9086),
@@ -68,10 +70,7 @@ final class MapController extends Controller
                 'totalPages' => 1,
                 'communities' => [],
                 'statuses' => [],
-                'mapConfig' => [
-                    'provider' => 'maplibre',
-                    'styleUrl' => 'https://tiles.openfreemap.org/styles/liberty',
-                ],
+                'mapConfig' => $mapConfig,
                 'mapDefaults' => [
                     'latitude' => 34.6814,
                     'longitude' => -1.9086,

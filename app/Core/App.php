@@ -181,8 +181,12 @@ final class App
             'edit_mosque',
         ];
         $scriptSources = "'self' 'nonce-{$this->cspNonce}'";
+        $connectSources = "'self' https://tiles.openfreemap.org";
         if (in_array($request->routePath(), $mapRoutes, true)) {
             $scriptSources .= " 'wasm-unsafe-eval'";
+        }
+        if (in_array($request->routePath(), ['mosque_maps.php', 'mosque_maps'], true)) {
+            $connectSources .= ' https://tiles.maps.eox.at';
         }
 
         $response
@@ -199,7 +203,7 @@ final class App
                 . "style-src-attr 'unsafe-inline'; "
                 . "font-src 'self' data: https://fonts.gstatic.com; "
                 . "img-src 'self' data: blob:; "
-                . "connect-src 'self' https://tiles.openfreemap.org; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+                . "connect-src {$connectSources}; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
             );
 
         if ($request->isSecure((bool) $this->config->get('security.trust_proxy_headers', false))) {

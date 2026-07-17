@@ -9,7 +9,17 @@ const CLUSTER_COUNT_LAYER_ID = 'mosque-cluster-count';
 const POINT_LAYER_ID = 'mosque-points';
 const SELECTED_HALO_LAYER_ID = 'selected-mosque-halo';
 const SELECTED_POINT_LAYER_ID = 'selected-mosque-point';
+const SATELLITE_SOURCE_ID = 'satellite-imagery';
+const SATELLITE_LAYER_ID = 'satellite-imagery-layer';
+const MAP_MODE_STORAGE_KEY = 'mosques.mapMode';
 const EMPTY_COLLECTION = { type: 'FeatureCollection', features: [] };
+const DEFAULT_SATELLITE_CONFIG = {
+    enabled: true,
+    tileUrl: 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2025_3857/default/g/{z}/{y}/{x}.jpg',
+    minZoom: 0,
+    maxZoom: 14,
+    attribution: 'EOxCloudless https://cloudless.eox.at by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2025)'
+};
 
 const mapPageData = (() => {
     try {
@@ -20,9 +30,11 @@ const mapPageData = (() => {
 })();
 
 const mapDefaults = mapPageData.mapDefaults || { latitude: 34.6814, longitude: -1.9086, zoom: 9 };
-const mapConfig = mapPageData.mapConfig || {
+const mapConfig = {
     provider: 'maplibre',
-    styleUrl: 'https://tiles.openfreemap.org/styles/liberty'
+    styleUrl: 'https://tiles.openfreemap.org/styles/liberty',
+    ...mapPageData.mapConfig,
+    satellite: { ...DEFAULT_SATELLITE_CONFIG, ...mapPageData.mapConfig?.satellite }
 };
 
 let map;
@@ -31,6 +43,8 @@ let selectedMosqueId = '';
 let selectedTrigger;
 let filteredMosquesData = [];
 let activeFilters = { search: '', community: '', status: '', friday: '' };
+let currentMapMode = 'street';
+let satelliteErrorShown = false;
 
 function escapeHtml(value) {
     if (value === null || value === undefined) return '';
@@ -137,6 +151,7 @@ async function initializeMap() {
     mapElement.dataset.styleUrl = String(mapConfig.styleUrl || '');
     mapElement.dataset.mapReady = 'false';
     mapElement.dataset.rtlTextReady = 'false';
+    mapElement.dataset.mapMode = 'street';
 
     try {
         await ensureMaplibreRtlText(maplibregl);
@@ -158,17 +173,28 @@ async function initializeMap() {
         }), 'bottom-right');
 
         map.on('load', () => {
+            addSatelliteLayer();
             addMapSourcesAndLayers();
             mapReady = true;
             mapElement.dataset.mapReady = 'true';
             applyFilters({ fit: false });
             fitToVisibleMosques(true);
             selectMosqueFromUrl();
+            setMapMode(readStoredMapMode());
             map.once('idle', hideMapLoading);
             window.setTimeout(hideMapLoading, 800);
         });
 
-        map.on('error', () => {
+        map.on('error', event => {
+            if (event.sourceId === SATELLITE_SOURCE_ID) {
+                if (currentMapMode === 'satellite' && event.error?.name !== 'AbortError') {
+                    const showNotice = !satelliteErrorShown;
+                    satelliteErrorShown = true;
+                    setMapMode('street');
+                    if (showNotice) showSatelliteErrorNotice();
+                }
+                return;
+            }
             if (!mapReady) {
                 hideMapLoading();
                 showMapError('تعذر تحميل نمط الخريطة المفتوح. تحقق من اتصال الشبكة ثم أعد المحاولة.');
@@ -178,6 +204,64 @@ async function initializeMap() {
         hideMapLoading();
         showMapError('تعذر تشغيل الخريطة على هذا المتصفح.');
     }
+}
+
+function addSatelliteLayer() {
+    if (!mapConfig.satellite.enabled) return;
+
+    if (!map.getSource(SATELLITE_SOURCE_ID)) {
+        map.addSource(SATELLITE_SOURCE_ID, {
+            type: 'raster',
+            tiles: [String(mapConfig.satellite.tileUrl)],
+            tileSize: 256,
+            minzoom: Number(mapConfig.satellite.minZoom) || 0,
+            maxzoom: Number(mapConfig.satellite.maxZoom) || 14,
+            attribution: String(mapConfig.satellite.attribution)
+        });
+    }
+    if (map.getLayer(SATELLITE_LAYER_ID)) return;
+
+    const firstSymbolLayer = map.getStyle().layers?.find(layer => layer.type === 'symbol');
+    map.addLayer({
+        id: SATELLITE_LAYER_ID,
+        type: 'raster',
+        source: SATELLITE_SOURCE_ID,
+        layout: { visibility: 'none' },
+        paint: { 'raster-opacity': 1, 'raster-fade-duration': 200 }
+    }, firstSymbolLayer?.id);
+}
+
+function readStoredMapMode() {
+    try {
+        return localStorage.getItem(MAP_MODE_STORAGE_KEY) === 'satellite' ? 'satellite' : 'street';
+    } catch (_) {
+        return 'street';
+    }
+}
+
+function setMapMode(mode) {
+    if (!mapReady) return;
+    const satellite = mode === 'satellite' && mapConfig.satellite.enabled && Boolean(map.getLayer(SATELLITE_LAYER_ID));
+    if (map.getLayer(SATELLITE_LAYER_ID)) {
+        map.setLayoutProperty(SATELLITE_LAYER_ID, 'visibility', satellite ? 'visible' : 'none');
+    }
+
+    currentMapMode = satellite ? 'satellite' : 'street';
+    document.getElementById('mapStyleStreet')?.setAttribute('aria-pressed', String(!satellite));
+    document.getElementById('mapStyleSatellite')?.setAttribute('aria-pressed', String(satellite));
+    document.getElementById('map')?.setAttribute('data-map-mode', currentMapMode);
+    try {
+        localStorage.setItem(MAP_MODE_STORAGE_KEY, currentMapMode);
+    } catch (_) {
+        // Storage can be unavailable in privacy-restricted browser contexts.
+    }
+}
+
+function showSatelliteErrorNotice() {
+    const notice = document.getElementById('satelliteMapNotice');
+    if (!notice) return;
+    notice.hidden = false;
+    window.setTimeout(() => { notice.hidden = true; }, 6000);
 }
 
 function addMapSourcesAndLayers() {
@@ -209,7 +293,7 @@ function addMapSourcesAndLayers() {
         source: SOURCE_ID,
         filter: ['has', 'point_count'],
         layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-font': ['Noto Sans Bold'], 'text-size': 12 },
-        paint: { 'text-color': '#ffffff' }
+        paint: { 'text-color': '#ffffff', 'text-halo-color': 'rgba(0, 0, 0, .65)', 'text-halo-width': 1 }
     });
     map.addLayer({
         id: POINT_LAYER_ID,
@@ -637,6 +721,8 @@ function closeSelectedMosque({ restoreFocus = true } = {}) {
 }
 
 function setupMapButtons() {
+    document.getElementById('mapStyleStreet')?.addEventListener('click', () => setMapMode('street'));
+    document.getElementById('mapStyleSatellite')?.addEventListener('click', () => setMapMode('satellite'));
     document.getElementById('fitToMarkers')?.addEventListener('click', () => fitToVisibleMosques(true));
     document.getElementById('resetMapView')?.addEventListener('click', resetMapView);
     document.getElementById('retryMap')?.addEventListener('click', () => window.location.reload());
@@ -715,14 +801,27 @@ function exposeBrowserTestApi() {
     window.__mapWorkspaceTest = Object.freeze({
         getState() {
             const clusters = mapReady ? map.queryRenderedFeatures({ layers: [CLUSTER_LAYER_ID] }) : [];
+            const points = mapReady ? map.queryRenderedFeatures({ layers: [POINT_LAYER_ID] }) : [];
+            const layers = map?.getStyle().layers || [];
+            const satelliteLayerIndex = layers.findIndex(layer => layer.id === SATELLITE_LAYER_ID);
             return {
                 ready: mapReady,
                 provider: String(mapConfig.provider || ''),
                 styleUrl: String(mapConfig.styleUrl || ''),
                 visibleCount: filteredMosquesData.length,
                 clusterCount: clusters.length,
+                pointCount: points.length,
                 selectedMosqueId,
                 zoom: map?.getZoom() ?? null,
+                center: map ? map.getCenter().toArray() : null,
+                pitch: map?.getPitch() ?? null,
+                bearing: map?.getBearing() ?? null,
+                mapMode: currentMapMode,
+                satelliteVisibility: map?.getLayoutProperty(SATELLITE_LAYER_ID, 'visibility') || 'none',
+                satelliteTileUrl: map?.getSource(SATELLITE_SOURCE_ID)?.serialize?.().tiles?.[0] || '',
+                satelliteBelowLabels: satelliteLayerIndex >= 0 && layers.findIndex(layer => layer.type === 'symbol') > satelliteLayerIndex,
+                satelliteBelowMosques: satelliteLayerIndex >= 0 && [CLUSTER_LAYER_ID, CLUSTER_COUNT_LAYER_ID, POINT_LAYER_ID, SELECTED_HALO_LAYER_ID, SELECTED_POINT_LAYER_ID]
+                    .every(layerId => layers.findIndex(layer => layer.id === layerId) > satelliteLayerIndex),
                 rtlTextStatus: maplibregl.getRTLTextPluginStatus()
             };
         },
@@ -738,6 +837,9 @@ function exposeBrowserTestApi() {
         },
         selectMosque(id) {
             return selectMosqueById(id, null, true);
+        },
+        failSatellite() {
+            map?.fire('error', { sourceId: SATELLITE_SOURCE_ID, error: new Error('Simulated satellite tile failure') });
         },
         fitVisible: fitToVisibleMosques,
         reset: resetMapView

@@ -110,6 +110,7 @@ const requestHosts = new Set();
 const googleMapRequests = [];
 const apiKeyRequests = [];
 const rtlPluginRequests = [];
+const eoxTileRequests = [];
 
 cdp.on('Runtime.consoleAPICalled', ({ type, args = [] }) => {
     if (!['error', 'warning', 'assert'].includes(type)) return;
@@ -134,6 +135,9 @@ cdp.on('Network.requestWillBeSent', ({ request }) => {
         }
         if (url.pathname.endsWith('/assets/dist/mapbox-gl-rtl-text.js')) {
             rtlPluginRequests.push(safeUrl(request.url));
+        }
+        if (url.hostname === 'tiles.maps.eox.at') {
+            eoxTileRequests.push(safeUrl(request.url));
         }
     } catch {
         // Ignore non-URL browser internals.
@@ -216,10 +220,12 @@ async function mapState() {
         const mapElement = document.querySelector('#map');
         const shell = document.querySelector('.map-canvas-shell') || mapElement?.parentElement;
         const attribution = document.querySelector('#map .maplibregl-ctrl-attrib');
+        const basemapSwitch = document.querySelector('.map-basemap-switch');
         const panelRect = panel && !panel.hidden ? panel.getBoundingClientRect() : null;
         const shellRect = shell?.getBoundingClientRect() || null;
         const mapRect = mapElement?.getBoundingClientRect() || null;
         const attributionRect = attribution?.getBoundingClientRect() || null;
+        const basemapSwitchRect = basemapSwitch?.getBoundingClientRect() || null;
         const rect = value => value ? ({ top: value.top, right: value.right, bottom: value.bottom, left: value.left, width: value.width, height: value.height }) : null;
         const overlaps = (a, b) => Boolean(a && b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
         const controls = [...document.querySelectorAll('#map .maplibregl-ctrl-top-right button')]
@@ -232,7 +238,23 @@ async function mapState() {
             styleUrl: mapElement?.dataset.styleUrl || '',
             visibleCount: testState.visibleCount ?? null,
             clusterCount: testState.clusterCount ?? null,
+            pointCount: testState.pointCount ?? null,
             zoom: testState.zoom ?? null,
+            center: testState.center || null,
+            pitch: testState.pitch ?? null,
+            bearing: testState.bearing ?? null,
+            mapMode: testState.mapMode || '',
+            satelliteVisibility: testState.satelliteVisibility || '',
+            satelliteTileUrl: testState.satelliteTileUrl || '',
+            satelliteBelowLabels: Boolean(testState.satelliteBelowLabels),
+            satelliteBelowMosques: Boolean(testState.satelliteBelowMosques),
+            streetPressed: document.querySelector('#mapStyleStreet')?.getAttribute('aria-pressed') || '',
+            satellitePressed: document.querySelector('#mapStyleSatellite')?.getAttribute('aria-pressed') || '',
+            storedMapMode: localStorage.getItem('mosques.mapMode') || '',
+            satelliteNoticeVisible: !document.querySelector('#satelliteMapNotice')?.hidden,
+            satelliteNoticeText: document.querySelector('#satelliteMapNotice')?.textContent?.trim() || '',
+            basemapSwitchVisible: Boolean(basemapSwitchRect && basemapSwitchRect.width > 0 && basemapSwitchRect.height > 0),
+            basemapSwitchHeight: basemapSwitchRect?.height || 0,
             rtlTextStatus: testState.rtlTextStatus || '',
             selectedMosqueId: testState.selectedMosqueId || '',
             documentScrollY: window.scrollY,
@@ -371,6 +393,16 @@ function check(name, ok, detail = '') {
     if (!ok) result.failures.push({ name, detail });
 }
 
+function sameCamera(left, right) {
+    const close = (a, b) => Math.abs(Number(a) - Number(b)) < 1e-7;
+    return left.center?.length === 2
+        && right.center?.length === 2
+        && left.center.every((value, index) => close(value, right.center[index]))
+        && close(left.zoom, right.zoom)
+        && close(left.pitch, right.pitch)
+        && close(left.bearing, right.bearing);
+}
+
 try {
     await viewport(1440, 1000);
     await login();
@@ -380,6 +412,17 @@ try {
 
     result.baseline = await mapState();
     result.baseline.screenshot = await screenshot('maplibre-unselected-1440x1000');
+    result.rtlPluginServed = await evaluate(`fetch(new URL('assets/dist/mapbox-gl-rtl-text.js', document.baseURI)).then(response => response.ok && response.url.startsWith(location.origin))`);
+    result.fullscreen = await evaluate(`(async () => {
+        const button = document.querySelector('#map .maplibregl-ctrl-fullscreen');
+        button?.click();
+        await new Promise(resolve => setTimeout(resolve, 250));
+        const active = Boolean(document.fullscreenElement);
+        if (active) await document.exitFullscreen();
+        return { buttonExists: Boolean(button), active };
+    })()`);
+    await delay(250);
+    const eoxRequestsBeforeSatellite = eoxTileRequests.length;
 
     const clusterBefore = await mapState();
     const clusterExpansion = await evaluate(`window.__mapWorkspaceTest.expandFirstCluster()`);
@@ -388,6 +431,28 @@ try {
 
     const firstSelection = await selectListItem(0);
     firstSelection.state.screenshot = await screenshot('maplibre-selected-1440x1000');
+    const modeBeforeSatellite = firstSelection.state;
+    await evaluate(`document.querySelector('#mapStyleSatellite')?.click()`);
+    await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'satellite'`);
+    await delay(1600);
+    const satelliteActive = await mapState();
+    satelliteActive.screenshot = await screenshot('maplibre-satellite-selected-1440x1000');
+    const eoxRequestsAfterSatellite = eoxTileRequests.length;
+    await evaluate(`document.querySelector('#mapStyleStreet')?.click()`);
+    await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'street'`);
+    await delay(300);
+    const streetRestored = await mapState();
+
+    await evaluate(`document.querySelector('#mapStyleSatellite')?.click()`);
+    await waitFor(`localStorage.getItem('mosques.mapMode') === 'satellite'`);
+    await navigate('mosque_maps.php');
+    await waitFor(`document.querySelector('#map')?.dataset.mapReady === 'true' && document.querySelector('#map')?.dataset.mapMode === 'satellite'`);
+    await delay(900);
+    const satellitePreferenceRestored = await mapState();
+    await evaluate(`window.__mapWorkspaceTest.failSatellite()`);
+    await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'street'`);
+    const satelliteFailureFallback = await mapState();
+    await selectListItem(0);
     await evaluate(`(() => { const list = document.querySelector('#mosquesList'); list.scrollTop = list.scrollHeight; return list.scrollTop; })()`);
     await delay(300);
     const afterListScroll = await mapState();
@@ -437,6 +502,13 @@ try {
         clusterExpansion,
         clusterAfter,
         firstSelection,
+        modeBeforeSatellite,
+        satelliteActive,
+        streetRestored,
+        satellitePreferenceRestored,
+        satelliteFailureFallback,
+        eoxRequestsBeforeSatellite,
+        eoxRequestsAfterSatellite,
         afterListScroll,
         afterZoom,
         afterPan,
@@ -454,7 +526,13 @@ try {
         await delay(650);
         const selection = await selectListItem(0);
         selection.state.screenshot = await screenshot(`maplibre-selected-${width}x${height}`);
-        result.viewports.push({ width, height, ...selection });
+        await evaluate(`document.querySelector('#mapStyleSatellite')?.click()`);
+        await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'satellite'`);
+        await delay(700);
+        const satelliteState = await mapState();
+        await evaluate(`document.querySelector('#mapStyleStreet')?.click()`);
+        await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'street'`);
+        result.viewports.push({ width, height, ...selection, satelliteState });
     }
 
     await viewport(1024, 900);
@@ -472,9 +550,10 @@ try {
 
     check('MapLibre map loads', result.baseline.mapLoaded);
     check('Map provider is MapLibre', result.baseline.provider === 'maplibre', result.baseline.provider);
+    check('Fullscreen control activates the map workspace', result.fullscreen.buttonExists && result.fullscreen.active, JSON.stringify(result.fullscreen));
     check('Configured Liberty style is used', result.baseline.styleUrl.includes('tiles.openfreemap.org/styles/liberty'), result.baseline.styleUrl);
     check('Arabic RTL shaping plugin is loaded', result.baseline.rtlTextStatus === 'loaded', result.baseline.rtlTextStatus);
-    check('Arabic RTL shaping plugin is served locally', rtlPluginRequests.some(url => url.startsWith(baseUrl)), rtlPluginRequests.join(', '));
+    check('Arabic RTL shaping plugin is served locally', result.rtlPluginServed && rtlPluginRequests.some(url => url.startsWith(baseUrl)), rtlPluginRequests.join(', '));
     check('All valid coordinate records reach the GeoJSON map', Number(result.baseline.visibleCount) > 0, String(result.baseline.visibleCount));
     check('Clusters render', Number(clusterBefore.clusterCount) > 0, String(clusterBefore.clusterCount));
     check('Cluster click resolves expansion zoom', Boolean(clusterExpansion && clusterExpansion.zoom > clusterExpansion.before), JSON.stringify(clusterExpansion));
@@ -500,6 +579,23 @@ try {
     check('Escape hides panel', !escapeState.panelVisible);
     check('Filtering out selection closes panel', !filteredSelection.panelVisible);
     check('No MapLibre popup is used for full details', !firstSelection.state.popupVisible);
+    check('Satellite WMTS keeps z/y/x order', satelliteActive.satelliteTileUrl.endsWith('/{z}/{y}/{x}.jpg'), satelliteActive.satelliteTileUrl);
+    check('Satellite raster stays below OpenFreeMap labels', satelliteActive.satelliteBelowLabels);
+    check('Satellite raster stays below mosque layers', satelliteActive.satelliteBelowMosques);
+    check('Normal mode makes no EOX tile requests', eoxRequestsBeforeSatellite === 0, String(eoxRequestsBeforeSatellite));
+    check('Satellite mode starts EOX tile requests', eoxRequestsAfterSatellite > eoxRequestsBeforeSatellite, `${eoxRequestsBeforeSatellite} -> ${eoxRequestsAfterSatellite}`);
+    check('Satellite toggle activates only the raster layer', satelliteActive.mapMode === 'satellite' && satelliteActive.satelliteVisibility === 'visible' && satelliteActive.streetPressed === 'false' && satelliteActive.satellitePressed === 'true');
+    check('Mosque markers stay visible over satellite imagery', Number(satelliteActive.pointCount) > 0, String(satelliteActive.pointCount));
+    check('Satellite attribution is visible', ['EOxCloudless', 'EOX IT Services GmbH', 'Copernicus Sentinel data 2025', 'OpenFreeMap'].every(value => satelliteActive.attributionText.includes(value)), satelliteActive.attributionText);
+    check('Satellite attribution does not overlap selected mosque panel', !satelliteActive.overlapsAttribution);
+    check('Satellite switch preserves camera', sameCamera(modeBeforeSatellite, satelliteActive), JSON.stringify({ before: modeBeforeSatellite, after: satelliteActive }));
+    check('Satellite switch preserves selected mosque and panel', satelliteActive.panelVisible && satelliteActive.selectedMosqueId === modeBeforeSatellite.selectedMosqueId);
+    check('Satellite switch preserves page scroll', satelliteActive.documentScrollY === modeBeforeSatellite.documentScrollY, `${modeBeforeSatellite.documentScrollY} -> ${satelliteActive.documentScrollY}`);
+    check('Street toggle hides only the raster layer', streetRestored.mapMode === 'street' && streetRestored.satelliteVisibility === 'none' && streetRestored.streetPressed === 'true' && streetRestored.satellitePressed === 'false');
+    check('Street toggle preserves camera', sameCamera(satelliteActive, streetRestored), JSON.stringify({ before: satelliteActive, after: streetRestored }));
+    check('Street toggle preserves selected mosque and panel', streetRestored.panelVisible && streetRestored.selectedMosqueId === satelliteActive.selectedMosqueId);
+    check('Saved satellite preference survives refresh', satellitePreferenceRestored.mapMode === 'satellite' && satellitePreferenceRestored.satelliteVisibility === 'visible' && satellitePreferenceRestored.storedMapMode === 'satellite');
+    check('Satellite failure falls back once with Arabic notice', satelliteFailureFallback.mapMode === 'street' && satelliteFailureFallback.satelliteVisibility === 'none' && satelliteFailureFallback.storedMapMode === 'street' && satelliteFailureFallback.satelliteNoticeVisible && satelliteFailureFallback.satelliteNoticeText === 'تعذر تحميل صور القمر الصناعي. تم الرجوع إلى الخريطة العادية.');
 
     result.filters.forEach(entry => {
         check(`Filter works: ${entry.property || entry.elementId}`, Boolean(entry.selected) && Number(entry.state.visibleCount) > 0, `${entry.selected}: ${entry.state.visibleCount}`);
@@ -514,6 +610,11 @@ try {
         check(`${label}: panel avoids controls`, !entry.state.overlapsControls);
         check(`${label}: OpenFreeMap attribution is visible`, entry.state.attributionVisible && entry.state.attributionText.includes('OpenFreeMap'));
         check(`${label}: panel avoids attribution`, !entry.state.overlapsAttribution);
+        check(`${label}: basemap switch stays visible and compact`, entry.state.basemapSwitchVisible && entry.state.basemapSwitchHeight <= 40, String(entry.state.basemapSwitchHeight));
+        check(`${label}: satellite mode preserves selected mosque`, entry.satelliteState.mapMode === 'satellite' && entry.satelliteState.panelVisible && entry.satelliteState.selectedMosqueId === entry.state.selectedMosqueId);
+        check(`${label}: satellite layout has no overflow`, !entry.satelliteState.documentOverflow);
+        check(`${label}: satellite panel avoids attribution`, !entry.satelliteState.overlapsAttribution);
+        check(`${label}: satellite attribution is visible`, entry.satelliteState.attributionVisible && entry.satelliteState.attributionText.includes('EOxCloudless'));
     });
 
     check('Create-form coordinate picker uses MapLibre', result.formPicker.mapLoaded && result.formPicker.provider === 'maplibre');
@@ -541,7 +642,7 @@ try {
 
 console.log(JSON.stringify({
     resultPath,
-    screenshots: result.viewports.length + (result.baseline?.screenshot ? 2 : 0),
+    screenshots: result.viewports.length + (result.baseline?.screenshot ? 3 : 0),
     assertions: result.assertions.length,
     failures: result.failures
 }, null, 2));
