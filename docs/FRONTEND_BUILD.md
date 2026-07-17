@@ -25,6 +25,7 @@ The build produces the following minified, cacheable assets:
 - `public/assets/dist/maps.min.css`
 - `public/assets/dist/mosque-form-map.min.js`
 - `public/assets/dist/mosque-form-map.min.css`
+- `public/assets/dist/mapbox-gl-rtl-text.js`
 - `public/assets/dist/import-export.min.js`
 - `public/assets/dist/backup-confirm.min.js`
 
@@ -43,6 +44,7 @@ Tailwind is compiled with the `tw` prefix and without Preflight. Bootstrap remai
 - Bootstrap, Font Awesome, SweetAlert2, Chart.js, jQuery, and Select2 are retained where the current application uses them.
 - Animate.css and Hover.css are no longer loaded; motion is implemented in the application stylesheet and honors `prefers-reduced-motion`.
 - MapLibre GL JS is bundled locally through npm/esbuild. OpenFreeMap supplies the configurable vector-tile style (`MAP_STYLE_URL`) without an API key.
+- The BSD-licensed `@mapbox/mapbox-gl-rtl-text` package is copied into the production assets during the build so Arabic and Hebrew map labels are shaped locally without a CDN.
 - Three.js is intentionally omitted because the visual concept is achieved with lightweight CSS transforms and gradients.
 
 ## Source layout

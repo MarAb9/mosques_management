@@ -1,5 +1,6 @@
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { ensureMaplibreRtlText } from '../maplibre/rtl-text.js';
 
 let formMap;
 let locationMarker;
@@ -52,14 +53,17 @@ function moveMarker(form, latitude, longitude, center = true) {
     if (center) formMap.easeTo({ center: lngLat, duration: 350 });
 }
 
-function initializeFormMap(form) {
+async function initializeFormMap(form) {
     const mapElement = document.getElementById('map');
     const mapContainer = document.getElementById('mapContainer');
     if (!mapElement || !mapContainer) return;
 
     const current = coordinates(form);
     if (!formMap) {
+        mapElement.dataset.rtlTextReady = 'false';
         try {
+            await ensureMaplibreRtlText(maplibregl);
+            mapElement.dataset.rtlTextReady = 'true';
             formMap = new maplibregl.Map({
                 container: mapElement,
                 style: form.dataset.mapStyleUrl || 'https://tiles.openfreemap.org/styles/liberty',

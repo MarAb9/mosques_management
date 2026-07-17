@@ -1,5 +1,6 @@
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { ensureMaplibreRtlText } from '../maplibre/rtl-text.js';
 
 const SOURCE_ID = 'mosques';
 const SELECTED_SOURCE_ID = 'selected-mosque';
@@ -126,7 +127,7 @@ function selectedMosque() {
     return allMosquesData.find(mosque => String(mosque.id) === String(selectedMosqueId));
 }
 
-function initializeMap() {
+async function initializeMap() {
     const mapElement = document.getElementById('map');
     if (!mapElement) return;
 
@@ -135,8 +136,11 @@ function initializeMap() {
     mapElement.dataset.provider = String(mapConfig.provider || 'maplibre');
     mapElement.dataset.styleUrl = String(mapConfig.styleUrl || '');
     mapElement.dataset.mapReady = 'false';
+    mapElement.dataset.rtlTextReady = 'false';
 
     try {
+        await ensureMaplibreRtlText(maplibregl);
+        mapElement.dataset.rtlTextReady = 'true';
         map = new maplibregl.Map({
             container: mapElement,
             style: String(mapConfig.styleUrl || 'https://tiles.openfreemap.org/styles/liberty'),
@@ -718,7 +722,8 @@ function exposeBrowserTestApi() {
                 visibleCount: filteredMosquesData.length,
                 clusterCount: clusters.length,
                 selectedMosqueId,
-                zoom: map?.getZoom() ?? null
+                zoom: map?.getZoom() ?? null,
+                rtlTextStatus: maplibregl.getRTLTextPluginStatus()
             };
         },
         async expandFirstCluster() {

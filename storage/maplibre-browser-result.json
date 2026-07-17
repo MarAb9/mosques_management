@@ -1,0 +1,2195 @@
+{
+  "generatedAt": "2026-07-16T13:40:03.977Z",
+  "baseline": {
+    "mapLoaded": true,
+    "provider": "maplibre",
+    "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+    "visibleCount": 318,
+    "clusterCount": 18,
+    "zoom": 9.315800042502369,
+    "rtlTextStatus": "loaded",
+    "selectedMosqueId": "",
+    "documentScrollY": 0,
+    "documentOverflow": false,
+    "panelExists": true,
+    "panelVisible": false,
+    "panelTitle": "-",
+    "nationalCode": "-",
+    "status": "-",
+    "address": "-",
+    "imam": "-",
+    "guideImam": "-",
+    "community": "-",
+    "friday": "-",
+    "detailsHref": "mosques.php",
+    "panelRect": null,
+    "shellRect": {
+      "top": 467.046875,
+      "right": 842.203125,
+      "bottom": 1117.046875,
+      "left": 29.796875,
+      "width": 812.40625,
+      "height": 650
+    },
+    "mapRect": {
+      "top": 467.046875,
+      "right": 842.203125,
+      "bottom": 1117.046875,
+      "left": 29.796875,
+      "width": 812.40625,
+      "height": 650
+    },
+    "panelInsideShell": false,
+    "panelIsBottomSheet": true,
+    "controlsOnRight": true,
+    "overlapsControls": false,
+    "attributionVisible": true,
+    "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+    "overlapsAttribution": false,
+    "popupVisible": false,
+    "listScrollTop": 0,
+    "activeMosqueId": "",
+    "screenshot": "docs/screenshots/maplibre-map/maplibre-unselected-1440x1000.png"
+  },
+  "interactions": {
+    "clusterBefore": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 318,
+      "clusterCount": 18,
+      "zoom": 9.315800042502369,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "",
+      "documentScrollY": 0,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": false,
+      "panelTitle": "-",
+      "nationalCode": "-",
+      "status": "-",
+      "address": "-",
+      "imam": "-",
+      "guideImam": "-",
+      "community": "-",
+      "friday": "-",
+      "detailsHref": "mosques.php",
+      "panelRect": null,
+      "shellRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": false,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 0,
+      "activeMosqueId": ""
+    },
+    "clusterExpansion": {
+      "before": 9.315800042502369,
+      "zoom": 12,
+      "clusterId": 2698
+    },
+    "clusterAfter": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 318,
+      "clusterCount": 3,
+      "zoom": 12,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "",
+      "documentScrollY": 0,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": false,
+      "panelTitle": "-",
+      "nationalCode": "-",
+      "status": "-",
+      "address": "-",
+      "imam": "-",
+      "guideImam": "-",
+      "community": "-",
+      "friday": "-",
+      "detailsHref": "mosques.php",
+      "panelRect": null,
+      "shellRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": false,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 0,
+      "activeMosqueId": ""
+    },
+    "firstSelection": {
+      "selected": {
+        "id": "51",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 0,
+        "zoom": 15,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "51",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": {
+          "top": 766.015625,
+          "right": 397.796875,
+          "bottom": 1081.046875,
+          "left": 45.796875,
+          "width": 352,
+          "height": 315.03125
+        },
+        "shellRect": {
+          "top": 467.046875,
+          "right": 842.203125,
+          "bottom": 1117.046875,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 467.046875,
+          "right": 842.203125,
+          "bottom": 1117.046875,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": "51",
+        "screenshot": "docs/screenshots/maplibre-map/maplibre-selected-1440x1000.png"
+      }
+    },
+    "afterListScroll": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 318,
+      "clusterCount": 0,
+      "zoom": 15,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "51",
+      "documentScrollY": 0,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": true,
+      "panelTitle": "أبو بكر الصديق",
+      "nationalCode": "113041164",
+      "status": "مفتوح",
+      "address": "شارع الحسن الثاني الحي الحسني",
+      "imam": "عبد الصمد ابراهيمي",
+      "guideImam": "مصطفى بوجمعاوي",
+      "community": "بركان",
+      "friday": "نعم",
+      "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+      "panelRect": {
+        "top": 766.015625,
+        "right": 397.796875,
+        "bottom": 1081.046875,
+        "left": 45.796875,
+        "width": 352,
+        "height": 315.03125
+      },
+      "shellRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": true,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 50519,
+      "activeMosqueId": "51"
+    },
+    "afterZoom": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 318,
+      "clusterCount": 0,
+      "zoom": 15.52155545505442,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "51",
+      "documentScrollY": 0,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": true,
+      "panelTitle": "أبو بكر الصديق",
+      "nationalCode": "113041164",
+      "status": "مفتوح",
+      "address": "شارع الحسن الثاني الحي الحسني",
+      "imam": "عبد الصمد ابراهيمي",
+      "guideImam": "مصطفى بوجمعاوي",
+      "community": "بركان",
+      "friday": "نعم",
+      "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+      "panelRect": {
+        "top": 766.015625,
+        "right": 397.796875,
+        "bottom": 1081.046875,
+        "left": 45.796875,
+        "width": 352,
+        "height": 315.03125
+      },
+      "shellRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": true,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 50519,
+      "activeMosqueId": "51"
+    },
+    "afterPan": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 318,
+      "clusterCount": 0,
+      "zoom": 15.52155545505442,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "51",
+      "documentScrollY": 0,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": true,
+      "panelTitle": "أبو بكر الصديق",
+      "nationalCode": "113041164",
+      "status": "مفتوح",
+      "address": "شارع الحسن الثاني الحي الحسني",
+      "imam": "عبد الصمد ابراهيمي",
+      "guideImam": "مصطفى بوجمعاوي",
+      "community": "بركان",
+      "friday": "نعم",
+      "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+      "panelRect": {
+        "top": 766.015625,
+        "right": 397.796875,
+        "bottom": 1081.046875,
+        "left": 45.796875,
+        "width": 352,
+        "height": 315.03125
+      },
+      "shellRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": true,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 50519,
+      "activeMosqueId": ""
+    },
+    "afterPageScroll": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 318,
+      "clusterCount": 0,
+      "zoom": 15.52155545505442,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "51",
+      "documentScrollY": 220,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": true,
+      "panelTitle": "أبو بكر الصديق",
+      "nationalCode": "113041164",
+      "status": "مفتوح",
+      "address": "شارع الحسن الثاني الحي الحسني",
+      "imam": "عبد الصمد ابراهيمي",
+      "guideImam": "مصطفى بوجمعاوي",
+      "community": "بركان",
+      "friday": "نعم",
+      "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+      "panelRect": {
+        "top": 546.015625,
+        "right": 397.796875,
+        "bottom": 861.046875,
+        "left": 45.796875,
+        "width": 352,
+        "height": 315.03125
+      },
+      "shellRect": {
+        "top": 247.046875,
+        "right": 842.203125,
+        "bottom": 897.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 247.046875,
+        "right": 842.203125,
+        "bottom": 897.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": true,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 50519,
+      "activeMosqueId": ""
+    },
+    "secondSelection": {
+      "selected": {
+        "id": "118",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 0,
+        "zoom": 15.52155545505442,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "118",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041133",
+        "status": "مفتوح",
+        "address": "دوار أولاد عبد الرحمان",
+        "imam": "عبد الله العبد الجليلي",
+        "guideImam": "ابراهيم رمضاني",
+        "community": "مداغ",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041133&from_map=113041133",
+        "panelRect": {
+          "top": 766.015625,
+          "right": 397.796875,
+          "bottom": 1081.046875,
+          "left": 45.796875,
+          "width": 352,
+          "height": 315.03125
+        },
+        "shellRect": {
+          "top": 467.046875,
+          "right": 842.203125,
+          "bottom": 1117.046875,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 467.046875,
+          "right": 842.203125,
+          "bottom": 1117.046875,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 8324,
+        "activeMosqueId": "118"
+      }
+    },
+    "closeState": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 318,
+      "clusterCount": 0,
+      "zoom": 15.52155545505442,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "",
+      "documentScrollY": 0,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": false,
+      "panelTitle": "أبو بكر الصديق",
+      "nationalCode": "113041133",
+      "status": "مفتوح",
+      "address": "دوار أولاد عبد الرحمان",
+      "imam": "عبد الله العبد الجليلي",
+      "guideImam": "ابراهيم رمضاني",
+      "community": "مداغ",
+      "friday": "نعم",
+      "detailsHref": "mosques.php?national_code=113041133&from_map=113041133",
+      "panelRect": null,
+      "shellRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": false,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 3124,
+      "activeMosqueId": "118"
+    },
+    "escapeState": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 318,
+      "clusterCount": 0,
+      "zoom": 15.52155545505442,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "",
+      "documentScrollY": 0,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": false,
+      "panelTitle": "أبو بكر الصديق",
+      "nationalCode": "113041164",
+      "status": "مفتوح",
+      "address": "شارع الحسن الثاني الحي الحسني",
+      "imam": "عبد الصمد ابراهيمي",
+      "guideImam": "مصطفى بوجمعاوي",
+      "community": "بركان",
+      "friday": "نعم",
+      "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+      "panelRect": null,
+      "shellRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 467.046875,
+        "right": 842.203125,
+        "bottom": 1117.046875,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": false,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 102,
+      "activeMosqueId": "51"
+    },
+    "filteredSelection": {
+      "mapLoaded": true,
+      "provider": "maplibre",
+      "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+      "visibleCount": 9,
+      "clusterCount": 1,
+      "zoom": 14,
+      "rtlTextStatus": "loaded",
+      "selectedMosqueId": "",
+      "documentScrollY": 0,
+      "documentOverflow": false,
+      "panelExists": true,
+      "panelVisible": false,
+      "panelTitle": "أبو بكر الصديق",
+      "nationalCode": "113041164",
+      "status": "مفتوح",
+      "address": "شارع الحسن الثاني الحي الحسني",
+      "imam": "عبد الصمد ابراهيمي",
+      "guideImam": "مصطفى بوجمعاوي",
+      "community": "بركان",
+      "friday": "نعم",
+      "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+      "panelRect": null,
+      "shellRect": {
+        "top": 521.640625,
+        "right": 842.203125,
+        "bottom": 1171.640625,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "mapRect": {
+        "top": 521.640625,
+        "right": 842.203125,
+        "bottom": 1171.640625,
+        "left": 29.796875,
+        "width": 812.40625,
+        "height": 650
+      },
+      "panelInsideShell": false,
+      "panelIsBottomSheet": true,
+      "controlsOnRight": true,
+      "overlapsControls": false,
+      "attributionVisible": true,
+      "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+      "overlapsAttribution": false,
+      "popupVisible": false,
+      "listScrollTop": 102,
+      "activeMosqueId": ""
+    }
+  },
+  "filters": [
+    {
+      "property": "mosque_name",
+      "selected": "أبو بكر الصديق",
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 2,
+        "clusterCount": 0,
+        "zoom": 11.595121785188168,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": false,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": null,
+        "shellRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": false,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": ""
+      }
+    },
+    {
+      "property": "address",
+      "selected": "شارع الحسن الثاني الحي الحسني",
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 1,
+        "clusterCount": 0,
+        "zoom": 15,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": false,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": null,
+        "shellRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": false,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": ""
+      }
+    },
+    {
+      "property": "national_code",
+      "selected": "113041164",
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 1,
+        "clusterCount": 0,
+        "zoom": 15,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": false,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": null,
+        "shellRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": false,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": ""
+      }
+    },
+    {
+      "property": "imam_name",
+      "selected": "عبد الصمد ابراهيمي",
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 1,
+        "clusterCount": 0,
+        "zoom": 15,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": false,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": null,
+        "shellRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": false,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": ""
+      }
+    },
+    {
+      "elementId": "communityFilter",
+      "selected": "أحفير",
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 9,
+        "clusterCount": 1,
+        "zoom": 14,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": false,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": null,
+        "shellRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": false,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": ""
+      }
+    },
+    {
+      "elementId": "statusFilter",
+      "selected": "مغلق",
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 18,
+        "clusterCount": 4,
+        "zoom": 10.100165042180802,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": false,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": null,
+        "shellRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": false,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": ""
+      }
+    },
+    {
+      "elementId": "fridayFilter",
+      "selected": "1",
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 209,
+        "clusterCount": 14,
+        "zoom": 9.341209867473083,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": false,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": null,
+        "shellRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 521.640625,
+          "right": 842.203125,
+          "bottom": 1171.640625,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": false,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": ""
+      }
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "selected": {
+        "id": "51",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 0,
+        "zoom": 15,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "51",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": {
+          "top": 818.015625,
+          "right": 487,
+          "bottom": 1133.046875,
+          "left": 135,
+          "width": 352,
+          "height": 315.03125
+        },
+        "shellRect": {
+          "top": 467.046875,
+          "right": 1233,
+          "bottom": 1169.046875,
+          "left": 119,
+          "width": 1114,
+          "height": 702
+        },
+        "mapRect": {
+          "top": 467.046875,
+          "right": 1233,
+          "bottom": 1169.046875,
+          "left": 119,
+          "width": 1114,
+          "height": 702
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": "51",
+        "screenshot": "docs/screenshots/maplibre-map/maplibre-selected-1920x1080.png"
+      }
+    },
+    {
+      "width": 1440,
+      "height": 1000,
+      "selected": {
+        "id": "51",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 0,
+        "zoom": 15,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "51",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": {
+          "top": 766.015625,
+          "right": 397.796875,
+          "bottom": 1081.046875,
+          "left": 45.796875,
+          "width": 352,
+          "height": 315.03125
+        },
+        "shellRect": {
+          "top": 467.046875,
+          "right": 842.203125,
+          "bottom": 1117.046875,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "mapRect": {
+          "top": 467.046875,
+          "right": 842.203125,
+          "bottom": 1117.046875,
+          "left": 29.796875,
+          "width": 812.40625,
+          "height": 650
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": "51",
+        "screenshot": "docs/screenshots/maplibre-map/maplibre-selected-1440x1000.png"
+      }
+    },
+    {
+      "width": 1024,
+      "height": 900,
+      "selected": {
+        "id": "51",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 18,
+        "zoom": 9.23427015700577,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "51",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": {
+          "top": 885.234375,
+          "right": 393,
+          "bottom": 1200.265625,
+          "left": 41,
+          "width": 352,
+          "height": 315.03125
+        },
+        "shellRect": {
+          "top": 616.265625,
+          "right": 751,
+          "bottom": 1236.265625,
+          "left": 25,
+          "width": 726,
+          "height": 620
+        },
+        "mapRect": {
+          "top": 616.265625,
+          "right": 751,
+          "bottom": 1236.265625,
+          "left": 25,
+          "width": 726,
+          "height": 620
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": "",
+        "screenshot": "docs/screenshots/maplibre-map/maplibre-selected-1024x900.png"
+      }
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "selected": {
+        "id": "51",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 17,
+        "zoom": 9.338545685951203,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "51",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": {
+          "top": 930.1875,
+          "right": 393,
+          "bottom": 1245.21875,
+          "left": 41,
+          "width": 352,
+          "height": 315.03125
+        },
+        "shellRect": {
+          "top": 615.625,
+          "right": 743,
+          "bottom": 1281.21875,
+          "left": 25,
+          "width": 718,
+          "height": 665.59375
+        },
+        "mapRect": {
+          "top": 615.625,
+          "right": 743,
+          "bottom": 1281.21875,
+          "left": 25,
+          "width": 718,
+          "height": 665.59375
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": false,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": "",
+        "screenshot": "docs/screenshots/maplibre-map/maplibre-selected-768x1024.png"
+      }
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "selected": {
+        "id": "51",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 6,
+        "zoom": 8.301809695810043,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "51",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": {
+          "top": 727.1875,
+          "right": 409,
+          "bottom": 1019.390625,
+          "left": 21,
+          "width": 388,
+          "height": 292.203125
+        },
+        "shellRect": {
+          "top": 504.203125,
+          "right": 417,
+          "bottom": 1063.390625,
+          "left": 13,
+          "width": 404,
+          "height": 559.1875
+        },
+        "mapRect": {
+          "top": 504.203125,
+          "right": 417,
+          "bottom": 1063.390625,
+          "left": 13,
+          "width": 404,
+          "height": 559.1875
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": "",
+        "screenshot": "docs/screenshots/maplibre-map/maplibre-selected-430x932.png"
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "selected": {
+        "id": "51",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 6,
+        "zoom": 8.099099915907939,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "51",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": {
+          "top": 688.09375,
+          "right": 369,
+          "bottom": 966.59375,
+          "left": 21,
+          "width": 348,
+          "height": 278.5
+        },
+        "shellRect": {
+          "top": 504.203125,
+          "right": 377,
+          "bottom": 1010.59375,
+          "left": 13,
+          "width": 364,
+          "height": 506.390625
+        },
+        "mapRect": {
+          "top": 504.203125,
+          "right": 377,
+          "bottom": 1010.59375,
+          "left": 13,
+          "width": 364,
+          "height": 506.390625
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": "",
+        "screenshot": "docs/screenshots/maplibre-map/maplibre-selected-390x844.png"
+      }
+    },
+    {
+      "width": 360,
+      "height": 800,
+      "selected": {
+        "id": "51",
+        "label": "تحديد"
+      },
+      "before": 0,
+      "after": 0,
+      "state": {
+        "mapLoaded": true,
+        "provider": "maplibre",
+        "styleUrl": "https://tiles.openfreemap.org/styles/liberty",
+        "visibleCount": 318,
+        "clusterCount": 2,
+        "zoom": 7.918481056258536,
+        "rtlTextStatus": "loaded",
+        "selectedMosqueId": "51",
+        "documentScrollY": 0,
+        "documentOverflow": false,
+        "panelExists": true,
+        "panelVisible": true,
+        "panelTitle": "أبو بكر الصديق",
+        "nationalCode": "113041164",
+        "status": "مفتوح",
+        "address": "شارع الحسن الثاني الحي الحسني",
+        "imam": "عبد الصمد ابراهيمي",
+        "guideImam": "مصطفى بوجمعاوي",
+        "community": "بركان",
+        "friday": "نعم",
+        "detailsHref": "mosques.php?national_code=113041164&from_map=113041164",
+        "panelRect": {
+          "top": 676.203125,
+          "right": 339,
+          "bottom": 940.203125,
+          "left": 21,
+          "width": 318,
+          "height": 264
+        },
+        "shellRect": {
+          "top": 504.203125,
+          "right": 347,
+          "bottom": 984.203125,
+          "left": 13,
+          "width": 334,
+          "height": 480
+        },
+        "mapRect": {
+          "top": 504.203125,
+          "right": 347,
+          "bottom": 984.203125,
+          "left": 13,
+          "width": 334,
+          "height": 480
+        },
+        "panelInsideShell": true,
+        "panelIsBottomSheet": true,
+        "controlsOnRight": true,
+        "overlapsControls": false,
+        "attributionVisible": true,
+        "attributionText": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        "overlapsAttribution": false,
+        "popupVisible": false,
+        "listScrollTop": 0,
+        "activeMosqueId": "",
+        "screenshot": "docs/screenshots/maplibre-map/maplibre-selected-360x800.png"
+      }
+    }
+  ],
+  "formPicker": {
+    "mapLoaded": true,
+    "provider": "maplibre",
+    "rtlTextReady": true,
+    "attribution": "OpenFreeMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+    "overflow": false
+  },
+  "console": [
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Image \"office\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"brownfield\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"gate\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"swimming_pool\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Image \"office\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"brownfield\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"gate\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"swimming_pool\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Image \"office\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"brownfield\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"gate\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Image \"swimming_pool\" could not be loaded. Please make sure you have added the image with map.addImage() or a \"sprite\" property in your style. You can provide missing images by listening for the \"styleimagemissing\" map event."
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    },
+    {
+      "type": "warning",
+      "text": "Expected value to be of type number, but found null instead.",
+      "source": "worker"
+    }
+  ],
+  "network": [],
+  "requestHosts": [
+    "",
+    "127.0.0.1",
+    "tiles.openfreemap.org"
+  ],
+  "assertions": [
+    {
+      "name": "MapLibre map loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Map provider is MapLibre",
+      "ok": true,
+      "detail": "maplibre"
+    },
+    {
+      "name": "Configured Liberty style is used",
+      "ok": true,
+      "detail": "https://tiles.openfreemap.org/styles/liberty"
+    },
+    {
+      "name": "Arabic RTL shaping plugin is loaded",
+      "ok": true,
+      "detail": "loaded"
+    },
+    {
+      "name": "Arabic RTL shaping plugin is served locally",
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "name": "All valid coordinate records reach the GeoJSON map",
+      "ok": true,
+      "detail": "318"
+    },
+    {
+      "name": "Clusters render",
+      "ok": true,
+      "detail": "18"
+    },
+    {
+      "name": "Cluster click resolves expansion zoom",
+      "ok": true,
+      "detail": "{\"before\":9.315800042502369,\"zoom\":12,\"clusterId\":2698}"
+    },
+    {
+      "name": "Cluster click smoothly increases zoom",
+      "ok": true,
+      "detail": "9.315800042502369 -> 12"
+    },
+    {
+      "name": "Selection panel is application-owned and visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selected mosque name is present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selected national code is present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selected status is present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selected address is present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selected imam is present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selected guide imam is present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selected community is present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selected Friday-prayer value is present",
+      "ok": true,
+      "detail": "نعم"
+    },
+    {
+      "name": "Details link remains internal",
+      "ok": true,
+      "detail": "mosques.php?national_code=113041164&from_map=113041164"
+    },
+    {
+      "name": "Selection keeps document scroll fixed",
+      "ok": true,
+      "detail": "0 -> 0"
+    },
+    {
+      "name": "List scroll keeps selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Zoom keeps selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Pan keeps selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Page scroll keeps selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Second selection updates the same panel",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Close button hides panel",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Close restores focus without page scroll",
+      "ok": true,
+      "detail": "118"
+    },
+    {
+      "name": "Escape hides panel",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Filtering out selection closes panel",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "No MapLibre popup is used for full details",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Filter works: mosque_name",
+      "ok": true,
+      "detail": "أبو بكر الصديق: 2"
+    },
+    {
+      "name": "Filter works: address",
+      "ok": true,
+      "detail": "شارع الحسن الثاني الحي الحسني: 1"
+    },
+    {
+      "name": "Filter works: national_code",
+      "ok": true,
+      "detail": "113041164: 1"
+    },
+    {
+      "name": "Filter works: imam_name",
+      "ok": true,
+      "detail": "عبد الصمد ابراهيمي: 1"
+    },
+    {
+      "name": "Filter works: communityFilter",
+      "ok": true,
+      "detail": "أحفير: 9"
+    },
+    {
+      "name": "Filter works: statusFilter",
+      "ok": true,
+      "detail": "مغلق: 18"
+    },
+    {
+      "name": "Filter works: fridayFilter",
+      "ok": true,
+      "detail": "1: 209"
+    },
+    {
+      "name": "1920x1080: selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1920x1080: panel stays inside map",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1920x1080: mobile panel is a bottom sheet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1920x1080: no horizontal overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1920x1080: RTL controls stay on the right",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1920x1080: panel avoids controls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1920x1080: OpenFreeMap attribution is visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1920x1080: panel avoids attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1440x1000: selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1440x1000: panel stays inside map",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1440x1000: mobile panel is a bottom sheet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1440x1000: no horizontal overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1440x1000: RTL controls stay on the right",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1440x1000: panel avoids controls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1440x1000: OpenFreeMap attribution is visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1440x1000: panel avoids attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1024x900: selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1024x900: panel stays inside map",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1024x900: mobile panel is a bottom sheet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1024x900: no horizontal overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1024x900: RTL controls stay on the right",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1024x900: panel avoids controls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1024x900: OpenFreeMap attribution is visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1024x900: panel avoids attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "768x1024: selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "768x1024: panel stays inside map",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "768x1024: mobile panel is a bottom sheet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "768x1024: no horizontal overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "768x1024: RTL controls stay on the right",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "768x1024: panel avoids controls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "768x1024: OpenFreeMap attribution is visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "768x1024: panel avoids attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "430x932: selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "430x932: panel stays inside map",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "430x932: mobile panel is a bottom sheet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "430x932: no horizontal overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "430x932: RTL controls stay on the right",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "430x932: panel avoids controls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "430x932: OpenFreeMap attribution is visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "430x932: panel avoids attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "390x844: selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "390x844: panel stays inside map",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "390x844: mobile panel is a bottom sheet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "390x844: no horizontal overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "390x844: RTL controls stay on the right",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "390x844: panel avoids controls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "390x844: OpenFreeMap attribution is visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "390x844: panel avoids attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x800: selection panel visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x800: panel stays inside map",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x800: mobile panel is a bottom sheet",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x800: no horizontal overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x800: RTL controls stay on the right",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x800: panel avoids controls",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x800: OpenFreeMap attribution is visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x800: panel avoids attribution",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Create-form coordinate picker uses MapLibre",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Create-form coordinate picker has RTL shaping",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Create-form attribution is visible",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Create-form map has no horizontal overflow",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "OpenFreeMap requests are present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "No Google Maps requests",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "No map API-key requests",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "No console errors",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "No missing or failed map assets",
+      "ok": true,
+      "detail": "[]"
+    }
+  ],
+  "failures": [
+    {
+      "name": "Arabic RTL shaping plugin is served locally",
+      "detail": ""
+    }
+  ],
+  "rtlPluginRequests": []
+}

@@ -109,6 +109,7 @@ const networkEvents = [];
 const requestHosts = new Set();
 const googleMapRequests = [];
 const apiKeyRequests = [];
+const rtlPluginRequests = [];
 
 cdp.on('Runtime.consoleAPICalled', ({ type, args = [] }) => {
     if (!['error', 'warning', 'assert'].includes(type)) return;
@@ -130,6 +131,9 @@ cdp.on('Network.requestWillBeSent', ({ request }) => {
         }
         if (url.hostname === 'tiles.openfreemap.org' && url.searchParams.has('key')) {
             apiKeyRequests.push(safeUrl(request.url));
+        }
+        if (url.pathname.endsWith('/assets/dist/mapbox-gl-rtl-text.js')) {
+            rtlPluginRequests.push(safeUrl(request.url));
         }
     } catch {
         // Ignore non-URL browser internals.
@@ -229,6 +233,7 @@ async function mapState() {
             visibleCount: testState.visibleCount ?? null,
             clusterCount: testState.clusterCount ?? null,
             zoom: testState.zoom ?? null,
+            rtlTextStatus: testState.rtlTextStatus || '',
             selectedMosqueId: testState.selectedMosqueId || '',
             documentScrollY: window.scrollY,
             documentOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -455,11 +460,12 @@ try {
     await viewport(1024, 900);
     await navigate('add_mosque.php');
     await evaluate(`document.querySelector('#showMapBtn')?.click()`);
-    await waitFor(`Boolean(document.querySelector('#mapContainer[data-provider="maplibre"] .maplibregl-canvas'))`);
+    await waitFor(`document.querySelector('#map')?.dataset.rtlTextReady === 'true' && Boolean(document.querySelector('#mapContainer[data-provider="maplibre"] .maplibregl-canvas'))`);
     await delay(700);
     result.formPicker = await evaluate(`(() => ({
         mapLoaded: Boolean(document.querySelector('#mapContainer .maplibregl-canvas')),
         provider: document.querySelector('#mapContainer')?.dataset.provider || '',
+        rtlTextReady: document.querySelector('#map')?.dataset.rtlTextReady === 'true',
         attribution: document.querySelector('#mapContainer .maplibregl-ctrl-attrib')?.textContent?.trim() || '',
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
     }))()`);
@@ -467,6 +473,8 @@ try {
     check('MapLibre map loads', result.baseline.mapLoaded);
     check('Map provider is MapLibre', result.baseline.provider === 'maplibre', result.baseline.provider);
     check('Configured Liberty style is used', result.baseline.styleUrl.includes('tiles.openfreemap.org/styles/liberty'), result.baseline.styleUrl);
+    check('Arabic RTL shaping plugin is loaded', result.baseline.rtlTextStatus === 'loaded', result.baseline.rtlTextStatus);
+    check('Arabic RTL shaping plugin is served locally', rtlPluginRequests.some(url => url.startsWith(baseUrl)), rtlPluginRequests.join(', '));
     check('All valid coordinate records reach the GeoJSON map', Number(result.baseline.visibleCount) > 0, String(result.baseline.visibleCount));
     check('Clusters render', Number(clusterBefore.clusterCount) > 0, String(clusterBefore.clusterCount));
     check('Cluster click resolves expansion zoom', Boolean(clusterExpansion && clusterExpansion.zoom > clusterExpansion.before), JSON.stringify(clusterExpansion));
@@ -509,6 +517,7 @@ try {
     });
 
     check('Create-form coordinate picker uses MapLibre', result.formPicker.mapLoaded && result.formPicker.provider === 'maplibre');
+    check('Create-form coordinate picker has RTL shaping', result.formPicker.rtlTextReady);
     check('Create-form attribution is visible', result.formPicker.attribution.includes('OpenFreeMap'));
     check('Create-form map has no horizontal overflow', !result.formPicker.overflow);
     check('OpenFreeMap requests are present', requestHosts.has('tiles.openfreemap.org'));
@@ -523,6 +532,7 @@ try {
     result.console = consoleEvents;
     result.network = networkEvents;
     result.requestHosts = [...requestHosts].sort();
+    result.rtlPluginRequests = rtlPluginRequests;
     await writeFile(resultPath, JSON.stringify(result, null, 2));
     cdp.close();
     chrome.kill();

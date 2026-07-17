@@ -172,6 +172,19 @@ final class App
 
     private function applySecurityHeaders(Response $response, Request $request): void
     {
+        $mapRoutes = [
+            'mosque_maps.php',
+            'mosque_maps',
+            'add_mosque.php',
+            'add_mosque',
+            'edit_mosque.php',
+            'edit_mosque',
+        ];
+        $scriptSources = "'self' 'nonce-{$this->cspNonce}'";
+        if (in_array($request->routePath(), $mapRoutes, true)) {
+            $scriptSources .= " 'wasm-unsafe-eval'";
+        }
+
         $response
             ->withHeader('X-Content-Type-Options', 'nosniff')
             ->withHeader('X-Frame-Options', 'DENY')
@@ -180,7 +193,7 @@ final class App
             ->withHeader(
                 'Content-Security-Policy',
                 "default-src 'self'; "
-                . "script-src 'self' 'nonce-{$this->cspNonce}'; "
+                . "script-src {$scriptSources}; "
                 . "style-src 'self' 'unsafe-inline'; "
                 . "style-src-elem 'self' 'unsafe-inline' 'nonce-{$this->cspNonce}' https://fonts.googleapis.com; "
                 . "style-src-attr 'unsafe-inline'; "
