@@ -23,7 +23,6 @@ final class MosqueWriteService
         private readonly MosqueValidator $validator,
         private readonly UploadService $uploads,
         private readonly ErrorHandler $errors,
-        private readonly DeletedMosqueService $deletedMosques,
     ) {
     }
 
@@ -161,13 +160,6 @@ final class MosqueWriteService
      */
     public function delete(array $registrationNumbers): int
     {
-        foreach ($registrationNumbers as $registrationNumber) {
-            $mosque = $this->mosques->find($registrationNumber);
-            if ($mosque !== null) {
-                $this->deletedMosques->archive($mosque);
-            }
-        }
-
         return $this->mosques->deleteByRegistrationNumbers($registrationNumbers);
     }
 }

@@ -21,7 +21,7 @@ $constructionYear = !empty($row['construction_date']) ? date('Y', strtotime((str
     <td data-column="community"><?= $view->e($row['community'] ?: '—') ?></td>
     <td data-column="location" class="column-hidden">
         <?php if (!empty($row['latitude']) && !empty($row['longitude'])): ?>
-            <button type="button" class="row-action view-on-map" data-lat="<?= $view->e($row['latitude']) ?>" data-lng="<?= $view->e($row['longitude']) ?>" data-mosque="<?= $view->e($row['mosque_name']) ?>" aria-label="عرض المسجد على الخريطة" title="عرض على الخريطة"><i class="fas fa-map-location-dot" aria-hidden="true"></i></button>
+            <button type="button" class="row-action view-on-map" data-mosque-id="<?= $view->e($row['registration_number']) ?>" data-mosque="<?= $view->e($row['mosque_name']) ?>" aria-label="عرض المسجد على الخريطة" title="عرض على الخريطة"><i class="fas fa-map-location-dot" aria-hidden="true"></i></button>
         <?php else: ?>—<?php endif; ?>
     </td>
     <td data-column="actions">

@@ -22,6 +22,10 @@ The build produces the following minified, cacheable assets:
 - `public/assets/dist/dashboard.min.js`
 - `public/assets/dist/quran.min.js`
 - `public/assets/dist/maps.min.js`
+- `public/assets/dist/maps.min.css`
+- `public/assets/dist/mosque-form-map.min.js`
+- `public/assets/dist/mosque-form-map.min.css`
+- `public/assets/dist/mapbox-gl-rtl-text.js`
 - `public/assets/dist/import-export.min.js`
 - `public/assets/dist/backup-confirm.min.js`
 
@@ -31,15 +35,16 @@ Tailwind is compiled with the `tw` prefix and without Preflight. Bootstrap remai
 
 1. Run `npm ci && npm run build` in CI or on a development machine.
 2. Deploy the PHP application together with the generated `public/assets/dist/` directory.
-3. Keep the existing environment variables and writable upload/storage directories configured as documented by the application.
+3. Keep the writable upload/storage directories and map style variables configured as documented by the application. No map API key is required.
 4. Do not run Node.js on the production host; the generated files are the production assets.
-5. After deployment, verify login, an authenticated dashboard request, form submission, export download, and the Google Maps callback in the target environment.
+5. After deployment, verify login, an authenticated dashboard request, form submission, export download, OpenFreeMap tile loading, clusters, and mosque selection.
 
 ## Dependency policy
 
 - Bootstrap, Font Awesome, SweetAlert2, Chart.js, jQuery, and Select2 are retained where the current application uses them.
 - Animate.css and Hover.css are no longer loaded; motion is implemented in the application stylesheet and honors `prefers-reduced-motion`.
-- Google Maps remains the map engine to preserve the current API contract and marker behavior.
+- MapLibre GL JS is bundled locally through npm/esbuild. OpenFreeMap supplies the configurable vector-tile style (`MAP_STYLE_URL`) without an API key.
+- The BSD-licensed `@mapbox/mapbox-gl-rtl-text` package is copied into the production assets during the build so Arabic and Hebrew map labels are shaped locally without a CDN.
 - Three.js is intentionally omitted because the visual concept is achieved with lightweight CSS transforms and gradients.
 
 ## Source layout

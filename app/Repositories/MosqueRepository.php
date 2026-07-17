@@ -563,17 +563,6 @@ final class MosqueRepository
         $stmt->execute($this->writeParams($data));
     }
 
-    /** @param array<string, mixed> $data archived mosque row */
-    public function insertRestored(array $data): void
-    {
-        $columns = 'registration_number, ' . implode(', ', self::WRITE_COLUMNS);
-        $placeholders = rtrim(str_repeat('?, ', count(self::WRITE_COLUMNS) + 1), ', ');
-        $params = [(int) $data['registration_number'], ...$this->writeParams($data)];
-
-        $stmt = $this->db->pdo()->prepare("INSERT INTO mosques ({$columns}) VALUES ({$placeholders})");
-        $stmt->execute($params);
-    }
-
     /**
      * @param array<string, mixed> $data
      */

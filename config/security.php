@@ -23,5 +23,4 @@ return [
         'blocked_production_passwords' => ['admin123', 'password', '12345678'],
     ],
     'audit_log' => dirname(__DIR__) . '/storage/logs/audit.log',
-    'deleted_mosques_log' => dirname(__DIR__) . '/storage/cache/deleted-mosques.jsonl',
 ];

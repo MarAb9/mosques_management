@@ -172,6 +172,19 @@ final class App
 
     private function applySecurityHeaders(Response $response, Request $request): void
     {
+        $mapRoutes = [
+            'mosque_maps.php',
+            'mosque_maps',
+            'add_mosque.php',
+            'add_mosque',
+            'edit_mosque.php',
+            'edit_mosque',
+        ];
+        $scriptSources = "'self' 'nonce-{$this->cspNonce}'";
+        if (in_array($request->routePath(), $mapRoutes, true)) {
+            $scriptSources .= " 'wasm-unsafe-eval'";
+        }
+
         $response
             ->withHeader('X-Content-Type-Options', 'nosniff')
             ->withHeader('X-Frame-Options', 'DENY')
@@ -180,13 +193,13 @@ final class App
             ->withHeader(
                 'Content-Security-Policy',
                 "default-src 'self'; "
-                . "script-src 'self' 'nonce-{$this->cspNonce}' https://maps.googleapis.com https://maps.gstatic.com; "
+                . "script-src {$scriptSources}; "
                 . "style-src 'self' 'unsafe-inline'; "
                 . "style-src-elem 'self' 'unsafe-inline' 'nonce-{$this->cspNonce}' https://fonts.googleapis.com; "
                 . "style-src-attr 'unsafe-inline'; "
                 . "font-src 'self' data: https://fonts.gstatic.com; "
-                . "img-src 'self' data: blob: https://maps.googleapis.com https://maps.gstatic.com https://*.googleusercontent.com; "
-                . "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+                . "img-src 'self' data: blob:; "
+                . "connect-src 'self' https://tiles.openfreemap.org; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
             );
 
         if ($request->isSecure((bool) $this->config->get('security.trust_proxy_headers', false))) {

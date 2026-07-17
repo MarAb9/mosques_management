@@ -1,7 +1,7 @@
 <?php
 /**
  * Mosque map page (legacy mosque_maps.php markup, moved verbatim).
- * Expects: $mosques, $allMosques, $totalMosques, $totalWithCoords,
+ * Expects: $mosques, $mosqueGeoJson, $totalMosques, $totalWithCoords,
  *          $totalPages, $page, $communities, $statuses
  */
 ?>
@@ -11,7 +11,6 @@
         'title' => 'خريطة المساجد',
         'subtitle' => number_format((int) $totalWithCoords) . ' مسجد محدد الموقع من ' . number_format((int) $totalMosques),
         'icon' => 'fa-map-location-dot',
-        'illustration' => 'assets/images/institutional/map-location-3d.svg',
     ]) ?>
 
     <div class="map-summary reveal" aria-label="ملخص التغطية الجغرافية">
@@ -21,11 +20,26 @@
     </div>
 
     <!-- Enhanced Search and Filters Section -->
-    <div class="row mb-4">
+    <div class="row mb-0 map-filter-row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <div class="row g-4">
+            <div class="card map-toolbar-card">
+                <div class="card-body">
+                    <div class="map-toolbar-heading">
+                        <div>
+                            <strong>البحث والتصفية</strong>
+                            <span>تتحدث الخريطة والقائمة مباشرة</span>
+                        </div>
+                        <div class="map-toolbar-actions">
+                            <span class="map-visible-count"><strong id="toolbarMosqueCount"><?= number_format((int) $totalWithCoords) ?></strong> نتيجة</span>
+                            <button type="button" id="clearAllFilters" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-rotate-left" aria-hidden="true"></i><span>إعادة ضبط</span>
+                            </button>
+                            <button type="button" id="mapFilterToggle" class="map-filter-toggle" aria-expanded="true" aria-controls="mapFilterPanel">
+                                <i class="fas fa-sliders-h" aria-hidden="true"></i><span>التصفية</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-3 map-filter-grid" id="mapFilterPanel">
                         <!-- Main Search -->
                         <div class="col-lg-4 col-md-6">
                             <div class="search-widget">
@@ -112,9 +126,6 @@
                             <div class="d-flex align-items-center flex-wrap gap-2">
                                 <span class="text-muted me-2">التصفيات النشطة:</span>
                                 <div id="activeFilters" class="d-flex flex-wrap gap-2"></div>
-                                <button id="clearAllFilters" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-times me-1"></i>مسح الكل
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -123,27 +134,63 @@
         </div>
     </div>
 <!-- Main Map Section -->
-    <div class="row">
+    <div class="map-view-switcher" role="tablist" aria-label="اختيار عرض الخريطة أو القائمة">
+        <button type="button" role="tab" data-map-view="map" aria-selected="true" aria-controls="mapCanvasColumn">
+            <i class="fas fa-map" aria-hidden="true"></i><span>الخريطة</span>
+        </button>
+        <button type="button" role="tab" data-map-view="list" aria-selected="false" aria-controls="mapListColumn">
+            <i class="fas fa-list" aria-hidden="true"></i><span>القائمة</span>
+        </button>
+    </div>
+    <div class="row map-main-row" id="mapMainRow">
         <!-- Map Container -->
-        <div class="col-lg-9 col-md-8 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
+        <div class="map-canvas-column" id="mapCanvasColumn">
+            <div class="card map-canvas-card">
+                <div class="card-header map-canvas-toolbar">
                     <h5 class="mb-0 fw-bold">
                         <i class="fas fa-map me-2 text-primary"></i>المواقع
                     </h5>
-                    <div class="d-flex gap-2 flex-wrap">
+                    <div class="map-canvas-actions">
+                        <span class="map-provider-badge"><i class="fas fa-layer-group" aria-hidden="true"></i>OpenFreeMap</span>
                         <button id="fitToMarkers" class="btn btn-outline-primary btn-sm d-flex align-items-center">
                             <i class="fas fa-expand-alt me-2"></i>عرض الكل
                         </button>
                         <div class="header-actions">
-                            <button id="refreshMap" class="btn btn-light btn-icon" aria-label="تحديث الخريطة" title="تحديث الخريطة">
-                                <i class="fas fa-sync-alt"></i>
+                            <button id="resetMapView" class="btn btn-light btn-icon" aria-label="إعادة ضبط عرض الخريطة" title="إعادة ضبط عرض الخريطة">
+                                <i class="fas fa-house"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class="card-body p-0 position-relative">
+                <div class="card-body p-0 position-relative map-canvas-shell">
                     <div id="map"></div>
+                    <aside id="selectedMosquePanel" class="map-selection-panel" aria-live="polite" aria-labelledby="selectedMosqueTitle" aria-hidden="true" hidden>
+                        <div class="map-selection-panel__header">
+                            <div>
+                                <span class="map-selection-panel__eyebrow">المسجد المحدد</span>
+                                <h2 id="selectedMosqueTitle">-</h2>
+                            </div>
+                            <button type="button" id="selectedMosqueClose" class="map-selection-panel__close" aria-label="إغلاق بطاقة المسجد">
+                                <i class="fas fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="map-selection-panel__meta" aria-label="حالة المسجد">
+                            <span id="selectedMosqueStatus">-</span>
+                            <span id="selectedMosqueCode">-</span>
+                            <span>الجمعة: <strong id="selectedMosqueFriday">-</strong></span>
+                        </div>
+                        <div class="map-selection-panel__body">
+                            <dl class="map-selection-panel__details">
+                                <div><dt>العنوان</dt><dd id="selectedMosqueAddress">-</dd></div>
+                                <div><dt>الإمام</dt><dd id="selectedMosqueImam">-</dd></div>
+                                <div><dt>الإمام المرشد</dt><dd id="selectedMosqueGuideImam">-</dd></div>
+                                <div><dt>الجماعة</dt><dd id="selectedMosqueCommunity">-</dd></div>
+                            </dl>
+                        </div>
+                        <div class="map-selection-panel__actions">
+                            <a id="selectedMosqueDetails" class="btn btn-primary btn-sm" href="mosques.php">عرض التفاصيل في الدليل</a>
+                        </div>
+                    </aside>
                     <div id="mapLoading" class="position-absolute top-50 start-50 translate-middle text-center">
                         <div class="spinner-border text-primary mb-3 map-loading-spinner" role="status">
                             <span class="visually-hidden">جاري التحميل...</span>
@@ -162,9 +209,9 @@
         </div>
 
          <!-- Mosque List Sidebar -->
-        <div class="col-lg-3 col-md-4 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <div class="map-list-column" id="mapListColumn">
+            <div class="card map-list-card">
+                <div class="card-header map-list-header">
                     <h5 class="mb-0 fw-bold">
                         <i class="fas fa-list me-2 text-primary"></i>قائمة المساجد
                     </h5>
@@ -242,35 +289,10 @@
         </div>
     </div>
 
-    <!-- Bottom Pagination -->
-    <?php if ($totalPages > 1): ?>
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="pagination-container card border-0 shadow-sm">
-                <div class="card-body py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-muted">
-                            الصفحة <?= $page ?> من <?= $totalPages ?>
-                        </div>
-                        <?= renderPagination($page, $totalPages) ?>
-                        <div class="text-muted">
-                            عرض <?= number_format(count($mosques)) ?> مسجد
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
 </div>
 
-<!-- Google Maps API-ready implementation. Add GOOGLE_MAPS_API_KEY to .env to activate. -->
-<?php $hasGoogleMapsKey = trim((string) ($googleMapsApiKey ?? '')) !== ''; ?>
-<script type="application/json" id="mapPageData" nonce="<?= $view->e($cspNonce ?? '') ?>"><?= json_encode(['mosques' => $mosques, 'allMosques' => $allMosques, 'mapDefaults' => $mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9], 'hasGoogleMapsKey' => $hasGoogleMapsKey], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?></script>
+<script type="application/json" id="mapPageData" nonce="<?= $view->e($cspNonce ?? '') ?>"><?= json_encode(['mosques' => $mosques, 'mosqueGeoJson' => $mosqueGeoJson, 'mapConfig' => $mapConfig ?? ['provider' => 'maplibre', 'styleUrl' => 'https://tiles.openfreemap.org/styles/liberty'], 'mapDefaults' => $mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9]], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?></script>
 <script src="assets/dist/maps.min.js"></script>
-<?php if ($hasGoogleMapsKey): ?>
-<script nonce="<?= $view->e($cspNonce ?? '') ?>" src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode((string) $googleMapsApiKey) ?>&callback=initGoogleMosqueMap&loading=async" async defer></script>
-<?php endif; ?>
 
 
 

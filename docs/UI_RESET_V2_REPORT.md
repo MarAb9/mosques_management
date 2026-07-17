@@ -71,7 +71,6 @@
 | الخريطة | [map-1440](screenshots/ui-reset-v2/after/map-1440.png) | [map-mobile-390](screenshots/ui-reset-v2/after/map-mobile-390.png) |
 | الاستيراد والتصدير | [import-export-1440](screenshots/ui-reset-v2/after/import-export-1440.png) | [import-export-mobile-390](screenshots/ui-reset-v2/after/import-export-mobile-390.png) |
 | جودة البيانات | [data-quality-1440](screenshots/ui-reset-v2/after/data-quality-1440.png) | [data-quality-mobile-390](screenshots/ui-reset-v2/after/data-quality-mobile-390.png) |
-| سلة المحذوفات | [trash-1440](screenshots/ui-reset-v2/after/trash-1440.png) | [trash-mobile-390](screenshots/ui-reset-v2/after/trash-mobile-390.png) |
 
 ## حالات دليل المساجد
 
@@ -113,7 +112,7 @@
 - البحث العام: التركيز انتقل إلى `globalSearchInput`، ثم عاد إلى `globalSearchToggle` بعد Escape.
 - قائمة الأعمدة: بقيت داخل حدود viewport ولم تتجاوز الشاشة.
 
-تحديث بيئي بتاريخ 15 يوليو 2026: أصبح `GOOGLE_MAPS_API_KEY` يمر من `.env` المحلي إلى حاوية التطبيق عبر `compose.yaml`، مع بقاء القيمة الفعلية خارج Git. بدأت خرائط Google بالتحميل، لكن المزود يحقن أنماطاً inline تمنعها سياسة CSP الحالية جزئياً. لم تُضعف السياسة الأمنية؛ يلزم اعتماد صريح قبل أي استثناء خاص بصفحات الخرائط.
+تحديث بتاريخ 16 يوليو 2026: استبدلت خرائط Google بالكامل بـ MapLibre GL JS المجمّع محلياً وOpenFreeMap. يضبط `MAP_STYLE_URL` النمط المتجهي، ولا يحتاج التشغيل إلى مفتاح API، كما أزيلت نطاقات Google Maps من سياسة CSP وإعداد Docker.
 
 ## نتائج الاختبارات
 

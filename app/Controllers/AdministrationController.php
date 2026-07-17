@@ -12,7 +12,6 @@ use App\Core\View;
 use App\Repositories\MosqueRepository;
 use App\Services\AuditLogger;
 use App\Services\BackupService;
-use App\Services\DeletedMosqueService;
 
 final class AdministrationController extends Controller
 {
@@ -21,7 +20,6 @@ final class AdministrationController extends Controller
         Session $session,
         private readonly MosqueRepository $mosques,
         private readonly AuditLogger $audit,
-        private readonly DeletedMosqueService $deletedMosques,
         private readonly BackupService $backup,
     ) {
         parent::__construct($view, $session);
@@ -36,32 +34,6 @@ final class AdministrationController extends Controller
             'issue' => $issue,
             'samples' => $this->mosques->dataQualitySamples($issue, 30),
         ]);
-    }
-
-
-    public function trash(Request $request): Response
-    {
-        return $this->render('admin.trash', [
-            'deletedMosques' => $this->deletedMosques->recent(80),
-            'successMessage' => $this->session->pullFlash('success'),
-            'errorMessage' => $this->session->pullFlash('error'),
-        ]);
-    }
-
-    public function restore(Request $request): Response
-    {
-        $registrationNumber = trim((string) $request->post('registration_number', ''));
-        if ($registrationNumber === '') {
-            return $this->redirectWithFlash('trash.php', 'error', 'طلب استعادة غير صالح');
-        }
-
-        if ($this->deletedMosques->restore($registrationNumber)) {
-            $this->audit->record('mosque.restore', 'success', $request, ['registration_number' => $registrationNumber]);
-            return $this->redirectWithFlash('trash.php', 'success', 'تمت استعادة المسجد بنجاح');
-        }
-
-        $this->audit->record('mosque.restore', 'failed', $request, ['registration_number' => $registrationNumber]);
-        return $this->redirectWithFlash('trash.php', 'error', 'تعذرت الاستعادة. قد يكون الرمز الوطني موجودا حاليا.');
     }
 
     public function backup(Request $request): Response

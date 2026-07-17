@@ -12,7 +12,6 @@ $routeAliases = [
     'mosque_maps' => 'mosque_maps.php',
     'import_export' => 'import_export.php',
     'data_quality' => 'data_quality.php',
-    'trash' => 'trash.php',
 ];
 $currentPage = $routeAliases[$requestPage] ?? ($requestPage !== '' ? $requestPage : basename((string) ($_SERVER['SCRIPT_NAME'] ?? 'index.php')));
 $pageConfig = [
@@ -26,11 +25,15 @@ $pageConfig = [
     'mosque_maps.php' => ['title' => 'الخريطة التشغيلية', 'section' => 'التغطية الجغرافية', 'icon' => 'fa-map-location-dot'],
     'import_export.php' => ['title' => 'الاستيراد والتصدير', 'section' => 'إدارة البيانات', 'icon' => 'fa-arrow-right-arrow-left'],
     'data_quality.php' => ['title' => 'جودة البيانات', 'section' => 'الحوكمة', 'icon' => 'fa-clipboard-check'],
-    'trash.php' => ['title' => 'سلة المحذوفات', 'section' => 'الحوكمة', 'icon' => 'fa-trash-can-arrow-up'],
 ];
 $page = $pageConfig[$currentPage] ?? ['title' => 'نظام إدارة مساجد إقليم بركان', 'section' => 'الإدارة', 'icon' => 'fa-mosque'];
 $roleLabel = ($currentRole ?? '') === 'admin' ? 'مسؤول النظام' : 'مشاهدة واستعلام';
 $select2Pages = ['mosques.php', 'quran_mosques.php', 'add_quran_mosque.php', 'edit_quran_mosque.php'];
+$pageStyleAsset = match ($currentPage) {
+    'mosque_maps.php' => 'assets/dist/maps.min.css',
+    'add_mosque.php', 'edit_mosque.php' => 'assets/dist/mosque-form-map.min.css',
+    default => null,
+};
 $navActive = static fn (array $pages): string => in_array($currentPage, $pages, true) ? ' is-active' : '';
 ?>
 <!DOCTYPE html>
@@ -48,6 +51,7 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
     <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css">
     <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
     <?php if (in_array($currentPage, $select2Pages, true)): ?><link rel="stylesheet" href="assets/vendor/select2/css/select2.min.css"><?php endif; ?>
+    <?php if ($pageStyleAsset !== null): ?><link rel="stylesheet" href="<?= $view->e($pageStyleAsset) ?>"><?php endif; ?>
     <link rel="stylesheet" href="assets/vendor/sweetalert2/sweetalert2.min.css">
     <link rel="stylesheet" href="assets/dist/app.min.css">
 </head>
@@ -85,7 +89,6 @@ $navActive = static fn (array $pages): string => in_array($currentPage, $pages, 
                     <span class="nav-group__label" id="nav-governance">الإدارة</span>
                     <ul class="sidebar-nav">
                         <li><a class="sidebar-nav__link<?= $navActive(['data_quality.php']) ?>" href="data_quality.php" title="جودة البيانات"><i class="fas fa-clipboard-check" aria-hidden="true"></i><span>جودة البيانات</span></a></li>
-                        <li><a class="sidebar-nav__link<?= $navActive(['trash.php']) ?>" href="trash.php" title="سلة المحذوفات"><i class="fas fa-trash-can-arrow-up" aria-hidden="true"></i><span>سلة المحذوفات</span></a></li>
                         <li><a class="sidebar-nav__link" href="backup.php" title="نسخة احتياطية"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>نسخة احتياطية</span></a></li>
                     </ul>
                 </section>

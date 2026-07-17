@@ -38,16 +38,19 @@ final class MapController extends Controller
             $totalPages = (int) max(1, ceil($totalWithCoords / self::PAGE_SIZE));
             $page = min($requestedPage, $totalPages);
             $start = ($page - 1) * self::PAGE_SIZE;
+            $allMosques = $this->mosques->allWithCoordinates();
             $data = [
                 'totalWithCoords' => $totalWithCoords,
                 'totalPages' => $totalPages,
                 'mosques' => $this->mosques->withCoordinatesPaginated($start, self::PAGE_SIZE),
-                'allMosques' => $this->mosques->allWithCoordinates(),
+                'mosqueGeoJson' => $this->toGeoJson($allMosques),
                 'totalMosques' => $this->mosques->countAll(),
                 'communities' => $this->mosques->distinctCommunitiesForMap(),
                 'statuses' => $this->mosques->distinctStatuses(),
-                'mapProvider' => (string) $this->config->get('maps.provider', 'google'),
-                'googleMapsApiKey' => (string) $this->config->get('maps.google_api_key', ''),
+                'mapConfig' => [
+                    'provider' => (string) $this->config->get('maps.provider', 'maplibre'),
+                    'styleUrl' => (string) $this->config->get('maps.style_url', 'https://tiles.openfreemap.org/styles/liberty'),
+                ],
                 'mapDefaults' => [
                     'latitude' => (float) $this->config->get('maps.default_latitude', 34.6814),
                     'longitude' => (float) $this->config->get('maps.default_longitude', -1.9086),
@@ -59,12 +62,21 @@ final class MapController extends Controller
             // Legacy fallback: render the page with empty data.
             $data = [
                 'mosques' => [],
-                'allMosques' => [],
+                'mosqueGeoJson' => ['type' => 'FeatureCollection', 'features' => []],
                 'totalWithCoords' => 0,
                 'totalMosques' => 0,
                 'totalPages' => 1,
                 'communities' => [],
                 'statuses' => [],
+                'mapConfig' => [
+                    'provider' => 'maplibre',
+                    'styleUrl' => 'https://tiles.openfreemap.org/styles/liberty',
+                ],
+                'mapDefaults' => [
+                    'latitude' => 34.6814,
+                    'longitude' => -1.9086,
+                    'zoom' => 9,
+                ],
             ];
             $page = 1;
             $start = 0;
@@ -75,6 +87,46 @@ final class MapController extends Controller
         $data['limit'] = self::PAGE_SIZE;
 
         return $this->render('maps.index', $data);
+    }
+
+    /**
+     * @param list<array<string, mixed>> $mosques
+     * @return array{type: string, features: list<array<string, mixed>>}
+     */
+    private function toGeoJson(array $mosques): array
+    {
+        $features = [];
+
+        foreach ($mosques as $mosque) {
+            $latitude = filter_var($mosque['latitude'] ?? null, FILTER_VALIDATE_FLOAT);
+            $longitude = filter_var($mosque['longitude'] ?? null, FILTER_VALIDATE_FLOAT);
+            if ($latitude === false || $longitude === false || $latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+                continue;
+            }
+
+            $registrationNumber = (string) ($mosque['registration_number'] ?? '');
+            $features[] = [
+                'type' => 'Feature',
+                'id' => $registrationNumber,
+                'geometry' => [
+                    'type' => 'Point',
+                    'coordinates' => [(float) $longitude, (float) $latitude],
+                ],
+                'properties' => [
+                    'registration_number' => $registrationNumber,
+                    'national_code' => (string) ($mosque['national_code'] ?? ''),
+                    'mosque_name' => (string) ($mosque['mosque_name'] ?? ''),
+                    'status' => (string) ($mosque['status'] ?? ''),
+                    'address' => (string) ($mosque['address'] ?? ''),
+                    'community' => (string) ($mosque['community'] ?? ''),
+                    'imam_name' => (string) ($mosque['imam_name'] ?? ''),
+                    'guide_imam' => (string) ($mosque['guide_imam'] ?? ''),
+                    'friday_prayer' => (string) ($mosque['friday_prayer'] ?? ''),
+                ],
+            ];
+        }
+
+        return ['type' => 'FeatureCollection', 'features' => $features];
     }
 }
 

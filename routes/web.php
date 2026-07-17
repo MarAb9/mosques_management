@@ -105,15 +105,6 @@ return function (Router $router): void {
         \App\Middleware\Authenticate::class,
         \App\Middleware\RequireAdmin::class,
     ]);
-    $router->get('trash.php', [\App\Controllers\AdministrationController::class, 'trash'], [
-        \App\Middleware\Authenticate::class,
-        \App\Middleware\RequireAdmin::class,
-    ]);
-    $router->post('restore_mosque.php', [\App\Controllers\AdministrationController::class, 'restore'], [
-        \App\Middleware\Authenticate::class,
-        \App\Middleware\RequireAdmin::class,
-        \App\Middleware\VerifyCsrf::class,
-    ]);
     $router->get('backup.php', [\App\Controllers\AdministrationController::class, 'backup'], [
         \App\Middleware\Authenticate::class,
         \App\Middleware\RequireAdmin::class,
@@ -175,8 +166,6 @@ return function (Router $router): void {
         'bulk_delete_mosques.php',
         'import_export.php',
         'data_quality.php',
-        'trash.php',
-        'restore_mosque.php',
         'backup.php',
         'quran_mosques.php',
         'add_quran_mosque.php',
