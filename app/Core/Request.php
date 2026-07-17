@@ -23,6 +23,7 @@ final class Request
         private readonly array $post,
         private readonly array $files,
         private readonly array $server,
+        private readonly array $routeParameters = [],
     ) {
     }
 
@@ -81,6 +82,42 @@ final class Request
     public function server(string $key, mixed $default = null): mixed
     {
         return $this->server[$key] ?? $default;
+    }
+
+    public function header(string $name, mixed $default = null): mixed
+    {
+        $key = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+
+        return $this->server[$key] ?? $default;
+    }
+
+    public function route(string $key, mixed $default = null): mixed
+    {
+        return $this->routeParameters[$key] ?? $default;
+    }
+
+    /** @param array<string, string> $parameters */
+    public function withRouteParameters(array $parameters): self
+    {
+        return new self($this->query, $this->post, $this->files, $this->server, $parameters);
+    }
+
+    public function hasDuplicateQueryParameters(): bool
+    {
+        $seen = [];
+        foreach (explode('&', (string) ($this->server['QUERY_STRING'] ?? '')) as $part) {
+            if ($part === '') {
+                continue;
+            }
+
+            $key = rawurldecode(str_replace('+', ' ', explode('=', $part, 2)[0]));
+            if (isset($seen[$key])) {
+                return true;
+            }
+            $seen[$key] = true;
+        }
+
+        return false;
     }
 
     public function clientIp(): string

@@ -6,7 +6,13 @@ services:
       - "127.0.0.1:${APP_PORT:-8080}:80"
     environment:
       APP_ENV: development
+      APP_URL: ${APP_URL:-http://localhost}
       APP_TIMEZONE: Africa/Casablanca
+      API_ACCESS_MODE: ${API_ACCESS_MODE:-public}
+      API_ALLOWED_ORIGINS: ${API_ALLOWED_ORIGINS:-https://other-website.example}
+      API_RATE_LIMIT: ${API_RATE_LIMIT:-120}
+      API_RATE_WINDOW: ${API_RATE_WINDOW:-60}
+      API_KEY_HASH: ${API_KEY_HASH:-}
       MAP_PROVIDER: ${MAP_PROVIDER:-maplibre}
       MAP_STYLE_URL: ${MAP_STYLE_URL:-https://tiles.openfreemap.org/styles/liberty}
       MAP_DEFAULT_LATITUDE: ${MAP_DEFAULT_LATITUDE:-34.6814}

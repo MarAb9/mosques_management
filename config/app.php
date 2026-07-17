@@ -14,6 +14,9 @@ return [
     // Application display name (user-facing, Arabic).
     'name' => 'نظام إدارة مساجد إقليم بركان',
 
+    // Canonical public URL used for API links and mosque image URLs.
+    'url' => rtrim(Config::env('APP_URL', 'http://localhost'), '/'),
+
     // All persisted timestamps should be UTC; presentation may localize them.
     'timezone' => Config::env('APP_TIMEZONE', 'Africa/Casablanca'),
 ];

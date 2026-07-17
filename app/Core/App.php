@@ -56,10 +56,18 @@ final class App
         self::$instance = $app;
 
         $app->errors->register();
-        $app->session->start();
+        $bootRequest = Request::capture();
+        $uriPath = (string) (parse_url((string) $bootRequest->server('REQUEST_URI', ''), PHP_URL_PATH) ?? '');
+        if (!str_starts_with($bootRequest->routePath(), 'api/v1/')
+            && !str_contains('/' . ltrim($uriPath, '/'), '/api/v1/')
+        ) {
+            $app->session->start();
+        }
 
         $routes = require $basePath . '/routes/web.php';
         $routes($app->router);
+        $apiRoutes = require $basePath . '/routes/api.php';
+        $apiRoutes($app->router);
 
         return $app;
     }
@@ -80,10 +88,12 @@ final class App
     public function handle(?string $routePath = null): void
     {
         $request = Request::capture();
+        $path = $routePath ?? $request->routePath();
+        $isApi = str_starts_with($path, 'api/v1/');
 
         try {
-            $path = $routePath ?? $request->routePath();
             $route = $this->router->match($request->method(), $path);
+            $request = $request->withRouteParameters($route['parameters']);
 
             $pipeline = $this->buildPipeline($route['middleware'], function (Request $req) use ($route): Response {
                 [$class, $method] = $route['action'];
@@ -94,9 +104,20 @@ final class App
 
             $response = $pipeline($request);
         } catch (HttpException $e) {
-            $response = $this->errors->handleException($e);
+            $response = $isApi
+                ? JsonResponse::error(
+                    $e->status() === 405 ? 'method_not_allowed' : 'not_found',
+                    $e->status() === 405 ? 'طريقة الطلب غير مسموحة' : 'المورد غير موجود',
+                    $e->status()
+                )
+                : $this->errors->handleException($e);
         } catch (Throwable $e) {
-            $response = $this->errors->handleException($e);
+            if ($isApi) {
+                $this->errors->log($e);
+                $response = JsonResponse::error('internal_error', 'حدث خطأ غير متوقع', 500);
+            } else {
+                $response = $this->errors->handleException($e);
+            }
         }
 
         $this->applySecurityHeaders($response, $request);

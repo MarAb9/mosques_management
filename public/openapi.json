@@ -1,0 +1,198 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mosques Management Public API",
+    "version": "1.0.0",
+    "description": "Read-only public mosque data. Deployments may use public mode or X-API-Key mode."
+  },
+  "servers": [{"url": "https://api.example.com"}],
+  "paths": {
+    "/api/v1/mosques": {
+      "get": {
+        "summary": "List public mosque records",
+        "parameters": [
+          {"name": "q", "in": "query", "schema": {"type": "string", "maxLength": 200}},
+          {"name": "community", "in": "query", "schema": {"type": "string", "maxLength": 100}},
+          {"name": "status", "in": "query", "schema": {"type": "string", "maxLength": 100}},
+          {"name": "friday_prayer", "in": "query", "schema": {"type": "boolean"}},
+          {"name": "has_coordinates", "in": "query", "schema": {"type": "boolean"}},
+          {"name": "national_code", "in": "query", "schema": {"type": "string", "pattern": "^[0-9]+$"}},
+          {"name": "page", "in": "query", "schema": {"type": "integer", "minimum": 1, "default": 1}},
+          {"name": "per_page", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 20}},
+          {"name": "sort", "in": "query", "schema": {"type": "string", "enum": ["name", "national_code", "community", "status", "construction_year"], "default": "name"}},
+          {"name": "order", "in": "query", "schema": {"type": "string", "enum": ["asc", "desc"], "default": "asc"}}
+        ],
+        "responses": {
+          "200": {"description": "Paginated collection", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MosqueCollection"}}}},
+          "400": {"$ref": "#/components/responses/Error"},
+          "401": {"$ref": "#/components/responses/Error"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "500": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/api/v1/mosques/{id}": {
+      "get": {
+        "summary": "Get a mosque by registration number or national code",
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string", "pattern": "^[0-9]{1,50}$"}}],
+        "responses": {
+          "200": {"description": "Single public mosque", "content": {"application/json": {"schema": {"type": "object", "required": ["data"], "properties": {"data": {"$ref": "#/components/schemas/Mosque"}}}}}},
+          "400": {"$ref": "#/components/responses/Error"},
+          "401": {"$ref": "#/components/responses/Error"},
+          "404": {"$ref": "#/components/responses/Error"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "500": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/api/v1/mosques.geojson": {
+      "get": {
+        "summary": "Get coordinate-bearing mosques as GeoJSON",
+        "parameters": [
+          {"name": "q", "in": "query", "schema": {"type": "string", "maxLength": 200}},
+          {"name": "community", "in": "query", "schema": {"type": "string", "maxLength": 100}},
+          {"name": "status", "in": "query", "schema": {"type": "string", "maxLength": 100}},
+          {"name": "friday_prayer", "in": "query", "schema": {"type": "boolean"}},
+          {"name": "national_code", "in": "query", "schema": {"type": "string", "pattern": "^[0-9]+$"}}
+        ],
+        "responses": {
+          "200": {"description": "GeoJSON FeatureCollection", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/FeatureCollection"}}}},
+          "400": {"$ref": "#/components/responses/Error"},
+          "401": {"$ref": "#/components/responses/Error"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "500": {"$ref": "#/components/responses/Error"}
+        }
+      }
+    },
+    "/api/v1/filters": {
+      "get": {
+        "summary": "Get public filter metadata",
+        "responses": {
+          "200": {"description": "Communities, statuses and Friday-prayer options", "content": {"application/json": {"schema": {"type": "object"}}}},
+          "401": {"$ref": "#/components/responses/Error"},
+          "429": {"$ref": "#/components/responses/RateLimited"}
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "summary": "Minimal API health check",
+        "responses": {
+          "200": {"description": "Healthy", "content": {"application/json": {"schema": {"type": "object", "required": ["status"], "properties": {"status": {"type": "string", "enum": ["ok"]}}}}}},
+          "401": {"$ref": "#/components/responses/Error"},
+          "429": {"$ref": "#/components/responses/RateLimited"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {"type": "apiKey", "in": "header", "name": "X-API-Key", "description": "Required only when API_ACCESS_MODE=key."}
+    },
+    "responses": {
+      "Error": {
+        "description": "JSON error response",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      },
+      "RateLimited": {
+        "description": "Rate limit exceeded",
+        "headers": {
+          "Retry-After": {"schema": {"type": "integer"}},
+          "X-RateLimit-Limit": {"schema": {"type": "integer"}},
+          "X-RateLimit-Remaining": {"schema": {"type": "integer"}},
+          "X-RateLimit-Reset": {"schema": {"type": "integer"}}
+        },
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      }
+    },
+    "schemas": {
+      "Mosque": {
+        "type": "object",
+        "required": ["id", "national_code", "name", "address", "community", "administrative_type", "status", "friday_prayer", "construction_year", "latitude", "longitude", "has_coordinates", "image_url", "quran_memorization", "literacy_program", "guidance_program"],
+        "properties": {
+          "id": {"type": "string"},
+          "national_code": {"type": "string", "nullable": true},
+          "name": {"type": "string", "nullable": true},
+          "address": {"type": "string", "nullable": true},
+          "community": {"type": "string", "nullable": true},
+          "administrative_type": {"type": "string", "nullable": true},
+          "status": {"type": "string", "nullable": true},
+          "friday_prayer": {"type": "boolean", "nullable": true},
+          "construction_year": {"type": "integer", "nullable": true},
+          "latitude": {"type": "number", "format": "double", "nullable": true},
+          "longitude": {"type": "number", "format": "double", "nullable": true},
+          "has_coordinates": {"type": "boolean"},
+          "image_url": {"type": "string", "format": "uri"},
+          "quran_memorization": {"type": "boolean", "nullable": true},
+          "literacy_program": {"type": "boolean", "nullable": true},
+          "guidance_program": {"type": "boolean", "nullable": true}
+        },
+        "additionalProperties": false
+      },
+      "MosqueCollection": {
+        "type": "object",
+        "required": ["data", "meta", "links"],
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Mosque"}},
+          "meta": {
+            "type": "object",
+            "required": ["current_page", "per_page", "total", "total_pages"],
+            "properties": {
+              "current_page": {"type": "integer"},
+              "per_page": {"type": "integer"},
+              "total": {"type": "integer"},
+              "total_pages": {"type": "integer"}
+            }
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "self": {"type": "string", "format": "uri"},
+              "first": {"type": "string", "format": "uri"},
+              "last": {"type": "string", "format": "uri"},
+              "previous": {"type": "string", "format": "uri", "nullable": true},
+              "next": {"type": "string", "format": "uri", "nullable": true}
+            }
+          }
+        }
+      },
+      "FeatureCollection": {
+        "type": "object",
+        "required": ["type", "features"],
+        "properties": {
+          "type": {"type": "string", "enum": ["FeatureCollection"]},
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "id", "geometry", "properties"],
+              "properties": {
+                "type": {"type": "string", "enum": ["Feature"]},
+                "id": {"type": "string"},
+                "geometry": {
+                  "type": "object",
+                  "properties": {
+                    "type": {"type": "string", "enum": ["Point"]},
+                    "coordinates": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+                  }
+                },
+                "properties": {"type": "object"}
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {"code": {"type": "string"}, "message": {"type": "string"}}
+          }
+        }
+      }
+    }
+  }
+}

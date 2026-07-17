@@ -61,7 +61,7 @@ final class Router
     }
 
     /**
-     * @return array{action: array{class-string, string}, middleware: list<class-string>}
+     * @return array{action: array{class-string, string}, middleware: list<class-string>, parameters: array<string, string>}
      */
     public function match(string $method, string $path): array
     {
@@ -70,16 +70,25 @@ final class Router
         $path = $this->aliases[$path] ?? $path;
 
         $route = $this->routes[$method][$path] ?? null;
+        $parameters = [];
 
         if ($route === null) {
-            if (isset($this->routes['GET'][$path]) || isset($this->routes['POST'][$path])) {
-                throw new HttpException(405, 'طلب غير صالح');
+            [$route, $parameters] = $this->matchDynamic($method, $path);
+        }
+
+        if ($route === null) {
+            foreach (array_keys($this->routes) as $registeredMethod) {
+                if (isset($this->routes[$registeredMethod][$path])
+                    || $this->matchDynamic($registeredMethod, $path)[0] !== null
+                ) {
+                    throw new HttpException(405, 'طريقة الطلب غير مسموحة');
+                }
             }
 
             throw new HttpException(404, 'الصفحة غير موجودة');
         }
 
-        return $route;
+        return $route + ['parameters' => $parameters];
     }
 
     public function has(string $path): bool
@@ -88,8 +97,10 @@ final class Router
         $path = $this->aliases[$path] ?? $path;
 
         foreach ($this->routes as $byPath) {
-            if (isset($byPath[$path])) {
-                return true;
+            foreach ($byPath as $registeredPath => $_route) {
+                if ($registeredPath === $path || $this->pathParameters($registeredPath, $path) !== null) {
+                    return true;
+                }
             }
         }
 
@@ -99,5 +110,48 @@ final class Router
     private function normalize(string $path): string
     {
         return ltrim(str_replace('\\', '/', $path), '/');
+    }
+
+    /** @return array{0: array{action: array{class-string, string}, middleware: list<class-string>}|null, 1: array<string, string>} */
+    private function matchDynamic(string $method, string $path): array
+    {
+        foreach ($this->routes[$method] ?? [] as $registeredPath => $route) {
+            $parameters = $this->pathParameters($registeredPath, $path);
+            if ($parameters !== null) {
+                return [$route, $parameters];
+            }
+        }
+
+        return [null, []];
+    }
+
+    /** @return array<string, string>|null */
+    private function pathParameters(string $registeredPath, string $path): ?array
+    {
+        if (!str_contains($registeredPath, '{')) {
+            return null;
+        }
+
+        $names = [];
+        $parts = array_map(function (string $part) use (&$names): string {
+            if (preg_match('/^\{([A-Za-z_][A-Za-z0-9_]*)\}$/', $part, $match) === 1) {
+                $names[] = $match[1];
+
+                return '([^/]+)';
+            }
+
+            return preg_quote($part, '#');
+        }, explode('/', $registeredPath));
+
+        if (preg_match('#^' . implode('/', $parts) . '$#u', $path, $matches) !== 1) {
+            return null;
+        }
+
+        $parameters = [];
+        foreach ($names as $index => $name) {
+            $parameters[$name] = rawurldecode($matches[$index + 1]);
+        }
+
+        return $parameters;
     }
 }
