@@ -84,7 +84,6 @@ function initializeFormMap(form) {
     const current = coordinates(form);
     if (!formMap) {
         const config = json(form.dataset.mapConfig);
-        const token = String(config.token || '');
         formMap = L.map(mapElement, {
             center: [current.latitude, current.longitude],
             zoom: mapDefaults(form).zoom,
@@ -95,13 +94,12 @@ function initializeFormMap(form) {
         });
         formMap.attributionControl.setPrefix(false);
         L.control.zoom({ position: 'topright' }).addTo(formMap);
-        if (token && config.street?.url) {
-            const separator = String(config.street.url).includes('?') ? '&' : '?';
-            L.tileLayer(`${config.street.url}${separator}token=${encodeURIComponent(token)}&language=ar`, {
+        if (config.street?.url) {
+            L.tileLayer(config.street.url, {
                 attribution: String(config.street.attribution || ''),
                 maxZoom: Number(config.street.max_zoom) || 22,
                 maxNativeZoom: Number(config.street.max_native_zoom) || 22,
-                tileSize: 256
+                tileSize: Number(config.street.tile_size) || 256
             }).on('tileerror', () => { mapElement.dataset.tileError = 'true'; }).addTo(formMap);
         } else {
             mapElement.dataset.tileError = 'missing-token';

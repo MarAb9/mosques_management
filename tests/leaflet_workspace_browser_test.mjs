@@ -96,7 +96,7 @@ cdp.on('Log.entryAdded', ({ entry }) => {
 cdp.on('Network.requestWillBeSent', ({ request }) => {
     try {
         const url = new URL(request.url);
-        requests.push({ host: url.hostname, path: url.pathname, method: request.method });
+        requests.push({ host: url.hostname, path: url.pathname, search: url.search, method: request.method });
     } catch (_) {}
 });
 cdp.on('Network.loadingFailed', ({ errorText, canceled, type }) => {
@@ -108,7 +108,7 @@ cdp.on('Network.responseReceived', ({ response, type }) => {
 cdp.on('Fetch.requestPaused', async ({ requestId, request }) => {
     try {
         const url = new URL(request.url);
-        if (url.hostname === 'static-map-tiles-api.arcgis.com' || url.hostname === 'ibasemaps-api.arcgis.com') {
+        if (url.pathname.endsWith('/ajax/map_tile.php')) {
             await cdp.send('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'image/png' }], body: png });
         } else if (url.pathname.endsWith('/ajax/map_route.php')) {
             await cdp.send('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json; charset=UTF-8' }], body: Buffer.from(JSON.stringify(routePayload)).toString('base64') });
@@ -123,8 +123,7 @@ cdp.on('Fetch.requestPaused', async ({ requestId, request }) => {
 await Promise.all([
     cdp.send('Page.enable'), cdp.send('Runtime.enable'), cdp.send('Network.enable'), cdp.send('Log.enable'),
     cdp.send('Fetch.enable', { patterns: [
-        { urlPattern: 'https://static-map-tiles-api.arcgis.com/*' },
-        { urlPattern: 'https://ibasemaps-api.arcgis.com/*' },
+        { urlPattern: `${baseUrl}/ajax/map_tile.php*` },
         { urlPattern: `${baseUrl}/ajax/map_route.php` }
     ] })
 ]);
@@ -210,7 +209,7 @@ try {
     result.states.baseline = await mapState();
     result.screenshots.push(await screenshot('leaflet-unselected-1440x1000'));
 
-    const imageryBefore = requests.filter(request => request.host === 'ibasemaps-api.arcgis.com').length;
+    const imageryBefore = requests.filter(request => request.search.includes('layer=imagery')).length;
     check('Leaflet workspace initializes', result.states.baseline.ready && result.states.baseline.provider === 'leaflet', result.states.baseline);
     check('Full dataset is clustered', result.states.baseline.markerCount === result.states.baseline.visibleCount && result.states.baseline.markerCount > 0, result.states.baseline);
     check('Provider maximum zoom is 22', result.states.baseline.maxZoom === 22, result.states.baseline.maxZoom);
@@ -227,12 +226,12 @@ try {
     await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'satellite'`);
     await waitFor(`window.__leafletWorkspaceTest.mode === 'satellite'`);
     result.states.satellite = await mapState();
-    check('Satellite is created on demand', requests.filter(request => request.host === 'ibasemaps-api.arcgis.com').length > imageryBefore);
+    check('Satellite is created on demand', requests.filter(request => request.search.includes('layer=imagery')).length > imageryBefore);
     check('Selection survives basemap changes', result.states.satellite.selectionVisible);
 
     await evaluate(`document.querySelector('#mapStyleHybrid').click()`);
     await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'hybrid'`);
-    check('Hybrid requests the ArcGIS labels overlay', requests.some(request => request.host === 'static-map-tiles-api.arcgis.com' && request.path.includes('/imagery/labels/')));
+    check('Hybrid requests the labels proxy', requests.some(request => request.search.includes('layer=labels')));
 
     await cdp.send('Browser.setPermission', { permission: { name: 'geolocation' }, setting: 'granted', origin: baseUrl });
     await cdp.send('Emulation.setGeolocationOverride', { latitude: 34.6814, longitude: -1.9086, accuracy: 12 });
@@ -273,7 +272,8 @@ try {
 
     const forbidden = /maplibre|openfreemap|mapbox-gl-rtl|tiles\.maps\.eox/i;
     check('No superseded map runtime traffic', !requests.some(request => forbidden.test(`${request.host}${request.path}`)));
-    check('Street requests use the current ArcGIS static tile service', requests.some(request => request.host === 'static-map-tiles-api.arcgis.com' && request.path.includes('/arcgis/navigation/static/tile/')));
+    check('Street requests use the local tile proxy', requests.some(request => request.path.endsWith('/ajax/map_tile.php') && request.search.includes('layer=street')));
+    check('ArcGIS credentials stay server-side', !requests.some(request => request.search.includes('token=') || request.host.endsWith('arcgis.com')));
     check('No browser console errors', consoleEvents.length === 0, consoleEvents);
     check('No failed requests or CSP blocks', failedRequests.length === 0, failedRequests);
 } catch (error) {

@@ -152,6 +152,9 @@ return function (Router $router): void {
     $router->get('ajax/get_mosques_for_map.php', [\App\Controllers\Ajax\MapAjaxController::class, 'mosques'], [
         \App\Middleware\Authenticate::class,
     ]);
+    $router->get('ajax/map_tile.php', [\App\Controllers\Ajax\MapAjaxController::class, 'tile'], [
+        \App\Middleware\Authenticate::class,
+    ]);
     $router->post('ajax/map_route.php', [\App\Controllers\Ajax\MapAjaxController::class, 'route'], [
         \App\Middleware\Authenticate::class,
     ]);
@@ -180,6 +183,7 @@ return function (Router $router): void {
         'ajax/get_mosque_stats.php',
         'ajax/get_quran_mosque_details.php',
         'ajax/get_mosques_for_map.php',
+        'ajax/map_tile.php',
         'ajax/map_route.php',
     ] as $legacyPath) {
         $router->alias(substr($legacyPath, 0, -4), $legacyPath);
