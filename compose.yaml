@@ -13,8 +13,13 @@ services:
       API_RATE_LIMIT: ${API_RATE_LIMIT:-120}
       API_RATE_WINDOW: ${API_RATE_WINDOW:-60}
       API_KEY_HASH: ${API_KEY_HASH:-}
-      MAP_PROVIDER: ${MAP_PROVIDER:-maplibre}
-      MAP_STYLE_URL: ${MAP_STYLE_URL:-https://tiles.openfreemap.org/styles/liberty}
+      ARCGIS_ACCESS_TOKEN: ${ARCGIS_ACCESS_TOKEN:-}
+      ARCGIS_ROUTING_TOKEN: ${ARCGIS_ROUTING_TOKEN:-}
+      ARCGIS_STREET_TILE_URL: ${ARCGIS_STREET_TILE_URL:-https://static-map-tiles-api.arcgis.com/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/{z}/{y}/{x}}
+      ARCGIS_SATELLITE_TILE_URL: ${ARCGIS_SATELLITE_TILE_URL:-https://ibasemaps-api.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}}
+      ARCGIS_SATELLITE_LABELS_URL: ${ARCGIS_SATELLITE_LABELS_URL:-https://static-map-tiles-api.arcgis.com/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/{z}/{y}/{x}}
+      MAP_ROUTING_PROVIDER: ${MAP_ROUTING_PROVIDER:-arcgis}
+      ARCGIS_ROUTING_URL: ${ARCGIS_ROUTING_URL:-https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/solve}
       MAP_DEFAULT_LATITUDE: ${MAP_DEFAULT_LATITUDE:-34.6814}
       MAP_DEFAULT_LONGITUDE: ${MAP_DEFAULT_LONGITUDE:--1.9086}
       MAP_DEFAULT_ZOOM: ${MAP_DEFAULT_ZOOM:-9}

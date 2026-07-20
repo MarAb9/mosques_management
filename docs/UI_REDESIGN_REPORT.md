@@ -37,7 +37,7 @@ Presentation baseline: `6b67b36`
 - Removed all 11 executable inline script blocks identified in the baseline audit.
 - Moved layout, dashboard, mosque, Quran, and map behavior into external modules.
 - Four nonce-protected `application/json` data payloads remain for server-to-page configuration; they contain no executable code.
-- MapLibre GL JS and its stylesheet are bundled locally through npm/esbuild and loaded only on map-enabled pages.
+- Leaflet, Leaflet.markercluster, and their stylesheets are bundled locally through npm/esbuild and loaded only on map-enabled pages.
 
 ## 5. Tailwind and Bootstrap coexistence
 
@@ -50,23 +50,23 @@ Tailwind CSS 4.3.2 compiles only theme and utilities, uses the `tw` prefix, and 
 - jQuery and Select2, conditionally loaded on selector-heavy mosque/Quran pages
 - SweetAlert2 for confirmation and destructive-action feedback
 - Chart.js, conditionally loaded for mosque statistics
-- MapLibre GL JS, conditionally loaded for the map workspace and coordinate picker
+- Leaflet and Leaflet.markercluster, conditionally loaded for the map workspace and coordinate picker
 
 ## 7. Libraries removed
 
 - Animate.css is no longer loaded; focused internal motion replaces it.
 - Hover.css is no longer loaded; component hover/focus states replace it.
-- Leaflet is not loaded because the application uses MapLibre GL JS. Its vendor files remain untouched for a future dependency-cleanup decision.
+- The superseded map runtime and its assets were removed after the Leaflet migration.
 - Three.js was not introduced; CSS transforms and gradients provide the requested depth at substantially lower cost.
 
 ## 8. Performance impact
 
 - Base compiled CSS: 40,278 bytes minified.
 - Base application JavaScript: 5,720 bytes minified.
-- Page scripts remain split and conditional; the larger locally bundled MapLibre runtime is loaded only on the map workspace and mosque coordinate forms.
-- jQuery, Select2, Chart.js, and MapLibre are not loaded globally when a page does not need them.
+- Page scripts remain split and conditional; the locally bundled Leaflet runtime is loaded only on the map workspace and mosque coordinate forms.
+- jQuery, Select2, Chart.js, and Leaflet are not loaded globally when a page does not need them.
 - No remote font is required, animations use transform/opacity, and reduced-motion mode disables nonessential work.
-- Production/shared-hosting deployment uses the committed minified assets and does not require Node.js or a map API key.
+- Production/shared-hosting deployment uses the committed minified assets and does not require Node.js; ArcGIS credentials are supplied through environment variables.
 
 ## 9. Accessibility improvements
 
@@ -115,13 +115,13 @@ The build uses Tailwind CLI for CSS and esbuild for minified page/application bu
 
 ## 14. Deployment instructions
 
-Build in CI or on a development machine, then deploy the PHP application together with the committed `public/assets/dist/` directory. Production/shared hosting does not need Node.js. Preserve writable upload/storage directories and the optional `MAP_STYLE_URL`, then smoke-test login, an authenticated dashboard request, a form submission, an export download, OpenFreeMap tiles, clustering, and mosque selection. Full instructions are in `docs/FRONTEND_BUILD.md`.
+Build in CI or on a development machine, then deploy the PHP application together with the committed `public/assets/dist/` directory. Production/shared hosting does not need Node.js. Preserve writable upload/storage directories and configure the ArcGIS variables, then smoke-test login, an authenticated dashboard request, a form submission, an export download, ArcGIS tiles, clustering, mosque selection, and routing. Full instructions are in `docs/FRONTEND_BUILD.md`.
 
 ## 15. Known remaining limitations
 
-- Map rendering depends on network access to the configured OpenFreeMap style/tile endpoint; no API key is required.
+- Map rendering depends on network access to the configured ArcGIS tile endpoints and a browser-restricted `ARCGIS_ACCESS_TOKEN`.
 - The visual browser audit used local headless Chrome because the in-app browser connector was unavailable; Safari and Firefox were not automated in this environment.
-- Leaflet, old CSS files, and old JavaScript vendor/application files remain on disk for backward-compatible public-asset contracts, but are not loaded by redesigned views.
+- Old map runtime assets were removed; only the locally bundled Leaflet implementation is deployed.
 - The CSP still permits inline styles for third-party Bootstrap compatibility, although the application views no longer contain inline CSS.
 - Backup remains the existing authenticated JSON download route, enhanced with a clear SweetAlert confirmation rather than converted into a new backend page.
 - The application has no dedicated error-view templates; shared alerts, validation feedback, empty-state components, and the existing global error handler cover current routes.

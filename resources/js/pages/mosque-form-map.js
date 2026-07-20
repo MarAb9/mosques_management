@@ -1,21 +1,20 @@
-import maplibregl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import { ensureMaplibreRtlText } from '../maplibre/rtl-text.js';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 let formMap;
 let locationMarker;
 
+function json(value, fallback = {}) {
+    try { return JSON.parse(value || '{}'); } catch (_) { return fallback; }
+}
+
 function mapDefaults(form) {
-    try {
-        const value = JSON.parse(form.dataset.mapDefaults || '{}');
-        return {
-            latitude: Number(value.latitude) || 34.6814,
-            longitude: Number(value.longitude) || -1.9086,
-            zoom: Number(value.zoom) || 12
-        };
-    } catch (_) {
-        return { latitude: 34.6814, longitude: -1.9086, zoom: 12 };
-    }
+    const value = json(form.dataset.mapDefaults);
+    return {
+        latitude: Number(value.latitude) || 34.6814,
+        longitude: Number(value.longitude) || -1.9086,
+        zoom: Number(value.zoom) || 12
+    };
 }
 
 function coordinates(form) {
@@ -37,72 +36,95 @@ function setCoordinateValues(form, latitude, longitude) {
     longitudeInput?.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
+function markerIcon() {
+    return L.divIcon({
+        className: 'mosque-form-marker-shell',
+        html: '<span class="mosque-form-marker"><i class="fas fa-mosque" aria-hidden="true"></i></span>',
+        iconSize: [38, 46],
+        iconAnchor: [19, 44]
+    });
+}
+
 function moveMarker(form, latitude, longitude, center = true) {
-    const lngLat = [Number(longitude), Number(latitude)];
+    const point = [Number(latitude), Number(longitude)];
     if (!locationMarker) {
-        locationMarker = new maplibregl.Marker({ color: '#176b57', draggable: true })
-            .setLngLat(lngLat)
-            .addTo(formMap);
+        locationMarker = L.marker(point, { icon: markerIcon(), draggable: true, autoPan: true }).addTo(formMap);
         locationMarker.on('dragend', () => {
-            const position = locationMarker.getLngLat();
+            const position = locationMarker.getLatLng();
             setCoordinateValues(form, position.lat, position.lng);
         });
     } else {
-        locationMarker.setLngLat(lngLat);
+        locationMarker.setLatLng(point);
     }
-    if (center) formMap.easeTo({ center: lngLat, duration: 350 });
+    if (center) formMap.panTo(point, { animate: true, duration: 0.35 });
 }
 
-async function initializeFormMap(form) {
+function addFullscreenControl(container) {
+    const Control = L.Control.extend({
+        options: { position: 'topright' },
+        onAdd() {
+            const button = L.DomUtil.create('button', 'leaflet-control map-form-fullscreen');
+            button.type = 'button';
+            button.title = 'ملء الشاشة';
+            button.setAttribute('aria-label', 'ملء الشاشة');
+            button.innerHTML = '<i class="fas fa-expand" aria-hidden="true"></i>';
+            L.DomEvent.disableClickPropagation(button);
+            L.DomEvent.on(button, 'click', () => document.fullscreenElement ? document.exitFullscreen?.() : container.requestFullscreen?.());
+            return button;
+        }
+    });
+    formMap.addControl(new Control());
+    document.addEventListener('fullscreenchange', () => window.setTimeout(() => formMap?.invalidateSize(), 80));
+}
+
+function initializeFormMap(form) {
     const mapElement = document.getElementById('map');
     const mapContainer = document.getElementById('mapContainer');
     if (!mapElement || !mapContainer) return;
-
     const current = coordinates(form);
     if (!formMap) {
-        mapElement.dataset.rtlTextReady = 'false';
-        try {
-            await ensureMaplibreRtlText(maplibregl);
-            mapElement.dataset.rtlTextReady = 'true';
-            formMap = new maplibregl.Map({
-                container: mapElement,
-                style: form.dataset.mapStyleUrl || 'https://tiles.openfreemap.org/styles/liberty',
-                center: [current.longitude, current.latitude],
-                zoom: mapDefaults(form).zoom,
-                attributionControl: false
-            });
-            formMap.addControl(new maplibregl.NavigationControl({ showCompass: true, showZoom: true }), 'top-right');
-            formMap.addControl(new maplibregl.FullscreenControl({ container: mapContainer }), 'top-right');
-            formMap.addControl(new maplibregl.AttributionControl({
-                compact: true,
-                customAttribution: '<a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a>'
-            }), 'bottom-right');
-            formMap.on('click', event => {
-                setCoordinateValues(form, event.lngLat.lat, event.lngLat.lng);
-                moveMarker(form, event.lngLat.lat, event.lngLat.lng, false);
-            });
-            formMap.on('load', () => moveMarker(form, current.latitude, current.longitude, false));
-            formMap.on('error', () => {
-                if (!formMap.loaded()) mapElement.dataset.mapLoadError = 'true';
-            });
-        } catch (_) {
-            mapElement.innerHTML = '<div class="h-100 d-flex align-items-center justify-content-center text-muted p-3 text-center">تعذر تشغيل الخريطة. يمكن إدخال الإحداثيات يدويا.</div>';
-            return;
+        const config = json(form.dataset.mapConfig);
+        const token = String(config.token || '');
+        formMap = L.map(mapElement, {
+            center: [current.latitude, current.longitude],
+            zoom: mapDefaults(form).zoom,
+            minZoom: 2,
+            maxZoom: 22,
+            zoomControl: false,
+            attributionControl: true
+        });
+        formMap.attributionControl.setPrefix(false);
+        L.control.zoom({ position: 'topright' }).addTo(formMap);
+        if (token && config.street?.url) {
+            const separator = String(config.street.url).includes('?') ? '&' : '?';
+            L.tileLayer(`${config.street.url}${separator}token=${encodeURIComponent(token)}&language=ar`, {
+                attribution: String(config.street.attribution || ''),
+                maxZoom: Number(config.street.max_zoom) || 22,
+                maxNativeZoom: Number(config.street.max_native_zoom) || 22,
+                tileSize: 256
+            }).on('tileerror', () => { mapElement.dataset.tileError = 'true'; }).addTo(formMap);
+        } else {
+            mapElement.dataset.tileError = 'missing-token';
         }
+        formMap.on('click', event => {
+            setCoordinateValues(form, event.latlng.lat, event.latlng.lng);
+            moveMarker(form, event.latlng.lat, event.latlng.lng, false);
+        });
+        addFullscreenControl(mapContainer);
+        moveMarker(form, current.latitude, current.longitude, false);
+        mapElement.dataset.provider = 'leaflet';
+        mapElement.dataset.mapReady = 'true';
     } else {
         moveMarker(form, current.latitude, current.longitude, false);
     }
-
     window.requestAnimationFrame(() => {
-        formMap.resize();
-        formMap.easeTo({ center: [current.longitude, current.latitude], duration: 0 });
+        formMap.invalidateSize();
+        formMap.setView([current.latitude, current.longitude], formMap.getZoom(), { animate: false });
     });
 }
 
 function setContainerHidden(container, hidden) {
-    Array.from(container.classList)
-        .filter(className => className.endsWith('-collapsed-section'))
-        .forEach(className => container.classList.remove(className));
+    [...container.classList].filter(name => name.endsWith('-collapsed-section')).forEach(name => container.classList.remove(name));
     container.hidden = hidden;
     container.classList.toggle('d-none', hidden);
 }
@@ -113,26 +135,20 @@ function setupFormMapPicker() {
     const currentLocationButton = document.getElementById('getCurrentLocationBtn');
     const mapContainer = document.getElementById('mapContainer');
     if (!form || !showMapButton || !mapContainer) return;
-
     mapContainer.dataset.mapOpen = 'false';
-    mapContainer.dataset.provider = form.dataset.mapProvider || 'maplibre';
+    mapContainer.dataset.provider = 'leaflet';
     showMapButton.setAttribute('aria-expanded', 'false');
     showMapButton.setAttribute('aria-controls', mapContainer.id);
     setContainerHidden(mapContainer, true);
-
     showMapButton.addEventListener('click', () => {
         const opening = mapContainer.dataset.mapOpen !== 'true';
-        mapContainer.dataset.mapOpen = opening ? 'true' : 'false';
+        mapContainer.dataset.mapOpen = String(opening);
         showMapButton.setAttribute('aria-expanded', String(opening));
         setContainerHidden(mapContainer, !opening);
         if (opening) initializeFormMap(form);
     });
-
     currentLocationButton?.addEventListener('click', () => {
-        if (!navigator.geolocation) {
-            window.alert('المتصفح لا يدعم تحديد الموقع الحالي.');
-            return;
-        }
+        if (!navigator.geolocation) return window.alert('المتصفح لا يدعم تحديد الموقع الحالي.');
         navigator.geolocation.getCurrentPosition(position => {
             setCoordinateValues(form, position.coords.latitude, position.coords.longitude);
             if (formMap) moveMarker(form, position.coords.latitude, position.coords.longitude);

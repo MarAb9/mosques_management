@@ -248,15 +248,15 @@ final class MosqueController extends Controller
         ]);
     }
 
-    /**
-     * @return array<string, mixed>|null
-     */
-    /** @return array{mapProvider: string, mapStyleUrl: string, mapDefaults: array{latitude: float, longitude: float, zoom: int}} */
+    /** @return array{mapConfig: array<string, mixed>, mapDefaults: array{latitude: float, longitude: float, zoom: int}} */
     private function formMapData(): array
     {
         return [
-            'mapProvider' => (string) $this->config->get('maps.provider', 'maplibre'),
-            'mapStyleUrl' => (string) $this->config->get('maps.style_url', 'https://tiles.openfreemap.org/styles/liberty'),
+            'mapConfig' => [
+                'engine' => 'leaflet',
+                'token' => (string) $this->config->get('maps.access_token', ''),
+                'street' => (array) $this->config->get('maps.street', []),
+            ],
             'mapDefaults' => [
                 'latitude' => (float) $this->config->get('maps.default_latitude', 34.6814),
                 'longitude' => (float) $this->config->get('maps.default_longitude', -1.9086),

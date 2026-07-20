@@ -332,36 +332,23 @@
     direction: ltr;
 }
 
-.map-workspace #map .maplibregl-canvas {
+.map-workspace #map .leaflet-map-pane {
     outline: none;
 }
 
-.map-workspace #map .maplibregl-ctrl-top-right {
-    top: .65rem;
-    right: .65rem;
-}
-
-.map-workspace #map .maplibregl-ctrl-group {
-    overflow: hidden;
-    border: 1px solid rgba(15, 79, 65, .18);
-    border-radius: .55rem;
-    box-shadow: 0 .35rem 1rem rgba(18, 53, 42, .16);
-}
-
-.map-workspace #map .maplibregl-ctrl-group button {
-    width: 2rem;
-    height: 2rem;
-}
-
-.map-workspace #map .maplibregl-ctrl-attrib {
+.map-workspace #map .leaflet-control-attribution {
     max-width: calc(100% - 1rem);
+    margin: 0 .35rem .35rem 0;
+    padding: .18rem .4rem;
+    white-space: nowrap;
     direction: ltr;
     color: #41534a;
     background: rgba(255, 255, 255, .9);
+    border-radius: .3rem;
     font-size: .64rem;
 }
 
-.map-workspace #map .maplibregl-ctrl-attrib a {
+.map-workspace #map .leaflet-control-attribution a {
     color: #154f40;
 }
 
@@ -620,6 +607,121 @@
     flex: 1;
 }
 
+.map-control-stack {
+    position: absolute;
+    inset-block-start: 1rem;
+    inset-inline-end: 1rem;
+    z-index: 500;
+    display: grid;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(15, 79, 65, .18);
+    border-radius: .65rem;
+    box-shadow: 0 .4rem 1.25rem rgba(18, 53, 42, .18);
+}
+
+.map-control-stack button {
+    width: 2.4rem;
+    height: 2.4rem;
+    color: #21493e;
+    background: #fff;
+    border: 0;
+    border-block-end: 1px solid #e1e9e5;
+}
+
+.map-control-stack button:last-child { border-block-end: 0; }
+.map-control-stack button:hover,
+.map-control-stack button:focus-visible,
+.map-control-stack button.is-loading { color: #fff; background: var(--color-brand-800); }
+
+.mosque-marker-shell,
+.mosque-cluster-shell,
+.mosque-form-marker-shell { background: transparent; border: 0; }
+
+.mosque-marker,
+.mosque-form-marker {
+    display: grid;
+    place-items: center;
+    width: 2.15rem;
+    height: 2.15rem;
+    color: #fff;
+    background: #60736a;
+    border: .16rem solid #fff;
+    border-radius: 50% 50% 50% .35rem;
+    box-shadow: 0 .35rem .8rem rgba(20, 48, 39, .32);
+    transform: rotate(-45deg);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.mosque-marker i,
+.mosque-form-marker i { transform: rotate(45deg); font-size: .9rem; }
+.mosque-marker--success,
+.mosque-form-marker { background: #176b57; }
+.mosque-marker--warning { background: #ba7b13; }
+.mosque-marker--danger { background: #b63d43; }
+.mosque-marker.is-selected { box-shadow: 0 0 0 .28rem #f0bd4f, 0 .45rem 1rem rgba(20, 48, 39, .4); transform: rotate(-45deg) scale(1.14); }
+
+.mosque-cluster {
+    display: grid;
+    place-content: center;
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    background: rgba(23, 107, 87, .94);
+    border: .2rem solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 .28rem rgba(23, 107, 87, .24), 0 .4rem 1rem rgba(18, 53, 42, .3);
+    text-align: center;
+}
+
+.mosque-cluster--medium { background: rgba(15, 79, 65, .96); }
+.mosque-cluster--large { background: rgba(148, 101, 29, .96); box-shadow: 0 0 0 .3rem rgba(184, 138, 59, .25), 0 .4rem 1rem rgba(18, 53, 42, .34); }
+.mosque-cluster strong { font-size: .84rem; line-height: 1; }
+.mosque-cluster small { margin-block-start: .14rem; font-size: .48rem; font-weight: 700; }
+
+.map-workspace .mosque-list-item { cursor: pointer; outline: 0; }
+.map-workspace .mosque-list-item.is-selected { background: #edf7f2; box-shadow: inset -.25rem 0 var(--color-brass); }
+.mosque-list-item__top { display: flex; justify-content: space-between; gap: .5rem; align-items: start; }
+.mosque-list-item__top strong { color: #153f33; font-size: .83rem; line-height: 1.5; }
+.map-workspace .mosque-list-item p { display: flex; gap: .4rem; margin: .35rem 0; color: #65756e; font-size: .72rem; }
+.map-workspace .mosque-list-item p i { width: .85rem; margin-block-start: .15rem; color: #899890; text-align: center; }
+.map-workspace .mosque-list-item .zoom-to-mosque { display: inline-flex; align-items: center; gap: .35rem; margin-block-start: .4rem; }
+.map-empty-state { display: grid; place-items: center; min-height: 16rem; padding: 2rem; color: #6c7c74; text-align: center; }
+.map-empty-state i { font-size: 2rem; opacity: .55; }
+.map-filter-chip { padding: .28rem .55rem; color: #21493e; background: #eaf4ef; border: 1px solid #cfe0d8; border-radius: 999px; font-size: .7rem; }
+
+.map-route-panel {
+    position: absolute;
+    inset-block-end: 2.25rem;
+    inset-inline-end: 1rem;
+    z-index: 600;
+    display: grid;
+    gap: .65rem;
+    width: min(24rem, calc(100% - 2rem));
+    max-height: calc(100% - 4.5rem);
+    overflow-y: auto;
+    padding: .85rem;
+    color: #263a32;
+    background: rgba(255, 255, 255, .98);
+    border: 1px solid #cad8d1;
+    border-radius: .8rem;
+    box-shadow: 0 1rem 2.5rem rgba(18, 53, 42, .22);
+}
+
+.map-route-panel[hidden] { display: none; }
+.map-route-panel__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.map-route-panel__header button { width: 2rem; height: 2rem; color: #53655d; background: #f4f7f5; border: 1px solid #d8e2dd; border-radius: 50%; }
+.map-route-modes { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+.map-route-modes button { padding: .45rem; color: #4d5f57; background: #f4f7f5; border: 1px solid #d5e0db; border-radius: .45rem; font-size: .75rem; font-weight: 700; }
+.map-route-modes button[aria-checked="true"] { color: #fff; background: var(--color-brand-800); border-color: var(--color-brand-800); }
+.map-route-status { color: #697a72; font-size: .75rem; }
+.map-route-summary { display: flex; align-items: baseline; gap: .75rem; padding: .6rem; background: #edf5f1; border-radius: .5rem; }
+.map-route-summary strong { color: #135442; font-size: 1.05rem; }
+.map-route-summary span { color: #65766e; font-size: .75rem; }
+.map-route-steps { display: grid; gap: .45rem; max-height: 12rem; margin: 0; padding-inline-start: 1.5rem; overflow-y: auto; }
+.map-route-steps li { padding-inline-start: .2rem; color: #344a41; font-size: .72rem; line-height: 1.5; }
+.map-route-steps small { display: block; color: #819088; font-size: .62rem; }
+
 .map-view-switcher {
     display: none;
 }
@@ -665,11 +767,11 @@
         display: none;
     }
 
-    .map-main-row.is-list-view .map-canvas-column {
+    .map-main-row[data-active-view="list"] .map-canvas-column {
         display: none;
     }
 
-    .map-main-row.is-list-view .map-list-column {
+    .map-main-row[data-active-view="list"] .map-list-column {
         display: block;
     }
 
@@ -761,7 +863,7 @@
     }
 
     .map-list-card {
-        height: 24rem;
+        height: clamp(26rem, 60vh, 36rem);
     }
 
     .map-selection-panel {
@@ -809,6 +911,19 @@
 
     .map-workspace .search-suggestions {
         max-height: 12rem;
+    }
+
+    .map-route-panel {
+        inset-inline: .5rem;
+        inset-block-end: .5rem;
+        width: auto;
+        max-height: 58%;
+        border-radius: .75rem .75rem .4rem .4rem;
+    }
+
+    .map-control-stack {
+        inset-block-start: .65rem;
+        inset-inline-end: .65rem;
     }
 }
 
