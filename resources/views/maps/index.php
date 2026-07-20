@@ -151,7 +151,14 @@
                         <i class="fas fa-map me-2 text-primary"></i>المواقع
                     </h5>
                     <div class="map-canvas-actions">
-                        <span class="map-provider-badge"><i class="fas fa-layer-group" aria-hidden="true"></i>OpenFreeMap</span>
+                        <div class="map-basemap-switch" role="group" aria-label="نوع عرض الخريطة">
+                            <button type="button" id="mapStyleStreet" class="map-basemap-switch__button" aria-pressed="true">
+                                <i class="fas fa-map" aria-hidden="true"></i><span>الخريطة</span>
+                            </button>
+                            <button type="button" id="mapStyleSatellite" class="map-basemap-switch__button" aria-pressed="false">
+                                <i class="fas fa-satellite" aria-hidden="true"></i><span>قمر صناعي</span>
+                            </button>
+                        </div>
                         <button id="fitToMarkers" class="btn btn-outline-primary btn-sm d-flex align-items-center">
                             <i class="fas fa-expand-alt me-2"></i>عرض الكل
                         </button>
@@ -203,6 +210,9 @@
                             <p class="mb-2">حدث خطأ في تحميل الخريطة</p>
                             <button id="retryMap" class="btn btn-sm btn-danger mt-1">إعادة المحاولة</button>
                         </div>
+                    </div>
+                    <div id="satelliteMapNotice" class="map-satellite-notice" role="status" aria-live="polite" hidden>
+                        تعذر تحميل صور القمر الصناعي. تم الرجوع إلى الخريطة العادية.
                     </div>
                 </div>
             </div>

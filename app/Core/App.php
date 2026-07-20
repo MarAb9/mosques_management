@@ -56,10 +56,18 @@ final class App
         self::$instance = $app;
 
         $app->errors->register();
-        $app->session->start();
+        $bootRequest = Request::capture();
+        $uriPath = (string) (parse_url((string) $bootRequest->server('REQUEST_URI', ''), PHP_URL_PATH) ?? '');
+        if (!str_starts_with($bootRequest->routePath(), 'api/v1/')
+            && !str_contains('/' . ltrim($uriPath, '/'), '/api/v1/')
+        ) {
+            $app->session->start();
+        }
 
         $routes = require $basePath . '/routes/web.php';
         $routes($app->router);
+        $apiRoutes = require $basePath . '/routes/api.php';
+        $apiRoutes($app->router);
 
         return $app;
     }
@@ -80,10 +88,12 @@ final class App
     public function handle(?string $routePath = null): void
     {
         $request = Request::capture();
+        $path = $routePath ?? $request->routePath();
+        $isApi = str_starts_with($path, 'api/v1/');
 
         try {
-            $path = $routePath ?? $request->routePath();
             $route = $this->router->match($request->method(), $path);
+            $request = $request->withRouteParameters($route['parameters']);
 
             $pipeline = $this->buildPipeline($route['middleware'], function (Request $req) use ($route): Response {
                 [$class, $method] = $route['action'];
@@ -94,9 +104,20 @@ final class App
 
             $response = $pipeline($request);
         } catch (HttpException $e) {
-            $response = $this->errors->handleException($e);
+            $response = $isApi
+                ? JsonResponse::error(
+                    $e->status() === 405 ? 'method_not_allowed' : 'not_found',
+                    $e->status() === 405 ? 'طريقة الطلب غير مسموحة' : 'المورد غير موجود',
+                    $e->status()
+                )
+                : $this->errors->handleException($e);
         } catch (Throwable $e) {
-            $response = $this->errors->handleException($e);
+            if ($isApi) {
+                $this->errors->log($e);
+                $response = JsonResponse::error('internal_error', 'حدث خطأ غير متوقع', 500);
+            } else {
+                $response = $this->errors->handleException($e);
+            }
         }
 
         $this->applySecurityHeaders($response, $request);
@@ -181,8 +202,12 @@ final class App
             'edit_mosque',
         ];
         $scriptSources = "'self' 'nonce-{$this->cspNonce}'";
+        $connectSources = "'self' https://tiles.openfreemap.org";
         if (in_array($request->routePath(), $mapRoutes, true)) {
             $scriptSources .= " 'wasm-unsafe-eval'";
+        }
+        if (in_array($request->routePath(), ['mosque_maps.php', 'mosque_maps'], true)) {
+            $connectSources .= ' https://tiles.maps.eox.at';
         }
 
         $response
@@ -199,7 +224,7 @@ final class App
                 . "style-src-attr 'unsafe-inline'; "
                 . "font-src 'self' data: https://fonts.gstatic.com; "
                 . "img-src 'self' data: blob:; "
-                . "connect-src 'self' https://tiles.openfreemap.org; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+                . "connect-src {$connectSources}; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
             );
 
         if ($request->isSecure((bool) $this->config->get('security.trust_proxy_headers', false))) {

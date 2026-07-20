@@ -73,6 +73,22 @@ final class Response
         return $this->status;
     }
 
+    public function body(): string
+    {
+        return $this->body;
+    }
+
+    public function header(string $name): ?string
+    {
+        foreach ($this->headers as $header => $value) {
+            if (strcasecmp($header, $name) === 0) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
     public function send(): void
     {
         if (!headers_sent()) {
