@@ -41,8 +41,7 @@
     <form data-mosque-form-mode="create" method="POST" action="" class="needs-validation" novalidate enctype="multipart/form-data"
           data-guard-unsaved="true"
           data-original-registration-number="<?= $view->e((string) ($formData['registration_number'] ?? '')) ?>"
-          data-map-provider="<?= $view->e((string) ($mapProvider ?? 'maplibre')) ?>"
-          data-map-style-url="<?= $view->e((string) ($mapStyleUrl ?? 'https://tiles.openfreemap.org/styles/liberty')) ?>"
+          data-map-config="<?= $view->e(json_encode($mapConfig ?? [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) ?>"
           data-map-defaults="<?= $view->e(json_encode($mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)) ?>">
         <input type="hidden" name="csrf_token" value="<?= $view->e($csrfToken) ?>">
         <div class="row g-4">

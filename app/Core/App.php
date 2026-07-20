@@ -202,12 +202,10 @@ final class App
             'edit_mosque',
         ];
         $scriptSources = "'self' 'nonce-{$this->cspNonce}'";
-        $connectSources = "'self' https://tiles.openfreemap.org";
+        $connectSources = "'self'";
+        $imageSources = "'self' data: blob:";
         if (in_array($request->routePath(), $mapRoutes, true)) {
-            $scriptSources .= " 'wasm-unsafe-eval'";
-        }
-        if (in_array($request->routePath(), ['mosque_maps.php', 'mosque_maps'], true)) {
-            $connectSources .= ' https://tiles.maps.eox.at';
+            $imageSources .= ' https://static-map-tiles-api.arcgis.com https://ibasemaps-api.arcgis.com';
         }
 
         $response
@@ -223,7 +221,7 @@ final class App
                 . "style-src-elem 'self' 'unsafe-inline' 'nonce-{$this->cspNonce}' https://fonts.googleapis.com; "
                 . "style-src-attr 'unsafe-inline'; "
                 . "font-src 'self' data: https://fonts.gstatic.com; "
-                . "img-src 'self' data: blob:; "
+                . "img-src {$imageSources}; "
                 . "connect-src {$connectSources}; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
             );
 

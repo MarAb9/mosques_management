@@ -14,8 +14,10 @@
 .import-workspace .card, .admin-workspace .card { box-shadow: var(--shadow-soft); }
 .form-map-shell { height: 18.75rem; overflow: hidden; }
 .form-map-canvas { height: 100%; }
-.form-map-shell .maplibregl-map { direction: ltr; font-family: inherit; }
-.form-map-shell .maplibregl-ctrl-attrib { direction: ltr; font-size: .62rem; }
+.form-map-shell .leaflet-container { direction: ltr; font-family: inherit; }
+.form-map-shell .leaflet-control-attribution { direction: ltr; font-size: .62rem; }
+.form-map-shell .map-form-fullscreen { display: grid; place-items: center; width: 2.1rem; height: 2.1rem; color: #176b57; background: #fff; border: 0; cursor: pointer; }
+.form-map-shell .mosque-form-marker { font-size: .9rem; }
 #image-preview { max-height: 12.5rem; object-fit: cover; }
 .page-title-box { min-height: 4.5rem; margin-block-end: 1rem; padding: 1rem 1.25rem; border: 1px solid var(--color-border-soft); border-radius: var(--radius-lg); background: #fff; box-shadow: var(--shadow-soft); }
 .page-title-box__image { width: 4rem; height: 3.5rem; object-fit: contain; }

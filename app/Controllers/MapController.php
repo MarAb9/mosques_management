@@ -32,11 +32,7 @@ final class MapController extends Controller
     public function index(Request $request): Response
     {
         $requestedPage = max(1, (int) $request->query('page', 1));
-        $mapConfig = [
-            'provider' => (string) $this->config->get('maps.provider', 'maplibre'),
-            'styleUrl' => (string) $this->config->get('maps.style_url', 'https://tiles.openfreemap.org/styles/liberty'),
-            'satellite' => (array) $this->config->get('maps.satellite', []),
-        ];
+        $mapConfig = $this->mapConfig();
 
         try {
             $totalWithCoords = $this->mosques->countWithCoordinates();
@@ -86,6 +82,21 @@ final class MapController extends Controller
         $data['limit'] = self::PAGE_SIZE;
 
         return $this->render('maps.index', $data);
+    }
+
+    /** @return array<string, mixed> */
+    private function mapConfig(): array
+    {
+        return [
+            'engine' => 'leaflet',
+            'token' => (string) $this->config->get('maps.access_token', ''),
+            'street' => (array) $this->config->get('maps.street', []),
+            'satellite' => (array) $this->config->get('maps.satellite', []),
+            'routing' => [
+                'enabled' => (string) $this->config->get('maps.routing.token', '') !== '',
+                'endpoint' => 'ajax/map_route.php',
+            ],
+        ];
     }
 
     /**

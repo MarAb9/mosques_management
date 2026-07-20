@@ -1,0 +1,2258 @@
+{
+  "baseUrl": "http://127.0.0.1:8085",
+  "screenshots": [
+    "docs/screenshots/leaflet-map/leaflet-unselected-1440x1000.png",
+    "docs/screenshots/leaflet-map/leaflet-selected-1920x1080.png",
+    "docs/screenshots/leaflet-map/leaflet-selected-1440x1000.png",
+    "docs/screenshots/leaflet-map/leaflet-selected-1024x900.png",
+    "docs/screenshots/leaflet-map/leaflet-selected-768x1024.png",
+    "docs/screenshots/leaflet-map/leaflet-selected-430x932.png",
+    "docs/screenshots/leaflet-map/leaflet-selected-390x844.png",
+    "docs/screenshots/leaflet-map/leaflet-selected-360x800.png"
+  ],
+  "states": {
+    "baseline": {
+      "ready": true,
+      "provider": "leaflet",
+      "mode": "street",
+      "maxZoom": 22,
+      "visibleCount": 318,
+      "markerCount": 318,
+      "clustersVisible": 28,
+      "markersVisible": 2,
+      "selectionVisible": false,
+      "routeReady": false,
+      "attributionText": "Esri, OpenStreetMap contributors, GIS User Community",
+      "attributionLink": "https://www.esri.com/",
+      "leafletPrefix": false,
+      "overflow": false,
+      "controls": 4,
+      "errors": ""
+    },
+    "selected": {
+      "ready": true,
+      "provider": "leaflet",
+      "mode": "street",
+      "maxZoom": 22,
+      "visibleCount": 318,
+      "markerCount": 318,
+      "clustersVisible": 2,
+      "markersVisible": 78,
+      "selectionVisible": true,
+      "routeReady": false,
+      "attributionText": "Esri, OpenStreetMap contributors, GIS User Community",
+      "attributionLink": "https://www.esri.com/",
+      "leafletPrefix": false,
+      "overflow": false,
+      "controls": 4,
+      "errors": ""
+    },
+    "satellite": {
+      "ready": true,
+      "provider": "leaflet",
+      "mode": "satellite",
+      "maxZoom": 22,
+      "visibleCount": 318,
+      "markerCount": 318,
+      "clustersVisible": 2,
+      "markersVisible": 78,
+      "selectionVisible": true,
+      "routeReady": false,
+      "attributionText": "Imagery © Esri and its data providers",
+      "attributionLink": "https://www.esri.com/",
+      "leafletPrefix": false,
+      "overflow": false,
+      "controls": 4,
+      "errors": ""
+    },
+    "routed": {
+      "ready": true,
+      "provider": "leaflet",
+      "mode": "hybrid",
+      "maxZoom": 22,
+      "visibleCount": 318,
+      "markerCount": 318,
+      "clustersVisible": 0,
+      "markersVisible": 0,
+      "selectionVisible": true,
+      "routeReady": true,
+      "attributionText": "Imagery © Esri and its data providers",
+      "attributionLink": "https://www.esri.com/",
+      "leafletPrefix": false,
+      "overflow": false,
+      "controls": 4,
+      "errors": ""
+    },
+    "persisted": {
+      "ready": true,
+      "provider": "leaflet",
+      "mode": "hybrid",
+      "maxZoom": 22,
+      "visibleCount": 318,
+      "markerCount": 318,
+      "clustersVisible": 28,
+      "markersVisible": 2,
+      "selectionVisible": false,
+      "routeReady": false,
+      "attributionText": "Imagery © Esri and its data providers",
+      "attributionLink": "https://www.esri.com/",
+      "leafletPrefix": false,
+      "overflow": false,
+      "controls": 4,
+      "errors": ""
+    },
+    "formPicker": {
+      "provider": "leaflet",
+      "leaflet": true,
+      "attribution": "Esri, OpenStreetMap contributors, GIS User Community"
+    }
+  },
+  "requests": [
+    {
+      "host": "127.0.0.1",
+      "path": "/login.php",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/css/bootstrap.rtl.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/css/all.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/logo.png",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/login.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/1.jpg",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/webfonts/fa-solid-900.woff2",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/logo.png",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/login.php",
+      "method": "POST"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/index.php",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/css/bootstrap.rtl.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/css/all.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/sweetalert2/sweetalert2.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/logo.png",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/institutional/mosque-building-3d.svg",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/js/bootstrap.bundle.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/sweetalert2/sweetalert2.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/backup-confirm.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/dashboard.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/webfonts/fa-solid-900.woff2",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/mosque_maps.php",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/css/bootstrap.rtl.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/css/all.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/maps.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/sweetalert2/sweetalert2.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/logo.png",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/maps.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/js/bootstrap.bundle.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/sweetalert2/sweetalert2.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/backup-confirm.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/webfonts/fa-solid-900.woff2",
+      "method": "GET"
+    },
+    {
+      "host": "",
+      "path": "image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e",
+      "method": "GET"
+    },
+    {
+      "host": "",
+      "path": "image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/405/504",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/405/505",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/406/504",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/406/505",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/404/504",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/404/505",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/405/503",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/405/506",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/406/503",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/406/506",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/407/504",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/407/505",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/404/503",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/404/506",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/407/503",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/10/407/506",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12987/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12987/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12988/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12988/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12986/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12986/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12987/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12987/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12988/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12988/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12989/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12989/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12986/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12986/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12989/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/15/12989/16173",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16171",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16172",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16171",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16172",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16171",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16172",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16170",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16173",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16170",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16173",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16171",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16172",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16170",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16173",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16170",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16173",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/ajax/map_route.php",
+      "method": "POST"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6506/8104",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6507/8104",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6506/8103",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6506/8105",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6507/8103",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6507/8105",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6505/8104",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6508/8104",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6505/8103",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6505/8105",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6508/8103",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6508/8105",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6506/8102",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6506/8106",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6507/8102",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6507/8106",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6505/8102",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6505/8106",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6508/8102",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/14/6508/8106",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6506/8104",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6507/8104",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6506/8103",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6506/8105",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6507/8103",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6507/8105",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6505/8104",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6508/8104",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6505/8103",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6505/8105",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6508/8103",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6508/8105",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6506/8102",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6506/8106",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6507/8102",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6507/8106",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6505/8102",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6505/8106",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6508/8102",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/14/6508/8106",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3253/4051",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3253/4052",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3252/4051",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3252/4052",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3254/4051",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3254/4052",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3253/4050",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3253/4053",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3252/4050",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3252/4053",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3254/4050",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/13/3254/4053",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3253/4051",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3253/4052",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3252/4051",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3252/4052",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3254/4051",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3254/4052",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3253/4050",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3253/4053",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3252/4050",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3252/4053",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3254/4050",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/13/3254/4053",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1626/2025",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1626/2026",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1625/2025",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1625/2026",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1627/2025",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1627/2026",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1626/2024",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1626/2027",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1625/2024",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1625/2027",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1627/2024",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/12/1627/2027",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1626/2025",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1626/2026",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1625/2025",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1625/2026",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1627/2025",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1627/2026",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1626/2024",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1626/2027",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1625/2024",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1625/2027",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1627/2024",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/12/1627/2027",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/11/812/1012",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/11/813/1012",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/11/812/1011",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/11/812/1013",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/11/813/1011",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/11/813/1013",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/11/812/1012",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/11/813/1012",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/11/812/1011",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/11/812/1013",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/11/813/1011",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/11/813/1013",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/mosque_maps.php",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/css/bootstrap.rtl.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/css/all.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/maps.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/sweetalert2/sweetalert2.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/logo.png",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/maps.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/js/bootstrap.bundle.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/sweetalert2/sweetalert2.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/backup-confirm.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/webfonts/fa-solid-900.woff2",
+      "method": "GET"
+    },
+    {
+      "host": "",
+      "path": "image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e",
+      "method": "GET"
+    },
+    {
+      "host": "",
+      "path": "image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/405/504",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/405/505",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/406/504",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/406/505",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/404/504",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/404/505",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/405/503",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/405/506",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/406/503",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/406/506",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/407/504",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/407/505",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/404/503",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/404/506",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/407/503",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/10/407/506",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/405/504",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/405/505",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/406/504",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/406/505",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/404/504",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/404/505",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/405/503",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/405/506",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/406/503",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/406/506",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/407/504",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/407/505",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/404/503",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/404/506",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/407/503",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/10/407/506",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/logo.png",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16171",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16172",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16171",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16172",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16171",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16172",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16170",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16173",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16170",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16173",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16171",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16172",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16170",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16173",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16170",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16171",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16172",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16173",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16170",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16173",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16169",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12987/16174",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16169",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12988/16174",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16169",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12986/16174",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16169",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/15/12989/16174",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16169",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12987/16174",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16169",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12988/16174",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16169",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12986/16174",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16169",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/15/12989/16174",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25975/32343",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25975/32344",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25976/32343",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25976/32344",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25974/32343",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25974/32344",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25975/32342",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25975/32345",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25976/32342",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25976/32345",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25977/32343",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25977/32344",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25974/32342",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25974/32345",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25977/32342",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25977/32345",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25975/32341",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25975/32346",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25976/32341",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25976/32346",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25974/32341",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25974/32346",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25977/32341",
+      "method": "GET"
+    },
+    {
+      "host": "ibasemaps-api.arcgis.com",
+      "path": "/arcgis/rest/services/World_Imagery/MapServer/tile/16/25977/32346",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25975/32343",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25975/32344",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25976/32343",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25976/32344",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25974/32343",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25974/32344",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25975/32342",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25975/32345",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25976/32342",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25976/32345",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25977/32343",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25977/32344",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25974/32342",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25974/32345",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25977/32342",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25977/32345",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25975/32341",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25975/32346",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25976/32341",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25976/32346",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25974/32341",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25974/32346",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25977/32341",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/imagery/labels/static/tile/16/25977/32346",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/add_mosque.php",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/css/bootstrap.rtl.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/css/all.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/mosque-form-map.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/sweetalert2/sweetalert2.min.css",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/logo.png",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/images/institutional/mosque-building-3d.svg",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/js/mosque_form.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/mosque-form-map.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/bootstrap/js/bootstrap.bundle.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/sweetalert2/sweetalert2.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/app.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/dist/backup-confirm.min.js",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1",
+      "path": "/assets/vendor/fontawesome/webfonts/fa-solid-900.woff2",
+      "method": "GET"
+    },
+    {
+      "host": "",
+      "path": "image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/9/202/252",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/9/202/253",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/9/203/252",
+      "method": "GET"
+    },
+    {
+      "host": "static-map-tiles-api.arcgis.com",
+      "path": "/arcgis/rest/services/static-basemap-tiles-service/v1/arcgis/navigation/static/tile/9/203/253",
+      "method": "GET"
+    }
+  ],
+  "consoleEvents": [],
+  "failedRequests": [],
+  "checks": [
+    {
+      "name": "Leaflet workspace initializes",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "street",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 28,
+        "markersVisible": 2,
+        "selectionVisible": false,
+        "routeReady": false,
+        "attributionText": "Esri, OpenStreetMap contributors, GIS User Community",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "Full dataset is clustered",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "street",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 28,
+        "markersVisible": 2,
+        "selectionVisible": false,
+        "routeReady": false,
+        "attributionText": "Esri, OpenStreetMap contributors, GIS User Community",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "Provider maximum zoom is 22",
+      "ok": true,
+      "detail": 22
+    },
+    {
+      "name": "Application controls are present",
+      "ok": true,
+      "detail": 4
+    },
+    {
+      "name": "Esri attribution is clickable with no framework prefix",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "street",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 28,
+        "markersVisible": 2,
+        "selectionVisible": false,
+        "routeReady": false,
+        "attributionText": "Esri, OpenStreetMap contributors, GIS User Community",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "Satellite is lazy before switching",
+      "ok": true,
+      "detail": 0
+    },
+    {
+      "name": "Selection uses the persistent details panel",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Satellite is created on demand",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selection survives basemap changes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Hybrid requests the ArcGIS labels overlay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Mocked geolocation route renders",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Selection remains stable while routing",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Routing stays on the local endpoint",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Basemap choice persists after reload",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "1920x1080 has no page overflow",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "hybrid",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 2,
+        "markersVisible": 78,
+        "selectionVisible": true,
+        "routeReady": false,
+        "attributionText": "Imagery © Esri and its data providers",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "1440x1000 has no page overflow",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "hybrid",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 1,
+        "markersVisible": 78,
+        "selectionVisible": true,
+        "routeReady": false,
+        "attributionText": "Imagery © Esri and its data providers",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "1024x900 has no page overflow",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "hybrid",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 2,
+        "markersVisible": 64,
+        "selectionVisible": true,
+        "routeReady": false,
+        "attributionText": "Imagery © Esri and its data providers",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "768x1024 has no page overflow",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "hybrid",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 1,
+        "markersVisible": 49,
+        "selectionVisible": true,
+        "routeReady": false,
+        "attributionText": "Imagery © Esri and its data providers",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "430x932 has no page overflow",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "hybrid",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 1,
+        "markersVisible": 49,
+        "selectionVisible": true,
+        "routeReady": false,
+        "attributionText": "Imagery © Esri and its data providers",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "390x844 has no page overflow",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "hybrid",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 1,
+        "markersVisible": 26,
+        "selectionVisible": true,
+        "routeReady": false,
+        "attributionText": "Imagery © Esri and its data providers",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "360x800 has no page overflow",
+      "ok": true,
+      "detail": {
+        "ready": true,
+        "provider": "leaflet",
+        "mode": "hybrid",
+        "maxZoom": 22,
+        "visibleCount": 318,
+        "markerCount": 318,
+        "clustersVisible": 1,
+        "markersVisible": 24,
+        "selectionVisible": true,
+        "routeReady": false,
+        "attributionText": "Imagery © Esri and its data providers",
+        "attributionLink": "https://www.esri.com/",
+        "leafletPrefix": false,
+        "overflow": false,
+        "controls": 4,
+        "errors": ""
+      }
+    },
+    {
+      "name": "Create form coordinate picker uses Leaflet",
+      "ok": true,
+      "detail": {
+        "provider": "leaflet",
+        "leaflet": true,
+        "attribution": "Esri, OpenStreetMap contributors, GIS User Community"
+      }
+    },
+    {
+      "name": "No superseded map runtime traffic",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Street requests use the current ArcGIS static tile service",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "No browser console errors",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "No failed requests or CSP blocks",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "fatalError": "",
+  "passed": 26,
+  "failed": 0
+}

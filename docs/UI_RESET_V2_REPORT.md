@@ -112,7 +112,7 @@
 - البحث العام: التركيز انتقل إلى `globalSearchInput`، ثم عاد إلى `globalSearchToggle` بعد Escape.
 - قائمة الأعمدة: بقيت داخل حدود viewport ولم تتجاوز الشاشة.
 
-تحديث بتاريخ 16 يوليو 2026: استبدلت خرائط Google بالكامل بـ MapLibre GL JS المجمّع محلياً وOpenFreeMap. يضبط `MAP_STYLE_URL` النمط المتجهي، ولا يحتاج التشغيل إلى مفتاح API، كما أزيلت نطاقات Google Maps من سياسة CSP وإعداد Docker.
+تحديث بتاريخ 20 يوليو 2026: تعتمد الخرائط على Leaflet وLeaflet.markercluster المجمّعين محلياً، مع خرائط ArcGIS النقطية واتجاهات ArcGIS عبر وكيل خادوم آمن.
 
 ## نتائج الاختبارات
 
