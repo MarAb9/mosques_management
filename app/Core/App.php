@@ -193,21 +193,9 @@ final class App
 
     private function applySecurityHeaders(Response $response, Request $request): void
     {
-        $mapRoutes = [
-            'mosque_maps.php',
-            'mosque_maps',
-            'add_mosque.php',
-            'add_mosque',
-            'edit_mosque.php',
-            'edit_mosque',
-        ];
         $scriptSources = "'self' 'nonce-{$this->cspNonce}'";
         $connectSources = "'self'";
         $imageSources = "'self' data: blob:";
-        if (in_array($request->routePath(), $mapRoutes, true)) {
-            $imageSources .= ' https://static-map-tiles-api.arcgis.com https://ibasemaps-api.arcgis.com';
-        }
-
         $response
             ->withHeader('X-Content-Type-Options', 'nosniff')
             ->withHeader('X-Frame-Options', 'DENY')

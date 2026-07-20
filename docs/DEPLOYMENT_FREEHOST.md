@@ -114,7 +114,7 @@ not inside `htdocs/`.
 
 ## ArcGIS map configuration
 
-Set `ARCGIS_ACCESS_TOKEN` to an ArcGIS API-key credential restricted to the production web origins and the static-basemap-tiles privilege. This key is intentionally browser-visible because the browser retrieves raster tiles directly.
+Set `ARCGIS_ACCESS_TOKEN` to an ArcGIS API-key credential with only the static-basemap-tiles privilege. It stays server-side: authenticated browsers request `ajax/map_tile.php`, and the application forwards fixed, validated tile requests to ArcGIS.
 
 Set `ARCGIS_ROUTING_TOKEN` separately and grant only the network-analysis privilege. It is server-only: the browser calls the authenticated, CSRF-protected `ajax/map_route.php` endpoint, and the application forwards the route request to ArcGIS. Never reuse or expose this token in HTML or client JavaScript.
 

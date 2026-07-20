@@ -19,7 +19,6 @@ const defaults = {
 };
 const config = {
     engine: 'leaflet',
-    token: '',
     street: {},
     satellite: {},
     routing: {},
@@ -80,11 +79,6 @@ function statusTone(status) {
     return 'secondary';
 }
 
-function tokenized(url) {
-    if (!url || !config.token) return '';
-    return `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(config.token)}&language=ar`;
-}
-
 function notify(message, duration = 6000) {
     const notice = document.getElementById('mapNotice');
     if (!notice) return;
@@ -95,12 +89,12 @@ function notify(message, duration = 6000) {
 }
 
 function tileLayer(settings, url, kind) {
-    const layer = L.tileLayer(tokenized(url), {
+    const layer = L.tileLayer(url, {
         attribution: String(settings.attribution || ''),
         minZoom: 0,
         maxZoom: Number(settings.max_zoom) || 22,
         maxNativeZoom: Number(settings.max_native_zoom) || 22,
-        tileSize: 256,
+        tileSize: Number(settings.tile_size) || 256,
         zoomOffset: 0,
         updateWhenIdle: true,
         keepBuffer: 3
@@ -116,17 +110,17 @@ function tileLayer(settings, url, kind) {
 }
 
 function ensureStreet() {
-    if (!streetLayer && config.token && config.street?.url) {
+    if (!streetLayer && config.street?.url) {
         streetLayer = tileLayer(config.street, config.street.url, 'street');
     }
     return streetLayer;
 }
 
 function ensureImagery() {
-    if (!imageryLayer && config.token && config.satellite?.url) {
+    if (!imageryLayer && config.satellite?.url) {
         imageryLayer = tileLayer(config.satellite, config.satellite.url, 'imagery');
     }
-    if (!labelsLayer && config.token && config.satellite?.labels_url) {
+    if (!labelsLayer && config.satellite?.labels_url) {
         labelsLayer = tileLayer(config.satellite, config.satellite.labels_url, 'labels');
     }
 }
@@ -238,7 +232,7 @@ function initializeMap() {
         mapElement.dataset.mapReady = 'true';
         window.setTimeout(() => map.invalidateSize(), 0);
     });
-    if (!config.token) notify('أضف ARCGIS_ACCESS_TOKEN لعرض خريطة الأساس. علامات المساجد ما زالت متاحة.', 9000);
+    if (!config.street?.url) notify('أضف ARCGIS_ACCESS_TOKEN لعرض خريطة الأساس. علامات المساجد ما زالت متاحة.', 9000);
 }
 
 function setText(id, value) {

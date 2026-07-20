@@ -87,11 +87,17 @@ final class MapController extends Controller
     /** @return array<string, mixed> */
     private function mapConfig(): array
     {
+        $enabled = (string) $this->config->get('maps.access_token', '') !== '';
+        $street = (array) $this->config->get('maps.street', []);
+        $satellite = (array) $this->config->get('maps.satellite', []);
+        $street['url'] = $enabled ? 'ajax/map_tile.php?layer=street&z={z}&x={x}&y={y}' : '';
+        $satellite['url'] = $enabled ? 'ajax/map_tile.php?layer=imagery&z={z}&x={x}&y={y}' : '';
+        $satellite['labels_url'] = $enabled ? 'ajax/map_tile.php?layer=labels&z={z}&x={x}&y={y}' : '';
+
         return [
             'engine' => 'leaflet',
-            'token' => (string) $this->config->get('maps.access_token', ''),
-            'street' => (array) $this->config->get('maps.street', []),
-            'satellite' => (array) $this->config->get('maps.satellite', []),
+            'street' => $street,
+            'satellite' => $satellite,
             'routing' => [
                 'enabled' => (string) $this->config->get('maps.routing.token', '') !== '',
                 'endpoint' => 'ajax/map_route.php',

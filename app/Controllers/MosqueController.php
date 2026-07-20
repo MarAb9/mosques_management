@@ -251,11 +251,15 @@ final class MosqueController extends Controller
     /** @return array{mapConfig: array<string, mixed>, mapDefaults: array{latitude: float, longitude: float, zoom: int}} */
     private function formMapData(): array
     {
+        $street = (array) $this->config->get('maps.street', []);
+        $street['url'] = (string) $this->config->get('maps.access_token', '') !== ''
+            ? 'ajax/map_tile.php?layer=street&z={z}&x={x}&y={y}'
+            : '';
+
         return [
             'mapConfig' => [
                 'engine' => 'leaflet',
-                'token' => (string) $this->config->get('maps.access_token', ''),
-                'street' => (array) $this->config->get('maps.street', []),
+                'street' => $street,
             ],
             'mapDefaults' => [
                 'latitude' => (float) $this->config->get('maps.default_latitude', 34.6814),

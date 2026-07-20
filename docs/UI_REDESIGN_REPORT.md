@@ -119,7 +119,7 @@ Build in CI or on a development machine, then deploy the PHP application togethe
 
 ## 15. Known remaining limitations
 
-- Map rendering depends on network access to the configured ArcGIS tile endpoints and a browser-restricted `ARCGIS_ACCESS_TOKEN`.
+- Map rendering depends on server-side network access to the configured ArcGIS tile endpoints and a private `ARCGIS_ACCESS_TOKEN`.
 - The visual browser audit used local headless Chrome because the in-app browser connector was unavailable; Safari and Firefox were not automated in this environment.
 - Old map runtime assets were removed; only the locally bundled Leaflet implementation is deployed.
 - The CSP still permits inline styles for third-party Bootstrap compatibility, although the application views no longer contain inline CSS.
