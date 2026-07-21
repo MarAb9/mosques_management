@@ -66,7 +66,7 @@ Tailwind CSS 4.3.2 compiles only theme and utilities, uses the `tw` prefix, and 
 - Page scripts remain split and conditional; the locally bundled Leaflet runtime is loaded only on the map workspace and mosque coordinate forms.
 - jQuery, Select2, Chart.js, and Leaflet are not loaded globally when a page does not need them.
 - No remote font is required, animations use transform/opacity, and reduced-motion mode disables nonessential work.
-- Production/shared-hosting deployment uses the committed minified assets and does not require Node.js; a domain-restricted MapTiler browser key enables satellite mode.
+- Production/shared-hosting deployment uses the committed minified assets and does not require Node.js or a tile-provider API key.
 
 ## 9. Accessibility improvements
 
@@ -115,11 +115,11 @@ The build uses Tailwind CLI for CSS and esbuild for minified page/application bu
 
 ## 14. Deployment instructions
 
-Build in CI or on a development machine, then deploy the PHP application together with the committed `public/assets/dist/` directory. Production/shared hosting does not need Node.js. Preserve writable upload/storage directories and configure `MAPTILER_API_KEY`, then smoke-test login, an authenticated dashboard request, a form submission, an export download, OpenStreetMap street tiles, MapTiler satellite tiles, clustering, and mosque selection. Full instructions are in `docs/FRONTEND_BUILD.md`.
+Build in CI or on a development machine, then deploy the PHP application together with the committed `public/assets/dist/` directory. Production/shared hosting does not need Node.js. Preserve writable upload/storage directories, then smoke-test login, an authenticated dashboard request, a form submission, an export download, OpenStreetMap street tiles, clustering, and mosque selection. Full instructions are in `docs/FRONTEND_BUILD.md`.
 
 ## 15. Known remaining limitations
 
-- Street rendering requires access to `*.tile.openstreetmap.org`; satellite rendering additionally requires a domain-restricted MapTiler browser key and access to `api.maptiler.com`.
+- Map rendering requires access to `*.tile.openstreetmap.org`.
 - The visual browser audit used local headless Chrome because the in-app browser connector was unavailable; Safari and Firefox were not automated in this environment.
 - Old map runtime assets were removed; only the locally bundled Leaflet implementation is deployed.
 - The CSP still permits inline styles for third-party Bootstrap compatibility, although the application views no longer contain inline CSS.

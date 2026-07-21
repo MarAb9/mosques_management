@@ -114,9 +114,9 @@ not inside `htdocs/`.
 
 ## Map configuration
 
-The street map uses OpenStreetMap raster tiles directly. Set `MAPTILER_API_KEY` to a browser key restricted to the development origins and final production domain for the optional satellite mode.
+The map uses OpenStreetMap raster tiles directly and does not require a tile-provider API key.
 
-After configuration, verify street and satellite modes through zoom 22, clustering, mosque selection, and the add/edit coordinate picker.
+After configuration, verify the map through zoom 19, clustering, mosque selection, and the add/edit coordinate picker.
 
 ## Post-deployment checks
 

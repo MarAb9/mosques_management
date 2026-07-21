@@ -34,9 +34,9 @@ Tailwind is compiled with the `tw` prefix and without Preflight. Bootstrap remai
 
 1. Run `npm ci && npm run build` in CI or on a development machine.
 2. Deploy the PHP application together with the generated `public/assets/dist/` directory.
-3. Keep the writable upload/storage directories and `MAPTILER_API_KEY` configured as documented by the application.
+3. Keep the writable upload/storage directories configured as documented by the application.
 4. Do not run Node.js on the production host; the generated files are the production assets.
-5. After deployment, verify login, an authenticated dashboard request, form submission, export download, OpenStreetMap street tiles, MapTiler satellite tiles, clusters, and mosque selection.
+5. After deployment, verify login, an authenticated dashboard request, form submission, export download, OpenStreetMap street tiles, clusters, and mosque selection.
 
 ## Dependency policy
 

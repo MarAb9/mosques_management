@@ -195,7 +195,7 @@ final class App
     {
         $scriptSources = "'self' 'nonce-{$this->cspNonce}'";
         $connectSources = "'self'";
-        $imageSources = "'self' data: blob: https://*.tile.openstreetmap.org https://api.maptiler.com";
+        $imageSources = "'self' data: blob: https://*.tile.openstreetmap.org";
         $response
             ->withHeader('X-Content-Type-Options', 'nosniff')
             ->withHeader('X-Frame-Options', 'DENY')

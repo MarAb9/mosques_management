@@ -3,7 +3,6 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 
-const MODE_KEY = 'mosques.leaflet.basemap';
 const EMPTY = 'غير محدد';
 const pageData = (() => {
     try {
@@ -19,17 +18,13 @@ const defaults = {
 };
 const config = {
     streetUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    satelliteUrl: '',
-    apiKey: '',
     ...pageData.mapConfig
 };
 const mapElement = document.getElementById('map');
 let map;
 let clusters;
 let streetLayer;
-let satelliteLayer;
 let selectedMosqueId = '';
-let currentMode = 'street';
 let filtered = [];
 const markers = new Map();
 let tileErrorShown = false;
@@ -91,23 +86,17 @@ function isCancellation(error) {
     return /abort|cancel/i.test(`${error?.name || ''} ${error?.message || ''} ${error?.error?.message || ''}`);
 }
 
-function recordLayerFailure(kind, error = {}) {
+function recordLayerFailure(error = {}) {
     if (isCancellation(error)) return;
     mapElement.dataset.tileErrors = String((Number(mapElement.dataset.tileErrors) || 0) + 1);
     if (tileErrorShown) return;
     tileErrorShown = true;
-    notify(
-        kind === 'satellite'
-            ? 'تعذر تحميل جزء من صور القمر الصناعي. حاول مرة أخرى.'
-            : 'تعذر تحميل جزء من الخريطة. حاول مرة أخرى.',
-        0,
-        true
-    );
+    notify('تعذر تحميل جزء من الخريطة. حاول مرة أخرى.', 0, true);
 }
 
-function tileLayer(url, options, kind) {
+function tileLayer(url, options) {
     const layer = L.tileLayer(url, { crossOrigin: true, ...options });
-    layer.on('tileerror', event => recordLayerFailure(kind, event));
+    layer.on('tileerror', recordLayerFailure);
     layer.on('load', syncSelection);
     return layer;
 }
@@ -118,46 +107,9 @@ function ensureStreet() {
             maxNativeZoom: 19,
             maxZoom: 22,
             attribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">&copy; OpenStreetMap contributors</a>'
-        }, 'street');
+        });
     }
     return streetLayer;
-}
-
-function ensureSatellite() {
-    if (!satelliteLayer && config.apiKey && config.satelliteUrl) {
-        const url = String(config.satelliteUrl).replace('{key}', encodeURIComponent(String(config.apiKey)));
-        satelliteLayer = tileLayer(url, {
-            maxNativeZoom: 22,
-            maxZoom: 22,
-            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener noreferrer">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">&copy; OpenStreetMap contributors</a>'
-        }, 'satellite');
-    }
-    return satelliteLayer;
-}
-
-function savedMode() {
-    try {
-        const value = localStorage.getItem(MODE_KEY);
-        return value === 'hybrid' ? 'satellite' : ['street', 'satellite'].includes(value) ? value : 'street';
-    } catch (_) {
-        return 'street';
-    }
-}
-
-function switchBasemap(mode) {
-    if (!map || !['street', 'satellite'].includes(mode)) return;
-    [streetLayer, satelliteLayer].forEach(layer => layer && map.removeLayer(layer));
-    const activeLayer = mode === 'street' ? ensureStreet() : ensureSatellite();
-    if (activeLayer) activeLayer.addTo(map);
-    else notify('أضف MAPTILER_API_KEY لعرض صور القمر الصناعي.', 0);
-    currentMode = mode;
-    mapElement.closest('.map-canvas-shell')?.setAttribute('data-map-mode', mode);
-    mapElement.dataset.mapMode = mode;
-    document.querySelectorAll('[data-basemap-mode]').forEach(button => {
-        button.setAttribute('aria-pressed', String(button.dataset.basemapMode === mode));
-    });
-    try { localStorage.setItem(MODE_KEY, mode); } catch (_) {}
-    syncSelection();
 }
 
 function markerIcon(mosque, selected = false) {
@@ -228,8 +180,9 @@ function initializeMap() {
     });
     map.createPane('mosqueMarkers').style.zIndex = '650';
     map.attributionControl.setPrefix(false);
+    ensureStreet().addTo(map);
+    mapElement.dataset.mapMode = 'street';
     createMarkers();
-    switchBasemap(savedMode());
     filtered = [...mosques];
     fitMarkers(false);
     map.whenReady(() => {
@@ -238,12 +191,7 @@ function initializeMap() {
         window.setTimeout(() => map.invalidateSize(), 0);
     });
     map.on('moveend', syncSelection);
-    map.on('zoomend', () => {
-        syncSelection();
-        if (currentMode === 'satellite' && map.getZoom() === 22) {
-            notify('تم الوصول إلى أقصى دقة متاحة.', 4000);
-        }
-    });
+    map.on('zoomend', syncSelection);
 }
 
 function setText(id, value) {
@@ -410,17 +358,14 @@ function setupFilters() {
 }
 
 function retryBasemap() {
-    const failedLayer = currentMode === 'street' ? streetLayer : satelliteLayer;
-    if (failedLayer) map.removeLayer(failedLayer);
-    if (currentMode === 'street') streetLayer = null;
-    else satelliteLayer = null;
+    if (streetLayer) map.removeLayer(streetLayer);
+    streetLayer = null;
     tileErrorShown = false;
-    switchBasemap(currentMode);
+    ensureStreet().addTo(map);
     notify('جاري إعادة تحميل خريطة الأساس...', 4000);
 }
 
 function setupControls() {
-    document.querySelectorAll('[data-basemap-mode]').forEach(button => button.addEventListener('click', () => switchBasemap(button.dataset.basemapMode)));
     document.getElementById('fitToMarkers')?.addEventListener('click', () => fitMarkers(true));
     document.getElementById('refreshMap')?.addEventListener('click', () => window.location.reload());
     document.getElementById('mapFullscreen')?.addEventListener('click', () => {
@@ -483,12 +428,10 @@ function start() {
         window.__leafletWorkspaceTest = {
             map,
             clusters,
-            get mode() { return currentMode; },
             get visibleCount() { return filtered.length; },
             get selectedMarkerHighlighted() {
                 return Boolean(markers.get(selectedMosqueId)?.options.icon?.options.html?.includes('is-selected'));
             },
-            switchBasemap,
             recordLayerFailure,
             selectFirst: () => filtered[0] && selectMosque(filtered[0].id, true),
             clickFirstMarker: () => {

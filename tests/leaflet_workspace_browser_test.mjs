@@ -10,6 +10,7 @@ const evidenceDir = path.join(root, 'docs', 'screenshots', 'leaflet-legacy');
 const profileDir = path.join(root, 'storage', `.leaflet-chrome-${Date.now()}`);
 const resultPath = path.join(root, 'storage', 'leaflet-browser-result.json');
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+await rm(evidenceDir, { recursive: true, force: true });
 await mkdir(evidenceDir, { recursive: true });
 await mkdir(profileDir, { recursive: true });
 
@@ -169,13 +170,11 @@ async function mapState() {
             clustersVisible: document.querySelectorAll('#map .mosque-cluster').length,
             markersVisible: document.querySelectorAll('#map .mosque-marker').length,
             streetTiles: document.querySelectorAll('#map img.leaflet-tile-loaded[src*="tile.openstreetmap.org"]').length,
-            satelliteTiles: document.querySelectorAll('#map img.leaflet-tile-loaded[src*="api.maptiler.com/tiles/satellite-v2"]').length,
             selectionVisible: Boolean(panel && !panel.hidden),
             selectionInViewport: Boolean(panelRect && !panel.hidden && panelRect.top >= 0 && panelRect.bottom <= innerHeight),
             selectedMarkerHighlighted: Boolean(leaflet?.selectedMarkerHighlighted),
             selectedListItems: document.querySelectorAll('.mosque-list-item[aria-current="true"]').length,
             attributionText: attribution?.textContent?.trim() || '',
-            maptilerLink: attribution?.querySelector('a[href*="maptiler.com"]')?.href || '',
             osmLink: attribution?.querySelector('a[href*="openstreetmap.org"]')?.href || '',
             attributionVisible: Boolean(attributionRect && shellRect
                 && attributionRect.width > 0
@@ -197,9 +196,6 @@ try {
     await navigate('mosque_maps.php');
     await waitFor(`document.querySelector('#map')?.dataset.mapReady === 'true' && Boolean(window.__leafletWorkspaceTest)`);
     await waitFor(`window.__leafletWorkspaceTest.visibleCount > 0`);
-    if (!await evaluate(`Boolean(JSON.parse(document.querySelector('#mapPageData')?.textContent || '{}').mapConfig?.apiKey)`)) {
-        throw new Error('MAPTILER_API_KEY is empty; live MapTiler approval requires a restricted browser key.');
-    }
     await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="tile.openstreetmap.org"]').length > 0`, 30000);
     result.states.baseline = await mapState();
     result.screenshots.push(await screenshot('legacy-street-1440x1000'));
@@ -211,7 +207,6 @@ try {
     check('Leaflet owns zoom, pan, markers, and clusters', result.states.baseline.maxZoom === 22 && result.states.baseline.controls === 2, result.states.baseline);
     check('Full dataset is clustered once', result.states.baseline.markerCount === result.states.baseline.visibleCount
         && result.states.baseline.markerCount > 0 && result.states.baseline.clustersVisible > 0, result.states.baseline);
-    check('Satellite is lazy before switching', !requests.some(request => request.host === 'api.maptiler.com' && request.path.includes('/tiles/satellite-v2/')));
     check('Required attribution is visible', result.states.baseline.attributionVisible
         && result.states.baseline.osmLink.includes('openstreetmap.org')
         && !result.states.baseline.leafletPrefix, result.states.baseline);
@@ -274,42 +269,23 @@ try {
     await evaluate(`document.exitFullscreen()`);
     await waitFor(`!document.fullscreenElement`);
 
-    await evaluate(`document.querySelector('#mapStyleSatellite').click()`);
-    await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'satellite'`);
-    await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="api.maptiler.com/tiles/satellite-v2"]').length > 0`, 30000);
-    await waitFor(`window.__leafletWorkspaceTest.mode === 'satellite'`);
-    await delay(700);
-    result.states.satellite = await mapState();
-    result.screenshots.push(await screenshot('legacy-satellite-1440x1000'));
-    check('MapTiler satellite raster loads', result.states.satellite.satelliteTiles > 0
-        && result.states.satellite.maptilerLink.includes('maptiler.com')
-        && requests.some(request => request.host === 'api.maptiler.com' && request.path.includes('/tiles/satellite-v2/')), requests);
-    check('Selection survives basemap switching', result.states.satellite.selectionVisible && result.states.satellite.selectedMarkerHighlighted);
+    await evaluate(`(() => { for (let i = 0; i < 4; i++) window.__leafletWorkspaceTest.recordLayerFailure(new Error('tile failed')); return true; })()`);
+    check('Tile errors keep the street map active', (await mapState()).mode === 'street');
+    check('Tile errors produce one non-blocking message', await evaluate(`document.querySelector('#mapNotice [data-map-notice-text]')?.textContent === 'تعذر تحميل جزء من الخريطة. حاول مرة أخرى.'`));
 
-    await evaluate(`(() => { for (let i = 0; i < 4; i++) window.__leafletWorkspaceTest.recordLayerFailure('satellite', new Error('tile failed')); return true; })()`);
-    check('Tile errors never switch satellite mode', (await mapState()).mode === 'satellite');
-    check('Tile errors produce one non-blocking message', await evaluate(`document.querySelector('#mapNotice [data-map-notice-text]')?.textContent === 'تعذر تحميل جزء من صور القمر الصناعي. حاول مرة أخرى.'`));
-
-    for (const zoom of [9, 12, 15, 17, 19, 21, 22]) {
+    for (const zoom of [9, 12, 15, 17, 19]) {
         await evaluate(`(() => { window.__leafletWorkspaceTest.map.setView([34.6814, -1.9086], ${zoom}, { animate: false }); return true; })()`);
         await waitFor(`window.__leafletWorkspaceTest.map.getZoom() === ${zoom}`);
-        await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="api.maptiler.com/tiles/satellite-v2/${zoom}/"]').length > 0`, 45000);
+        await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="tile.openstreetmap.org/${zoom}/"]').length > 0`, 45000);
         const state = await mapState();
-        check(`Satellite remains selected and rendered at zoom ${zoom}`, state.mode === 'satellite' && state.satelliteTiles > 0, state);
+        check(`OpenStreetMap renders at zoom ${zoom}`, state.mode === 'street' && state.streetTiles > 0, state);
         check(`Mosque card survives zoom ${zoom}`, state.selectionVisible && state.selectedMarkerHighlighted, state);
-        result.screenshots.push(await screenshot(`legacy-satellite-berkane-z${zoom}`));
+        result.screenshots.push(await screenshot(`legacy-street-berkane-z${zoom}`));
     }
-    check('Maximum-detail message is shown at zoom 22', await evaluate(`document.querySelector('#mapNotice [data-map-notice-text]')?.textContent === 'تم الوصول إلى أقصى دقة متاحة.'`));
 
     await evaluate(`(() => { window.__leafletWorkspaceTest.map.panBy([80, 40], { animate: false }); return true; })()`);
     await delay(180);
     check('Mosque card survives panning', (await mapState()).selectionVisible && (await mapState()).selectedMarkerHighlighted);
-
-    await evaluate(`location.reload()`);
-    await waitFor(`document.querySelector('#map')?.dataset.mapReady === 'true' && Boolean(window.__leafletWorkspaceTest)`);
-    await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'satellite'`);
-    result.states.persisted = await mapState();
-    check('Satellite choice persists after reload', result.states.persisted.mode === 'satellite');
 
     await evaluate(`window.__leafletWorkspaceTest.selectFirst()`);
     const viewports = [[1920, 1080], [1440, 1000], [1280, 800], [1024, 900], [768, 1024], [430, 932], [390, 844], [360, 800]];
@@ -323,7 +299,7 @@ try {
             return true;
         })()`);
         await delay(180);
-        await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="api.maptiler.com/tiles/satellite-v2/"]').length > 0`, 30000);
+        await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="tile.openstreetmap.org"]').length > 0`, 30000);
         const state = await mapState();
         check(`${width}x${height} has no page overflow`, !state.overflow, state);
         check(`${width}x${height} keeps attribution visible`, state.attributionVisible, state);
@@ -352,10 +328,10 @@ try {
     check('Coordinate picker uses Leaflet and the legacy street raster', result.states.formPicker.provider === 'leaflet'
         && result.states.formPicker.leaflet && result.states.formPicker.raster, result.states.formPicker);
 
-    check('Satellite requests use the configured browser key', requests.some(request => request.host === 'api.maptiler.com' && request.hasKey));
+    check('No tile API key is exposed', !requests.some(request => request.hasKey), requests);
     check('No routing UI or request remains', !requests.some(request => request.path.includes('map_route'))
         && !Boolean(await evaluate(`document.querySelector('#routeToMosque, #routePanel, a[href*="google.com/maps"]')`)));
-    check('No rejected provider runtime request exists', !requests.some(request => /arcgis|esri|maplibre|openfreemap|eox|google\.com\/maps/i.test(`${request.host}${request.path}`)), requests);
+    check('No rejected provider runtime request exists', !requests.some(request => /arcgis|esri|maplibre|maptiler|openfreemap|eox|google\.com\/maps/i.test(`${request.host}${request.path}`)), requests);
     check('No browser console or CSP errors', consoleEvents.length === 0, consoleEvents);
     check('No failed requests or tile storm', failedRequests.length === 0, failedRequests);
 } catch (error) {

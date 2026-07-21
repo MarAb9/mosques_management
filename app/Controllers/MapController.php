@@ -90,8 +90,6 @@ final class MapController extends Controller
         return [
             'engine' => 'leaflet',
             'streetUrl' => (string) $this->config->get('maps.street_tile_url', ''),
-            'satelliteUrl' => (string) $this->config->get('maps.satellite_tile_url', ''),
-            'apiKey' => (string) $this->config->get('maps.api_key', ''),
         ];
     }
 

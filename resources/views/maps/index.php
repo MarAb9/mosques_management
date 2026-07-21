@@ -150,14 +150,6 @@
                         <i class="fas fa-map me-2 text-primary"></i>خريطة تواجد المساجد
                     </h5>
                     <div class="map-canvas-actions">
-                        <div class="map-basemap-switch" role="group" aria-label="نوع عرض الخريطة">
-                            <button type="button" id="mapStyleStreet" data-basemap-mode="street" class="map-basemap-switch__button" aria-pressed="true">
-                                <i class="fas fa-map" aria-hidden="true"></i><span>الخريطة</span>
-                            </button>
-                            <button type="button" id="mapStyleSatellite" data-basemap-mode="satellite" class="map-basemap-switch__button" aria-pressed="false">
-                                <i class="fas fa-satellite" aria-hidden="true"></i><span>قمر صناعي</span>
-                            </button>
-                        </div>
                         <button id="fitToMarkers" class="btn btn-outline-primary btn-sm d-flex align-items-center">
                             <i class="fas fa-expand-alt me-2"></i>عرض الكل
                         </button>
@@ -216,7 +208,7 @@
                             <button id="retryMap" class="btn btn-sm btn-danger mt-1">إعادة المحاولة</button>
                         </div>
                     </div>
-                    <div id="mapNotice" class="map-satellite-notice" role="status" aria-live="polite" hidden>
+                    <div id="mapNotice" class="map-notice" role="status" aria-live="polite" hidden>
                         <span data-map-notice-text>تعذر تحميل بعض أجزاء الخريطة.</span>
                         <button type="button" id="retryMapTiles" hidden>حاول مرة أخرى</button>
                     </div>
