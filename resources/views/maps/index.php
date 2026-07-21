@@ -191,6 +191,7 @@
                         </div>
                         <div class="map-selection-panel__actions">
                             <button type="button" id="copyMosqueCoordinates" class="btn btn-outline-secondary btn-sm">نسخ الإحداثيات</button>
+                            <a id="selectedMosqueGoogleMaps" class="btn btn-outline-primary btn-sm" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-location-dot" aria-hidden="true"></i> خرائط Google</a>
                             <a id="selectedMosqueDetails" class="btn btn-primary btn-sm" href="mosques.php">عرض التفاصيل في الدليل</a>
                         </div>
                         </aside>

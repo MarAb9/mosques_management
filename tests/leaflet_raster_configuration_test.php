@@ -25,7 +25,7 @@ $dependencies = $package['dependencies'] ?? [];
 $check('Only local Leaflet map dependencies remain', array_keys($dependencies) === ['leaflet', 'leaflet.markercluster']);
 
 $runtimeFiles = ['app', 'config', 'resources', 'routes', 'public/ajax'];
-$forbidden = '/arcgis|esri|maplibre|maptiler|openfreemap|eox|google\.com\/maps/i';
+$forbidden = '/arcgis|esri|maplibre|maptiler|openfreemap|eox|maps\.googleapis\.com|google\.com\/maps\/(?:api|vt)/i';
 $matches = [];
 foreach ($runtimeFiles as $runtimePath) {
     $directory = new RecursiveDirectoryIterator(dirname(__DIR__) . '/' . $runtimePath, FilesystemIterator::SKIP_DOTS);
@@ -42,11 +42,15 @@ $mapScript = (string) file_get_contents(dirname(__DIR__) . '/resources/js/pages/
 $formScript = (string) file_get_contents(dirname(__DIR__) . '/resources/js/pages/mosque-form-map.js');
 $check('Both maps use plain Leaflet raster layers', str_contains($mapScript, 'L.tileLayer(') && str_contains($formScript, 'L.tileLayer('));
 $check('The workspace has one raster layer path', substr_count($mapScript, 'L.tileLayer(') === 1);
+$check('Google Maps uses the selected coordinates without an API key', str_contains($mapScript, 'https://www.google.com/maps/search/?api=1&query=')
+    && str_contains($mapScript, 'encodeURIComponent(`${mosque.latitude},${mosque.longitude}`)'));
 
 $view = (string) file_get_contents(dirname(__DIR__) . '/resources/views/maps/index.php');
 $check('Routing and basemap controls are absent', !str_contains($view, 'routeToMosque')
     && !str_contains($view, 'routePanel')
     && !str_contains($view, 'data-basemap-mode'));
+$check('Google Maps opens safely in a new tab', str_contains($view, 'id="selectedMosqueGoogleMaps"')
+    && str_contains($view, 'target="_blank" rel="noopener noreferrer"'));
 
 echo "Leaflet raster configuration: {$pass} passed, {$fail} failed" . PHP_EOL;
 exit($fail === 0 ? 0 : 1);

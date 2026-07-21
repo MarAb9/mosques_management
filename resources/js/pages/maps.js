@@ -221,6 +221,8 @@ function syncSelection() {
         setText('selectedMosqueCommunity', mosque.community);
         const details = document.getElementById('selectedMosqueDetails');
         if (details) details.href = `mosques.php?national_code=${encodeURIComponent(mosque.nationalCode)}&from_map=${encodeURIComponent(mosque.nationalCode)}`;
+        const googleMaps = document.getElementById('selectedMosqueGoogleMaps');
+        if (googleMaps) googleMaps.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${mosque.latitude},${mosque.longitude}`)}`;
         panel.hidden = false;
         panel.setAttribute('aria-hidden', 'false');
     }

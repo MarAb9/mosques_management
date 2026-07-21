@@ -174,6 +174,9 @@ async function mapState() {
             selectionInViewport: Boolean(panelRect && !panel.hidden && panelRect.top >= 0 && panelRect.bottom <= innerHeight),
             selectedMarkerHighlighted: Boolean(leaflet?.selectedMarkerHighlighted),
             selectedListItems: document.querySelectorAll('.mosque-list-item[aria-current="true"]').length,
+            googleMapsUrl: document.querySelector('#selectedMosqueGoogleMaps')?.href || '',
+            googleMapsTarget: document.querySelector('#selectedMosqueGoogleMaps')?.target || '',
+            googleMapsRel: document.querySelector('#selectedMosqueGoogleMaps')?.rel || '',
             attributionText: attribution?.textContent?.trim() || '',
             osmLink: attribution?.querySelector('a[href*="openstreetmap.org"]')?.href || '',
             attributionVisible: Boolean(attributionRect && shellRect
@@ -225,6 +228,10 @@ try {
     result.states.selected = await mapState();
     check('Mosque card and selected marker are stable', result.states.selected.selectionVisible
         && result.states.selected.selectedMarkerHighlighted && result.states.selected.selectedListItems === 1, result.states.selected);
+    check('Google Maps link targets the selected coordinates safely', /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=-?\d+(?:\.\d+)?%2C-?\d+(?:\.\d+)?$/.test(result.states.selected.googleMapsUrl)
+        && result.states.selected.googleMapsTarget === '_blank'
+        && result.states.selected.googleMapsRel.split(/\s+/).includes('noopener')
+        && result.states.selected.googleMapsRel.split(/\s+/).includes('noreferrer'), result.states.selected);
     check('Selection does not scroll the page', result.states.selected.scrollY === scrollBeforeSelection, result.states.selected);
     await evaluate(`document.querySelector('#selectedMosqueClose').click()`);
     await waitFor(`document.querySelector('#selectedMosquePanel').hidden`);
@@ -329,8 +336,8 @@ try {
         && result.states.formPicker.leaflet && result.states.formPicker.raster, result.states.formPicker);
 
     check('No tile API key is exposed', !requests.some(request => request.hasKey), requests);
-    check('No routing UI or request remains', !requests.some(request => request.path.includes('map_route'))
-        && !Boolean(await evaluate(`document.querySelector('#routeToMosque, #routePanel, a[href*="google.com/maps"]')`)));
+    check('No routing API request remains', !requests.some(request => request.path.includes('map_route'))
+        && !Boolean(await evaluate(`document.querySelector('#routeToMosque, #routePanel')`)));
     check('No rejected provider runtime request exists', !requests.some(request => /arcgis|esri|maplibre|maptiler|openfreemap|eox|google\.com\/maps/i.test(`${request.host}${request.path}`)), requests);
     check('No browser console or CSP errors', consoleEvents.length === 0, consoleEvents);
     check('No failed requests or tile storm', failedRequests.length === 0, failedRequests);
