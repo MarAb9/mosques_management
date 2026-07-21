@@ -9,20 +9,22 @@
     z-index: 0;
     inset: 0;
     content: "";
-    background: linear-gradient(90deg, rgba(7, 31, 26, .28), rgba(7, 31, 26, .62));
+    background: linear-gradient(90deg, rgba(6, 59, 48, .38), rgba(6, 59, 48, .76));
 }
+.login-page::after { position: fixed; z-index: 0; inset: 0; content: ""; pointer-events: none; background: url("../../assets/images/institutional/arch-pattern.svg") center / 11rem auto repeat; opacity: .045; }
 .login-shell { position: relative; z-index: 1; display: grid; min-height: 100vh; place-items: center; padding: clamp(1rem, 4vw, 3rem); }
-.login-panel { width: min(100%, 30rem); }
+.login-panel { position: relative; width: min(100%, 30rem); }
 .login-card {
     width: 100%;
     padding: clamp(1.5rem, 4vw, 2.25rem);
     background: rgba(255, 255, 255, .96);
     border: 1px solid rgba(255, 255, 255, .72);
+    border-block-start: .2rem solid var(--color-brass);
     border-radius: var(--radius-xl);
     box-shadow: 0 1.5rem 4rem rgba(3, 24, 20, .28);
 }
 .login-brand { display: flex; align-items: center; gap: .75rem; margin-block-end: 1.5rem; }
-.login-brand__mark { display: grid; width: 3rem; height: 3rem; flex: 0 0 auto; place-items: center; background: var(--color-brand-900); border-radius: var(--radius-md); }
+.login-brand__mark { display: grid; width: 3rem; height: 3rem; flex: 0 0 auto; place-items: center; background: var(--color-brand-900); border: 1px solid var(--color-brass); border-radius: 1.5rem 1.5rem var(--radius-md) var(--radius-md); }
 .login-brand__mark img { width: 2rem; height: 2rem; object-fit: contain; }
 .login-brand strong { font-size: .875rem; line-height: 1.45; }
 .login-brand small { color: var(--color-text-muted); font-size: .6875rem; }

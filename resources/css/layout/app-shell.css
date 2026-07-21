@@ -8,9 +8,17 @@
     flex-direction: column;
     overflow: hidden;
     color: #fff;
-    background: var(--color-brand-950);
+    background: linear-gradient(180deg, var(--color-brand-950), #052f27);
     border-inline-end: 1px solid rgba(255, 255, 255, .1);
     transition: width var(--duration-normal) var(--ease-standard), transform var(--duration-normal) var(--ease-standard);
+}
+.app-sidebar::before {
+    position: absolute;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+    background: url("../../assets/images/institutional/arch-pattern.svg") center bottom / 10rem auto repeat;
+    opacity: .035;
 }
 .sidebar-brand {
     position: relative;
@@ -19,9 +27,10 @@
     align-items: center;
     gap: .75rem;
     padding: 1rem;
-    background: var(--color-brand-900);
+    background: linear-gradient(135deg, var(--color-brand-900), var(--color-brand-950));
     border-block-end: 1px solid rgba(255, 255, 255, .1);
 }
+.sidebar-brand::after { position: absolute; inset-inline: 1rem; inset-block-end: 0; height: 1px; content: ""; background: linear-gradient(90deg, transparent, var(--color-sand-500), transparent); opacity: .8; }
 .sidebar-brand__mark {
     display: grid;
     width: 2.5rem;
@@ -30,15 +39,15 @@
     place-items: center;
     background: rgba(255, 255, 255, .08);
     border: 1px solid rgba(255, 255, 255, .14);
-    border-radius: var(--radius-md);
+    border-radius: 1.25rem 1.25rem var(--radius-sm) var(--radius-sm);
 }
 .sidebar-brand__mark img { width: 1.875rem; height: 1.875rem; object-fit: contain; }
 .sidebar-brand__text { min-width: 0; padding-inline-end: 1.5rem; }
 .sidebar-brand__title { display: block; color: #fff; font-size: .875rem; font-weight: 800; line-height: 1.45; }
 .sidebar-brand__subtitle { display: block; margin-top: .125rem; color: rgba(255, 255, 255, .64); font-size: .6875rem; line-height: 1.4; }
-.sidebar-scroll { flex: 1; overflow: auto; padding: .75rem; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .25) transparent; }
+.sidebar-scroll { position: relative; z-index: 1; flex: 1; overflow: auto; padding: .75rem; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .25) transparent; }
 .nav-group + .nav-group { margin-top: 1rem; }
-.nav-group__label { display: block; padding-inline: .625rem; margin-block-end: .375rem; color: rgba(255, 255, 255, .58); font-size: .75rem; font-weight: 700; }
+.nav-group__label { display: block; padding-inline: .625rem; margin-block-end: .375rem; color: var(--color-sand-300); font-size: .75rem; font-weight: 700; opacity: .78; }
 .sidebar-nav { display: grid; gap: .25rem; padding: 0; margin: 0; list-style: none; }
 .sidebar-nav__link {
     position: relative;
@@ -54,12 +63,12 @@
 }
 .sidebar-nav__link i { width: 1.25rem; color: rgba(255, 255, 255, .68); text-align: center; }
 .sidebar-nav__link:hover, .sidebar-nav__link:focus-visible { color: #fff; background: rgba(255, 255, 255, .08); }
-.sidebar-nav__link.is-active { color: #fff; background: rgba(255, 255, 255, .13); }
+.sidebar-nav__link.is-active { color: #fff; background: rgba(255, 255, 255, .12); box-shadow: inset 0 0 0 1px rgba(234, 214, 167, .08); }
 .sidebar-nav__link.is-active i { color: var(--color-sand-300); }
 .sidebar-nav__link.is-active::before { content: ""; position: absolute; inset-block: .5rem; inset-inline-start: -.75rem; width: .1875rem; background: var(--color-brass); border-radius: 0 .25rem .25rem 0; }
-.sidebar-account { padding: .75rem; border-block-start: 1px solid rgba(255, 255, 255, .1); }
+.sidebar-account { position: relative; z-index: 1; padding: .75rem; border-block-start: 1px solid rgba(255, 255, 255, .1); }
 .account-card { display: flex; align-items: center; gap: .625rem; }
-.account-avatar { display: grid; width: 2.25rem; height: 2.25rem; flex: 0 0 auto; place-items: center; color: #fff; background: rgba(255, 255, 255, .09); border-radius: var(--radius-sm); }
+.account-avatar { display: grid; width: 2.25rem; height: 2.25rem; flex: 0 0 auto; place-items: center; color: var(--color-sand-300); background: rgba(255, 255, 255, .09); border-radius: 1rem 1rem var(--radius-sm) var(--radius-sm); }
 .account-meta { min-width: 0; flex: 1; }
 .account-meta strong { display: block; color: #fff; font-size: .75rem; white-space: nowrap; }
 .logout-btn { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; color: rgba(255, 255, 255, .7); background: transparent; border-radius: var(--radius-sm); }
@@ -79,6 +88,7 @@
     padding-inline: clamp(1.5rem, 2vw, 2rem);
     background: rgba(255, 255, 255, .96);
     border-block-end: 1px solid var(--color-border-soft);
+    box-shadow: 0 1px 0 rgba(169, 121, 36, .08);
     backdrop-filter: blur(10px);
 }
 .topbar-title { min-width: 0; }

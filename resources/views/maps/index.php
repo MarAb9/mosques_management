@@ -11,6 +11,7 @@
         'title' => 'خريطة المساجد',
         'subtitle' => number_format((int) $totalWithCoords) . ' مسجد محدد الموقع من ' . number_format((int) $totalMosques),
         'icon' => 'fa-map-location-dot',
+        'illustration' => 'assets/images/institutional/map-location-3d.svg',
     ]) ?>
 
     <div class="map-summary reveal" aria-label="ملخص التغطية الجغرافية">

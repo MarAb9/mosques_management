@@ -48,6 +48,7 @@ foreach ($activeFilterLabels as $filterKey => $filterLabel) {
         'title' => 'دليل المساجد',
         'subtitle' => number_format((int) $total) . ' مسجد',
         'icon' => 'fa-mosque',
+        'illustration' => 'assets/images/institutional/mosque-building-3d.svg',
         'actionsHtml' => $directoryActions,
     ]) ?>
 

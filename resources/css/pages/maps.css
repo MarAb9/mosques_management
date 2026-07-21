@@ -1,8 +1,8 @@
 .map-workspace {
     --map-height: clamp(38.75rem, 65vh, 44rem);
-    --map-panel-border: #d7e1dc;
-    --map-panel-muted: #64756d;
-    --map-panel-soft: #f5f8f6;
+    --map-panel-border: var(--color-border-soft);
+    --map-panel-muted: var(--color-text-muted);
+    --map-panel-soft: var(--color-surface-base);
     max-width: 112rem;
     margin-inline: auto;
     padding-block-end: 1.5rem;
@@ -29,6 +29,7 @@
     color: var(--map-panel-muted);
     background: #fff;
     border: 1px solid var(--map-panel-border);
+    border-inline-start: .16rem solid var(--color-brass);
     border-radius: .5rem;
     font-size: .75rem;
 }
@@ -622,10 +623,10 @@
 .mosque-marker i,
 .mosque-form-marker i { transform: rotate(45deg); font-size: .9rem; }
 .mosque-marker--success,
-.mosque-form-marker { background: #176b57; }
-.mosque-marker--warning { background: #ba7b13; }
-.mosque-marker--danger { background: #b63d43; }
-.mosque-marker.is-selected { box-shadow: 0 0 0 .28rem #f0bd4f, 0 .45rem 1rem rgba(20, 48, 39, .4); transform: rotate(-45deg) scale(1.14); }
+.mosque-form-marker { background: var(--color-brand-800); }
+.mosque-marker--warning { background: var(--color-warning); }
+.mosque-marker--danger { background: var(--color-danger); }
+.mosque-marker.is-selected { box-shadow: 0 0 0 .28rem var(--color-sand-500), 0 .45rem 1rem rgba(20, 48, 39, .4); transform: rotate(-45deg) scale(1.14); }
 
 .mosque-cluster {
     display: grid;
@@ -633,15 +634,15 @@
     width: 100%;
     height: 100%;
     color: #fff;
-    background: rgba(23, 107, 87, .94);
+    background: rgba(15, 102, 82, .94);
     border: .2rem solid #fff;
     border-radius: 50%;
     box-shadow: 0 0 0 .28rem rgba(23, 107, 87, .24), 0 .4rem 1rem rgba(18, 53, 42, .3);
     text-align: center;
 }
 
-.mosque-cluster--medium { background: rgba(15, 79, 65, .96); }
-.mosque-cluster--large { background: rgba(148, 101, 29, .96); box-shadow: 0 0 0 .3rem rgba(184, 138, 59, .25), 0 .4rem 1rem rgba(18, 53, 42, .34); }
+.mosque-cluster--medium { background: rgba(8, 127, 131, .96); }
+.mosque-cluster--large { background: rgba(169, 121, 36, .96); box-shadow: 0 0 0 .3rem rgba(197, 150, 61, .25), 0 .4rem 1rem rgba(18, 53, 42, .34); }
 .mosque-cluster strong { font-size: .84rem; line-height: 1; }
 .mosque-cluster small { margin-block-start: .14rem; font-size: .48rem; font-weight: 700; }
 

@@ -5,7 +5,9 @@ $qualityIssueCount = array_sum(array_map('intval', $dataQuality ?? []));
     <!-- Legacy HTTP smoke contract: لوحة تحكم المسؤول -->
     <section class="dashboard-hero reveal" aria-labelledby="dashboardWelcome">
         <div class="dashboard-hero__content">
+            <span class="dashboard-hero__eyebrow">المجلس العلمي المحلي بإقليم بركان</span>
             <h1 id="dashboardWelcome">لوحة التحكم</h1>
+            <p class="dashboard-hero__summary">نظرة تشغيلية موحدة على سجلات المساجد، التغطية الجغرافية، وبرامج القرآن الكريم.</p>
             <div class="dashboard-hero__actions">
                 <a class="btn btn-light" href="mosques.php"><i class="fas fa-magnifying-glass me-2" aria-hidden="true"></i>دليل المساجد</a>
                 <a class="btn btn-outline-light" href="mosque_maps.php"><i class="fas fa-map-location-dot me-2" aria-hidden="true"></i>خريطة المساجد</a>

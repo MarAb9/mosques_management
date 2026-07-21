@@ -8,22 +8,37 @@
     overflow: hidden;
     padding: 1.5rem;
     color: #fff;
-    background: var(--color-brand-900);
+    background: linear-gradient(120deg, var(--color-brand-950), var(--color-brand-800));
     border: 1px solid var(--color-brand-950);
+    border-block-end-color: var(--color-brass);
     border-radius: var(--radius-lg);
+    box-shadow: 0 .75rem 2rem rgba(6, 59, 48, .12);
 }
+.dashboard-hero::before { position: absolute; inset: 0 0 0 auto; width: 48%; content: ""; pointer-events: none; background: url("../../assets/images/institutional/geometric-corner.svg") right center / cover no-repeat; opacity: .08; }
 .dashboard-hero h1 { margin: 0; color: #fff; font-size: clamp(1.5rem, 2.5vw, 1.875rem); }
 .dashboard-hero__content { position: relative; z-index: 1; width: min(70%, 44rem); }
+.dashboard-hero__eyebrow { display: block; margin-block-end: .25rem; color: var(--color-sand-300); font-size: .75rem; font-weight: 800; }
+.dashboard-hero__summary { max-width: 37rem; margin: .35rem 0 0; color: rgba(255, 255, 255, .76); font-size: .8125rem; }
 .dashboard-hero__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-block-start: 1rem; }
 .dashboard-hero__actions .btn { min-height: 2.25rem; }
-.dashboard-hero__image { position: absolute; inset-block: .75rem; inset-inline-end: 1.5rem; width: 10rem; height: 8.5rem; object-fit: contain; }
+.dashboard-hero__image { position: absolute; z-index: 1; inset-block: .75rem; inset-inline-end: 1.5rem; width: 10rem; height: 8.5rem; object-fit: contain; filter: drop-shadow(0 .5rem .8rem rgba(3, 36, 29, .22)); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-block-end: .75rem; }
+.section-heading h2 { display: flex; align-items: center; gap: .55rem; }
+.section-heading h2::before { width: .25rem; height: 1.25rem; content: ""; background: var(--color-brass); border-radius: 999px; }
 .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.metric-grid > :nth-child(2), .metric-grid > :nth-child(5) { --metric-accent: var(--color-brass); --metric-soft: var(--color-brass-soft); }
+.metric-grid > :nth-child(3) { --metric-accent: var(--color-success); --metric-soft: #eaf7f2; }
+.metric-grid > :nth-child(6) { --metric-accent: var(--color-teal); --metric-soft: #e8f7f7; }
 .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(17rem, .8fr); gap: 1rem; }
 .quick-actions { display: grid; gap: .5rem; }
 .quick-action { display: flex; min-height: 3.5rem; align-items: center; gap: .75rem; padding: .625rem .75rem; color: var(--color-text-primary); border: 1px solid var(--color-border-soft); border-radius: var(--radius-sm); background: #fff; text-decoration: none; transition: border-color var(--duration-fast), background-color var(--duration-fast); }
-.quick-action:hover { color: var(--color-brand-900); background: var(--color-brand-50); border-color: #b5ccc4; }
+.quick-action:hover { color: var(--color-brand-900); background: var(--color-brand-50); border-color: #9dc8ba; }
 .quick-action i { display: grid; width: 2.25rem; height: 2.25rem; flex: 0 0 auto; place-items: center; color: var(--color-brand-700); background: var(--color-brand-50); border-radius: var(--radius-sm); }
+.dashboard-grid > .data-panel:first-child .data-panel__header { box-shadow: inset -.2rem 0 var(--color-teal); }
+.dashboard-grid > .data-panel:last-child .data-panel__header { box-shadow: inset -.2rem 0 var(--color-brass); }
+.quick-actions .quick-action:nth-child(2) i { color: var(--color-teal); background: #e8f7f7; }
+.quick-actions .quick-action:nth-child(3) i { color: var(--color-brass); background: var(--color-brass-soft); }
+.quick-actions .quick-action:nth-child(4) i { color: var(--color-info); background: #eef6fc; }
 @media (min-width: 1680px) { .metric-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 @media (max-width: 1199.98px) { .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 991.98px) { .dashboard-grid { grid-template-columns: 1fr; } }

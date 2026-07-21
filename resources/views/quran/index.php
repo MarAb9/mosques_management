@@ -34,6 +34,7 @@ if ($isAdmin) {
     <?= $view->partial('components.page_header', [
         'title' => 'قائمة مساجد التحفيظ',
         'subtitle' => 'إجمالي مساجد التحفيظ: ' . number_format($total),
+        'icon' => 'fa-book-quran',
         'actionsHtml' => $quranActions,
     ]) ?>
 </div>
