@@ -94,16 +94,12 @@ function initializeFormMap(form) {
         });
         formMap.attributionControl.setPrefix(false);
         L.control.zoom({ position: 'topright' }).addTo(formMap);
-        if (config.street?.url) {
-            L.tileLayer(config.street.url, {
-                attribution: String(config.street.attribution || ''),
-                maxZoom: Number(config.street.max_zoom) || 22,
-                maxNativeZoom: Number(config.street.max_native_zoom) || 22,
-                tileSize: Number(config.street.tile_size) || 256
-            }).on('tileerror', () => { mapElement.dataset.tileError = 'true'; }).addTo(formMap);
-        } else {
-            mapElement.dataset.tileError = 'missing-token';
-        }
+        L.tileLayer(String(config.streetUrl || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'), {
+            maxNativeZoom: 19,
+            maxZoom: 19,
+            crossOrigin: true,
+            attribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">&copy; OpenStreetMap contributors</a>'
+        }).on('tileerror', () => { mapElement.dataset.tileError = 'true'; }).addTo(formMap);
         formMap.on('click', event => {
             setCoordinateValues(form, event.latlng.lat, event.latlng.lng);
             moveMarker(form, event.latlng.lat, event.latlng.lng, false);

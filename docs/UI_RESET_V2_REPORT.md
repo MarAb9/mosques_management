@@ -112,7 +112,7 @@
 - البحث العام: التركيز انتقل إلى `globalSearchInput`، ثم عاد إلى `globalSearchToggle` بعد Escape.
 - قائمة الأعمدة: بقيت داخل حدود viewport ولم تتجاوز الشاشة.
 
-تحديث بتاريخ 20 يوليو 2026: تعتمد الخرائط على Leaflet وLeaflet.markercluster المجمّعين محلياً، مع خرائط ArcGIS النقطية واتجاهات ArcGIS عبر وكيل خادوم آمن.
+تحديث بتاريخ 21 يوليو 2026: تعتمد الخرائط على Leaflet وLeaflet.markercluster محلياً، مع خريطة شوارع OpenStreetMap نقطية وصور MapTiler نقطية للقمر الصناعي دون وظيفة توجيه.
 
 ## نتائج الاختبارات
 

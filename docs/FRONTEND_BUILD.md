@@ -34,15 +34,15 @@ Tailwind is compiled with the `tw` prefix and without Preflight. Bootstrap remai
 
 1. Run `npm ci && npm run build` in CI or on a development machine.
 2. Deploy the PHP application together with the generated `public/assets/dist/` directory.
-3. Keep the writable upload/storage directories and ArcGIS variables configured as documented by the application.
+3. Keep the writable upload/storage directories and `MAPTILER_API_KEY` configured as documented by the application.
 4. Do not run Node.js on the production host; the generated files are the production assets.
-5. After deployment, verify login, an authenticated dashboard request, form submission, export download, ArcGIS tile loading, clusters, mosque selection, and routing.
+5. After deployment, verify login, an authenticated dashboard request, form submission, export download, OpenStreetMap street tiles, MapTiler satellite tiles, clusters, and mosque selection.
 
 ## Dependency policy
 
 - Bootstrap, Font Awesome, SweetAlert2, Chart.js, jQuery, and Select2 are retained where the current application uses them.
 - Animate.css and Hover.css are no longer loaded; motion is implemented in the application stylesheet and honors `prefers-reduced-motion`.
-- Leaflet and Leaflet.markercluster are bundled locally through npm/esbuild. ArcGIS supplies the configured raster basemaps; no map runtime is loaded from a CDN.
+- Leaflet and Leaflet.markercluster are bundled locally through npm/esbuild. Basemaps are plain raster tile layers; no JavaScript or CSS runtime is loaded from a CDN.
 - Three.js is intentionally omitted because the visual concept is achieved with lightweight CSS transforms and gradients.
 
 ## Source layout

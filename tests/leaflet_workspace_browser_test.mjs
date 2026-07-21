@@ -4,9 +4,9 @@ import path from 'node:path';
 
 const baseUrl = (process.env.MAP_TEST_BASE_URL || 'http://127.0.0.1:8085').replace(/\/$/, '');
 const chromePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const port = Number(process.env.MAP_TEST_DEBUG_PORT || 9445);
+const port = Number(process.env.MAP_TEST_DEBUG_PORT || 9300 + Math.floor(Math.random() * 500));
 const root = process.cwd();
-const evidenceDir = path.join(root, 'docs', 'screenshots', 'leaflet-map');
+const evidenceDir = path.join(root, 'docs', 'screenshots', 'leaflet-legacy');
 const profileDir = path.join(root, 'storage', `.leaflet-chrome-${Date.now()}`);
 const resultPath = path.join(root, 'storage', 'leaflet-browser-result.json');
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -76,16 +76,6 @@ const failedRequests = [];
 const requests = [];
 const checks = [];
 const check = (name, ok, detail = '') => checks.push({ name, ok: Boolean(ok), detail });
-const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
-const routePayload = {
-    data: {
-        distance_km: 4.2,
-        duration_minutes: 11,
-        geometry: [[34.6814, -1.9086], [34.689, -1.92], [34.7, -1.94]],
-        steps: [{ text: 'اتجه شمالاً ثم واصل إلى المسجد', distance_km: 4.2, duration_minutes: 11 }]
-    }
-};
-
 cdp.on('Runtime.consoleAPICalled', ({ type, args = [] }) => {
     if (['error', 'warning', 'assert'].includes(type)) consoleEvents.push({ type, text: args.map(arg => arg.value ?? arg.description ?? '').join(' ') });
 });
@@ -96,7 +86,13 @@ cdp.on('Log.entryAdded', ({ entry }) => {
 cdp.on('Network.requestWillBeSent', ({ request }) => {
     try {
         const url = new URL(request.url);
-        requests.push({ host: url.hostname, path: url.pathname, search: url.search, method: request.method });
+        requests.push({
+            host: url.hostname,
+            path: url.pathname,
+            query: [...url.searchParams.keys()].sort(),
+            hasKey: url.searchParams.has('key'),
+            method: request.method
+        });
     } catch (_) {}
 });
 cdp.on('Network.loadingFailed', ({ errorText, canceled, type }) => {
@@ -105,27 +101,8 @@ cdp.on('Network.loadingFailed', ({ errorText, canceled, type }) => {
 cdp.on('Network.responseReceived', ({ response, type }) => {
     if (response.status >= 400) failedRequests.push({ status: response.status, type, url: response.url.split('?')[0] });
 });
-cdp.on('Fetch.requestPaused', async ({ requestId, request }) => {
-    try {
-        const url = new URL(request.url);
-        if (url.pathname.endsWith('/ajax/map_tile.php')) {
-            await cdp.send('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'image/png' }], body: png });
-        } else if (url.pathname.endsWith('/ajax/map_route.php')) {
-            await cdp.send('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json; charset=UTF-8' }], body: Buffer.from(JSON.stringify(routePayload)).toString('base64') });
-        } else {
-            await cdp.send('Fetch.continueRequest', { requestId });
-        }
-    } catch (_) {
-        await cdp.send('Fetch.continueRequest', { requestId }).catch(() => {});
-    }
-});
-
 await Promise.all([
-    cdp.send('Page.enable'), cdp.send('Runtime.enable'), cdp.send('Network.enable'), cdp.send('Log.enable'),
-    cdp.send('Fetch.enable', { patterns: [
-        { urlPattern: `${baseUrl}/ajax/map_tile.php*` },
-        { urlPattern: `${baseUrl}/ajax/map_route.php` }
-    ] })
+    cdp.send('Page.enable'), cdp.send('Runtime.enable'), cdp.send('Network.enable'), cdp.send('Log.enable')
 ]);
 
 async function evaluate(expression) {
@@ -176,28 +153,42 @@ async function mapState() {
     return evaluate(`(() => {
         const map = document.querySelector('#map');
         const panel = document.querySelector('#selectedMosquePanel');
+        const panelRect = panel?.getBoundingClientRect();
         const attribution = document.querySelector('#map .leaflet-control-attribution');
+        const attributionRect = attribution?.getBoundingClientRect();
+        const shellRect = document.querySelector('.map-canvas-shell')?.getBoundingClientRect();
+        const leaflet = window.__leafletWorkspaceTest;
         return {
             ready: map?.dataset.mapReady === 'true',
             provider: map?.dataset.provider || '',
             mode: map?.dataset.mapMode || '',
-            maxZoom: window.__leafletWorkspaceTest?.map?.getMaxZoom(),
+            zoom: leaflet?.map?.getZoom(),
+            maxZoom: leaflet?.map?.getMaxZoom(),
             visibleCount: Number(map?.dataset.visibleCount || 0),
-            markerCount: window.__leafletWorkspaceTest?.clusters?.getLayers()?.length || 0,
+            markerCount: leaflet?.clusters?.getLayers()?.length || 0,
             clustersVisible: document.querySelectorAll('#map .mosque-cluster').length,
             markersVisible: document.querySelectorAll('#map .mosque-marker').length,
+            streetTiles: document.querySelectorAll('#map img.leaflet-tile-loaded[src*="tile.openstreetmap.org"]').length,
+            satelliteTiles: document.querySelectorAll('#map img.leaflet-tile-loaded[src*="api.maptiler.com/tiles/satellite-v2"]').length,
             selectionVisible: Boolean(panel && !panel.hidden),
-            routeReady: map?.dataset.routeReady === 'true',
+            selectionInViewport: Boolean(panelRect && !panel.hidden && panelRect.top >= 0 && panelRect.bottom <= innerHeight),
+            selectedMarkerHighlighted: Boolean(leaflet?.selectedMarkerHighlighted),
+            selectedListItems: document.querySelectorAll('.mosque-list-item[aria-current="true"]').length,
             attributionText: attribution?.textContent?.trim() || '',
-            attributionLink: attribution?.querySelector('a[href*="esri.com"]')?.href || '',
+            maptilerLink: attribution?.querySelector('a[href*="maptiler.com"]')?.href || '',
+            osmLink: attribution?.querySelector('a[href*="openstreetmap.org"]')?.href || '',
+            attributionVisible: Boolean(attributionRect && shellRect
+                && attributionRect.width > 0
+                && attributionRect.bottom <= shellRect.bottom
+                && attributionRect.left >= shellRect.left),
             leafletPrefix: Boolean(attribution?.querySelector('a[href*="leafletjs.com"]')),
             overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-            controls: document.querySelectorAll('.map-control-stack button').length,
+            scrollY: window.scrollY,
+            controls: document.querySelectorAll('#map .leaflet-control-zoom a').length,
             errors: map?.dataset.mapLoadError || ''
         };
     })()`);
 }
-
 const result = { baseUrl, screenshots: [], states: {}, requests, consoleEvents, failedRequests, checks };
 let fatalError = '';
 try {
@@ -206,76 +197,167 @@ try {
     await navigate('mosque_maps.php');
     await waitFor(`document.querySelector('#map')?.dataset.mapReady === 'true' && Boolean(window.__leafletWorkspaceTest)`);
     await waitFor(`window.__leafletWorkspaceTest.visibleCount > 0`);
+    if (!await evaluate(`Boolean(JSON.parse(document.querySelector('#mapPageData')?.textContent || '{}').mapConfig?.apiKey)`)) {
+        throw new Error('MAPTILER_API_KEY is empty; live MapTiler approval requires a restricted browser key.');
+    }
+    await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="tile.openstreetmap.org"]').length > 0`, 30000);
     result.states.baseline = await mapState();
-    result.screenshots.push(await screenshot('leaflet-unselected-1440x1000'));
+    result.screenshots.push(await screenshot('legacy-street-1440x1000'));
 
-    const imageryBefore = requests.filter(request => request.search.includes('layer=imagery')).length;
     check('Leaflet workspace initializes', result.states.baseline.ready && result.states.baseline.provider === 'leaflet', result.states.baseline);
-    check('Full dataset is clustered', result.states.baseline.markerCount === result.states.baseline.visibleCount && result.states.baseline.markerCount > 0, result.states.baseline);
-    check('Provider maximum zoom is 22', result.states.baseline.maxZoom === 22, result.states.baseline.maxZoom);
-    check('Application controls are present', result.states.baseline.controls === 4, result.states.baseline.controls);
-    check('Esri attribution is clickable with no framework prefix', result.states.baseline.attributionLink.includes('esri.com') && !result.states.baseline.leafletPrefix, result.states.baseline);
-    check('Satellite is lazy before switching', imageryBefore === 0, imageryBefore);
+    check('Legacy OpenStreetMap raster is the default', result.states.baseline.mode === 'street'
+        && result.states.baseline.streetTiles > 0
+        && requests.some(request => request.host.endsWith('tile.openstreetmap.org')), requests);
+    check('Leaflet owns zoom, pan, markers, and clusters', result.states.baseline.maxZoom === 22 && result.states.baseline.controls === 2, result.states.baseline);
+    check('Full dataset is clustered once', result.states.baseline.markerCount === result.states.baseline.visibleCount
+        && result.states.baseline.markerCount > 0 && result.states.baseline.clustersVisible > 0, result.states.baseline);
+    check('Satellite is lazy before switching', !requests.some(request => request.host === 'api.maptiler.com' && request.path.includes('/tiles/satellite-v2/')));
+    check('Required attribution is visible', result.states.baseline.attributionVisible
+        && result.states.baseline.osmLink.includes('openstreetmap.org')
+        && !result.states.baseline.leafletPrefix, result.states.baseline);
+    check('Marker clusters can spiderfy', Boolean(await evaluate(`window.__leafletWorkspaceTest.spiderfyFirstCluster()`)));
 
-    await evaluate(`window.__leafletWorkspaceTest.selectFirst()`);
+    const firstLoadTime = await evaluate('performance.timeOrigin');
+    await evaluate(`document.querySelector('#refreshMap').click()`);
+    await waitFor(`performance.timeOrigin !== ${firstLoadTime}`);
+    await waitFor(`document.querySelector('#map')?.dataset.mapReady === 'true' && Boolean(window.__leafletWorkspaceTest)`);
+    await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="tile.openstreetmap.org"]').length > 0`, 30000);
+    check('Refresh restores the working street map', (await mapState()).mode === 'street' && (await mapState()).streetTiles > 0);
+
+    const scrollBeforeSelection = await evaluate('window.scrollY');
+    await evaluate(`document.querySelector('#mosquesList [data-mosque-id]').click()`);
     await waitFor(`!document.querySelector('#selectedMosquePanel').hidden`);
     result.states.selected = await mapState();
-    check('Selection uses the persistent details panel', result.states.selected.selectionVisible);
+    check('Mosque card and selected marker are stable', result.states.selected.selectionVisible
+        && result.states.selected.selectedMarkerHighlighted && result.states.selected.selectedListItems === 1, result.states.selected);
+    check('Selection does not scroll the page', result.states.selected.scrollY === scrollBeforeSelection, result.states.selected);
+    await evaluate(`document.querySelector('#selectedMosqueClose').click()`);
+    await waitFor(`document.querySelector('#selectedMosquePanel').hidden`);
+    check('Marker click opens the mosque card', Boolean(await evaluate(`window.__leafletWorkspaceTest.clickFirstMarker()`)));
+    await waitFor(`!document.querySelector('#selectedMosquePanel').hidden`);
+
+    await evaluate(`(() => {
+        const select = document.querySelector('#communityFilter');
+        const community = document.querySelector('#selectedMosqueCommunity')?.textContent?.trim();
+        const option = [...select.options].find(item => item.value === community);
+        if (!option) return false;
+        select.value = option.value;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+    })()`);
+    await delay(250);
+    check('Filters preserve an included selection', (await mapState()).selectionVisible && (await mapState()).selectedMarkerHighlighted);
+
+    const beforeSearch = await evaluate('window.__leafletWorkspaceTest.visibleCount');
+    await evaluate(`(() => {
+        const input = document.querySelector('#globalSearch');
+        input.value = document.querySelector('#selectedMosqueTitle').textContent.trim().slice(0, 3);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        return true;
+    })()`);
+    await delay(300);
+    check('Search synchronizes the list and markers', await evaluate(`window.__leafletWorkspaceTest.visibleCount > 0 && window.__leafletWorkspaceTest.visibleCount <= ${beforeSearch}`));
+    await evaluate(`document.querySelector('#clearGlobalSearch').click()`);
+
+    await evaluate(`document.querySelector('#fitToMarkers').click()`);
+    await delay(200);
+    check('Fit-all keeps the map usable', (await mapState()).ready && !(await mapState()).errors);
+
+    await evaluate(`(() => { window.__leafletWorkspaceTest.map.setZoom(18, { animate: false }); return true; })()`);
+    await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="tile.openstreetmap.org/18/"]').length > 0`, 30000);
+    check('Street detail renders at zoom 18', (await mapState()).mode === 'street' && (await mapState()).streetTiles > 0);
+    result.screenshots.push(await screenshot('legacy-street-selected-z18'));
+
+    await evaluate(`document.querySelector('#mapFullscreen').click()`);
+    await waitFor(`Boolean(document.fullscreenElement)`);
+    check('Fullscreen opens without losing selection', (await mapState()).selectionVisible);
+    await evaluate(`document.exitFullscreen()`);
+    await waitFor(`!document.fullscreenElement`);
 
     await evaluate(`document.querySelector('#mapStyleSatellite').click()`);
     await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'satellite'`);
+    await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="api.maptiler.com/tiles/satellite-v2"]').length > 0`, 30000);
     await waitFor(`window.__leafletWorkspaceTest.mode === 'satellite'`);
+    await delay(700);
     result.states.satellite = await mapState();
-    check('Satellite is created on demand', requests.filter(request => request.search.includes('layer=imagery')).length > imageryBefore);
-    check('Selection survives basemap changes', result.states.satellite.selectionVisible);
+    result.screenshots.push(await screenshot('legacy-satellite-1440x1000'));
+    check('MapTiler satellite raster loads', result.states.satellite.satelliteTiles > 0
+        && result.states.satellite.maptilerLink.includes('maptiler.com')
+        && requests.some(request => request.host === 'api.maptiler.com' && request.path.includes('/tiles/satellite-v2/')), requests);
+    check('Selection survives basemap switching', result.states.satellite.selectionVisible && result.states.satellite.selectedMarkerHighlighted);
 
-    await evaluate(`document.querySelector('#mapStyleHybrid').click()`);
-    await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'hybrid'`);
-    check('Hybrid requests the labels proxy', requests.some(request => request.search.includes('layer=labels')));
+    await evaluate(`(() => { for (let i = 0; i < 4; i++) window.__leafletWorkspaceTest.recordLayerFailure('satellite', new Error('tile failed')); return true; })()`);
+    check('Tile errors never switch satellite mode', (await mapState()).mode === 'satellite');
+    check('Tile errors produce one non-blocking message', await evaluate(`document.querySelector('#mapNotice [data-map-notice-text]')?.textContent === 'تعذر تحميل جزء من صور القمر الصناعي. حاول مرة أخرى.'`));
 
-    await cdp.send('Browser.setPermission', { permission: { name: 'geolocation' }, setting: 'granted', origin: baseUrl });
-    await cdp.send('Emulation.setGeolocationOverride', { latitude: 34.6814, longitude: -1.9086, accuracy: 12 });
-    await evaluate(`document.querySelector('#routeToMosque').click()`);
-    await waitFor(`document.querySelector('#map')?.dataset.routeReady === 'true'`);
-    result.states.routed = await mapState();
-    check('Mocked geolocation route renders', result.states.routed.routeReady && Boolean(await evaluate(`document.querySelector('#routeSteps li')?.textContent.includes('شمال')`)));
-    check('Selection remains stable while routing', result.states.routed.selectionVisible);
-    check('Routing stays on the local endpoint', requests.some(request => request.path.endsWith('/ajax/map_route.php')) && !requests.some(request => request.host === 'route-api.arcgis.com'));
+    for (const zoom of [9, 12, 15, 17, 19, 21, 22]) {
+        await evaluate(`(() => { window.__leafletWorkspaceTest.map.setView([34.6814, -1.9086], ${zoom}, { animate: false }); return true; })()`);
+        await waitFor(`window.__leafletWorkspaceTest.map.getZoom() === ${zoom}`);
+        await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="api.maptiler.com/tiles/satellite-v2/${zoom}/"]').length > 0`, 45000);
+        const state = await mapState();
+        check(`Satellite remains selected and rendered at zoom ${zoom}`, state.mode === 'satellite' && state.satelliteTiles > 0, state);
+        check(`Mosque card survives zoom ${zoom}`, state.selectionVisible && state.selectedMarkerHighlighted, state);
+        result.screenshots.push(await screenshot(`legacy-satellite-berkane-z${zoom}`));
+    }
+    check('Maximum-detail message is shown at zoom 22', await evaluate(`document.querySelector('#mapNotice [data-map-notice-text]')?.textContent === 'تم الوصول إلى أقصى دقة متاحة.'`));
+
+    await evaluate(`(() => { window.__leafletWorkspaceTest.map.panBy([80, 40], { animate: false }); return true; })()`);
+    await delay(180);
+    check('Mosque card survives panning', (await mapState()).selectionVisible && (await mapState()).selectedMarkerHighlighted);
 
     await evaluate(`location.reload()`);
-    await waitFor(`document.querySelector('#map')?.dataset.mapReady === 'true'`);
-    await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'hybrid'`);
+    await waitFor(`document.querySelector('#map')?.dataset.mapReady === 'true' && Boolean(window.__leafletWorkspaceTest)`);
+    await waitFor(`document.querySelector('#map')?.dataset.mapMode === 'satellite'`);
     result.states.persisted = await mapState();
-    check('Basemap choice persists after reload', result.states.persisted.mode === 'hybrid');
+    check('Satellite choice persists after reload', result.states.persisted.mode === 'satellite');
 
     await evaluate(`window.__leafletWorkspaceTest.selectFirst()`);
-    const viewports = [[1920, 1080], [1440, 1000], [1024, 900], [768, 1024], [430, 932], [390, 844], [360, 800]];
+    const viewports = [[1920, 1080], [1440, 1000], [1280, 800], [1024, 900], [768, 1024], [430, 932], [390, 844], [360, 800]];
     for (const [width, height] of viewports) {
         await viewport(width, height);
         await evaluate(`(() => { window.dispatchEvent(new Event('resize')); window.__leafletWorkspaceTest.map.invalidateSize(); return true; })()`);
+        await evaluate(`(() => {
+            const shell = document.querySelector('.map-canvas-shell');
+            document.documentElement.style.scrollBehavior = 'auto';
+            window.scrollTo(0, Math.max(0, shell.getBoundingClientRect().top + scrollY - (innerHeight - shell.offsetHeight) / 2));
+            return true;
+        })()`);
         await delay(180);
+        await waitFor(`document.querySelectorAll('#map img.leaflet-tile-loaded[src*="api.maptiler.com/tiles/satellite-v2/"]').length > 0`, 30000);
         const state = await mapState();
         check(`${width}x${height} has no page overflow`, !state.overflow, state);
-        result.screenshots.push(await screenshot(`leaflet-selected-${width}x${height}`));
+        check(`${width}x${height} keeps attribution visible`, state.attributionVisible, state);
+        check(`${width}x${height} keeps the mosque card in view`, state.selectionVisible && state.selectionInViewport, state);
+        result.screenshots.push(await screenshot(`legacy-selected-${width}x${height}`));
+        if (width === 430) {
+            await evaluate(`document.querySelector('[data-map-view="list"]').click()`);
+            check('Mobile list tab shows one view at a time', await evaluate(`getComputedStyle(document.querySelector('#mapListColumn')).display !== 'none'
+                && getComputedStyle(document.querySelector('#mapCanvasColumn')).display === 'none'`));
+            result.screenshots.push(await screenshot('legacy-list-430x932'));
+            await evaluate(`document.querySelector('[data-map-view="map"]').click()`);
+        }
     }
 
-    await viewport(1024, 900);
+    await viewport(1440, 1000);
     await navigate('add_mosque.php');
     await evaluate(`document.querySelector('#showMapBtn').click()`);
     await waitFor(`document.querySelector('#mapContainer #map')?.dataset.mapReady === 'true'`);
+    await waitFor(`document.querySelectorAll('#mapContainer img.leaflet-tile-loaded[src*="tile.openstreetmap.org"]').length > 0`, 30000);
     result.states.formPicker = await evaluate(`(() => ({
         provider: document.querySelector('#mapContainer')?.dataset.provider,
         leaflet: Boolean(document.querySelector('#mapContainer .leaflet-container')),
+        raster: Boolean(document.querySelector('#mapContainer img.leaflet-tile-loaded[src*="tile.openstreetmap.org"]')),
         attribution: document.querySelector('#mapContainer .leaflet-control-attribution')?.textContent?.trim() || ''
     }))()`);
-    check('Create form coordinate picker uses Leaflet', result.states.formPicker.provider === 'leaflet' && result.states.formPicker.leaflet, result.states.formPicker);
+    check('Coordinate picker uses Leaflet and the legacy street raster', result.states.formPicker.provider === 'leaflet'
+        && result.states.formPicker.leaflet && result.states.formPicker.raster, result.states.formPicker);
 
-    const forbidden = /maplibre|openfreemap|mapbox-gl-rtl|tiles\.maps\.eox/i;
-    check('No superseded map runtime traffic', !requests.some(request => forbidden.test(`${request.host}${request.path}`)));
-    check('Street requests use the local tile proxy', requests.some(request => request.path.endsWith('/ajax/map_tile.php') && request.search.includes('layer=street')));
-    check('ArcGIS credentials stay server-side', !requests.some(request => request.search.includes('token=') || request.host.endsWith('arcgis.com')));
-    check('No browser console errors', consoleEvents.length === 0, consoleEvents);
-    check('No failed requests or CSP blocks', failedRequests.length === 0, failedRequests);
+    check('Satellite requests use the configured browser key', requests.some(request => request.host === 'api.maptiler.com' && request.hasKey));
+    check('No routing UI or request remains', !requests.some(request => request.path.includes('map_route'))
+        && !Boolean(await evaluate(`document.querySelector('#routeToMosque, #routePanel, a[href*="google.com/maps"]')`)));
+    check('No rejected provider runtime request exists', !requests.some(request => /arcgis|esri|maplibre|openfreemap|eox|google\.com\/maps/i.test(`${request.host}${request.path}`)), requests);
+    check('No browser console or CSP errors', consoleEvents.length === 0, consoleEvents);
+    check('No failed requests or tile storm', failedRequests.length === 0, failedRequests);
 } catch (error) {
     fatalError = error.stack || error.message;
     check('Browser suite completed', false, fatalError);

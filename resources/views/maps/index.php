@@ -56,7 +56,6 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
-                                <div class="search-suggestions mt-2" id="searchSuggestions"></div>
                             </div>
                         </div>
 
@@ -148,7 +147,7 @@
             <div class="card map-canvas-card">
                 <div class="card-header map-canvas-toolbar">
                     <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-map me-2 text-primary"></i>المواقع
+                        <i class="fas fa-map me-2 text-primary"></i>خريطة تواجد المساجد
                     </h5>
                     <div class="map-canvas-actions">
                         <div class="map-basemap-switch" role="group" aria-label="نوع عرض الخريطة">
@@ -158,29 +157,24 @@
                             <button type="button" id="mapStyleSatellite" data-basemap-mode="satellite" class="map-basemap-switch__button" aria-pressed="false">
                                 <i class="fas fa-satellite" aria-hidden="true"></i><span>قمر صناعي</span>
                             </button>
-                            <button type="button" id="mapStyleHybrid" data-basemap-mode="hybrid" class="map-basemap-switch__button" aria-pressed="false">
-                                <i class="fas fa-layer-group" aria-hidden="true"></i><span>هجين</span>
-                            </button>
                         </div>
                         <button id="fitToMarkers" class="btn btn-outline-primary btn-sm d-flex align-items-center">
                             <i class="fas fa-expand-alt me-2"></i>عرض الكل
                         </button>
                         <div class="header-actions">
-                            <button id="resetMapView" class="btn btn-light btn-icon" aria-label="إعادة ضبط عرض الخريطة" title="إعادة ضبط عرض الخريطة">
-                                <i class="fas fa-house"></i>
+                            <button id="mapFullscreen" class="btn btn-light btn-icon" aria-label="ملء الشاشة" title="ملء الشاشة">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button id="refreshMap" class="btn btn-light btn-icon" aria-label="تحديث الخريطة" title="تحديث الخريطة">
+                                <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
                     </div>
                 </div>
                 <div class="card-body p-0 position-relative map-canvas-shell">
                     <div id="map"></div>
-                    <div class="map-control-stack" aria-label="أدوات الخريطة">
-                        <button type="button" id="mapZoomIn" aria-label="تكبير" title="تكبير"><i class="fas fa-plus" aria-hidden="true"></i></button>
-                        <button type="button" id="mapZoomOut" aria-label="تصغير" title="تصغير"><i class="fas fa-minus" aria-hidden="true"></i></button>
-                        <button type="button" id="mapFullscreen" aria-label="ملء الشاشة" title="ملء الشاشة"><i class="fas fa-expand" aria-hidden="true"></i></button>
-                        <button type="button" id="locateMe" aria-label="موقعي الحالي" title="موقعي الحالي"><i class="fas fa-location-crosshairs" aria-hidden="true"></i></button>
-                    </div>
-                    <aside id="selectedMosquePanel" class="map-selection-panel" aria-live="polite" aria-labelledby="selectedMosqueTitle" aria-hidden="true" hidden>
+                    <div id="mapApplicationOverlays" class="map-application-overlays">
+                        <aside id="selectedMosquePanel" class="map-selection-panel" aria-live="polite" aria-labelledby="selectedMosqueTitle" aria-hidden="true" hidden>
                         <div class="map-selection-panel__header">
                             <div>
                                 <span class="map-selection-panel__eyebrow">المسجد المحدد</span>
@@ -205,24 +199,10 @@
                         </div>
                         <div class="map-selection-panel__actions">
                             <button type="button" id="copyMosqueCoordinates" class="btn btn-outline-secondary btn-sm">نسخ الإحداثيات</button>
-                            <button type="button" id="routeToMosque" class="btn btn-outline-primary btn-sm">الاتجاهات</button>
                             <a id="selectedMosqueDetails" class="btn btn-primary btn-sm" href="mosques.php">عرض التفاصيل في الدليل</a>
                         </div>
-                    </aside>
-                    <aside id="routePanel" class="map-route-panel" aria-live="polite" hidden>
-                        <div class="map-route-panel__header">
-                            <strong>الاتجاهات إلى المسجد</strong>
-                            <button type="button" id="clearRoute" aria-label="إغلاق الاتجاهات"><i class="fas fa-times" aria-hidden="true"></i></button>
-                        </div>
-                        <div class="map-route-modes" role="radiogroup" aria-label="طريقة التنقل">
-                            <button type="button" data-route-mode="driving" role="radio" aria-checked="true"><i class="fas fa-car" aria-hidden="true"></i> سيارة</button>
-                            <button type="button" data-route-mode="walking" role="radio" aria-checked="false"><i class="fas fa-person-walking" aria-hidden="true"></i> مشياً</button>
-                        </div>
-                        <div id="routeStatus" class="map-route-status"></div>
-                        <div id="routeSummary" class="map-route-summary" hidden><strong id="routeDistance">-</strong><span id="routeDuration">-</span></div>
-                        <ol id="routeSteps" class="map-route-steps"></ol>
-                        <a id="externalDirections" class="btn btn-outline-secondary btn-sm" href="#" target="_blank" rel="noopener noreferrer">فتح في تطبيق خرائط</a>
-                    </aside>
+                        </aside>
+                    </div>
                     <div id="mapLoading" class="position-absolute top-50 start-50 translate-middle text-center">
                         <div class="spinner-border text-primary mb-3 map-loading-spinner" role="status">
                             <span class="visually-hidden">جاري التحميل...</span>
@@ -237,7 +217,8 @@
                         </div>
                     </div>
                     <div id="mapNotice" class="map-satellite-notice" role="status" aria-live="polite" hidden>
-                        تعذر تحميل صور القمر الصناعي. تم الرجوع إلى الخريطة العادية.
+                        <span data-map-notice-text>تعذر تحميل بعض أجزاء الخريطة.</span>
+                        <button type="button" id="retryMapTiles" hidden>حاول مرة أخرى</button>
                     </div>
                 </div>
             </div>
@@ -326,7 +307,7 @@
 
 </div>
 
-<script type="application/json" id="mapPageData" nonce="<?= $view->e($cspNonce ?? '') ?>"><?= json_encode(['mosques' => $mosques, 'mosqueGeoJson' => $mosqueGeoJson, 'mapConfig' => $mapConfig ?? ['engine' => 'leaflet'], 'mapDefaults' => $mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9], 'csrfToken' => $csrfToken ?? ''], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?></script>
+<script type="application/json" id="mapPageData" nonce="<?= $view->e($cspNonce ?? '') ?>"><?= json_encode(['mosques' => $mosques, 'mosqueGeoJson' => $mosqueGeoJson, 'mapConfig' => $mapConfig ?? ['engine' => 'leaflet'], 'mapDefaults' => $mapDefaults ?? ['latitude' => 34.6814, 'longitude' => -1.9086, 'zoom' => 9]], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?></script>
 <script src="assets/dist/maps.min.js"></script>
 
 

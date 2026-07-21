@@ -112,15 +112,11 @@ files in the FTP client.
 `vendor/` is required by PHP but belongs in the private application root,
 not inside `htdocs/`.
 
-## ArcGIS map configuration
+## Map configuration
 
-Set `ARCGIS_ACCESS_TOKEN` to an ArcGIS API-key credential with only the static-basemap-tiles privilege. It stays server-side: authenticated browsers request `ajax/map_tile.php`, and the application forwards fixed, validated tile requests to ArcGIS.
+The street map uses OpenStreetMap raster tiles directly. Set `MAPTILER_API_KEY` to a browser key restricted to the development origins and final production domain for the optional satellite mode.
 
-Set `ARCGIS_ROUTING_TOKEN` separately and grant only the network-analysis privilege. It is server-only: the browser calls the authenticated, CSRF-protected `ajax/map_route.php` endpoint, and the application forwards the route request to ArcGIS. Never reuse or expose this token in HTML or client JavaScript.
-
-The optional `ARCGIS_STREET_TILE_URL`, `ARCGIS_SATELLITE_TILE_URL`, `ARCGIS_SATELLITE_LABELS_URL`, and `ARCGIS_ROUTING_URL` values have official ArcGIS defaults in `.env.example`. Production must use HTTPS and allow outbound access to the configured ArcGIS hosts.
-
-After configuration, verify street, satellite, and hybrid modes; zoom level 22 where the provider has coverage; clickable Esri attribution; geolocation permission handling; driving and walking routes; and the add/edit coordinate picker.
+After configuration, verify street and satellite modes through zoom 22, clustering, mosque selection, and the add/edit coordinate picker.
 
 ## Post-deployment checks
 

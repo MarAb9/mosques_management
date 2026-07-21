@@ -11,8 +11,6 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
 use App\Repositories\MosqueRepository;
-use App\Services\ArcGisRouteService;
-use App\Services\ArcGisTileService;
 
 final class MapAjaxController extends Controller
 {
@@ -21,8 +19,6 @@ final class MapAjaxController extends Controller
         Session $session,
         private readonly MosqueRepository $mosques,
         private readonly ErrorHandler $errors,
-        private readonly ArcGisRouteService $routes,
-        private readonly ArcGisTileService $tiles,
     ) {
         parent::__construct($view, $session);
     }
@@ -37,77 +33,5 @@ final class MapAjaxController extends Controller
 
             return $this->json(['error' => 'Failed to load mosque data'], 500);
         }
-    }
-
-    public function route(Request $request): Response
-    {
-        $csrf = $request->post('csrf_token');
-        if (!is_string($csrf) || !hash_equals($this->session->csrfToken(), $csrf)) {
-            return $this->routeError('csrf_failed', 419);
-        }
-
-        $values = [
-            $request->post('origin_latitude'),
-            $request->post('origin_longitude'),
-            $request->post('destination_latitude'),
-            $request->post('destination_longitude'),
-        ];
-        if (array_filter($values, static fn (mixed $value): bool => !is_numeric($value)) !== []) {
-            return $this->routeError('route_invalid_coordinates', 422);
-        }
-
-        try {
-            $route = $this->routes->route(
-                (float) $values[0],
-                (float) $values[1],
-                (float) $values[2],
-                (float) $values[3],
-                (string) $request->post('mode', 'driving'),
-            );
-
-            return $this->json(['data' => $route]);
-        } catch (\DomainException $e) {
-            return $this->routeError($e->getMessage(), 422);
-        } catch (\RuntimeException $e) {
-            $this->errors->log($e);
-            $code = strtok($e->getMessage(), ':') ?: 'route_failed';
-            $status = match ($code) {
-                'route_rate_limit', 'route_quota' => 429,
-                'route_not_found' => 404,
-                'route_unavailable' => 503,
-                default => 502,
-            };
-
-            return $this->routeError($code, $status);
-        }
-    }
-
-    public function tile(Request $request): Response
-    {
-        try {
-            $tile = $this->tiles->tile(
-                (string) $request->query('layer', ''),
-                $request->query('z'),
-                $request->query('x'),
-                $request->query('y'),
-                (string) $request->header('Referer', ''),
-            );
-
-            return new Response($tile['body'], 200, [
-                'Content-Type' => $tile['content_type'],
-                'Cache-Control' => 'private, max-age=86400',
-            ]);
-        } catch (\DomainException) {
-            return new Response('', 400, ['Cache-Control' => 'no-store']);
-        } catch (\RuntimeException $e) {
-            $this->errors->log($e);
-
-            return new Response('', $e->getMessage() === 'tile_quota' ? 429 : 502, ['Cache-Control' => 'no-store']);
-        }
-    }
-
-    private function routeError(string $code, int $status): Response
-    {
-        return $this->json(['error' => ['code' => $code]], $status);
     }
 }

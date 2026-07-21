@@ -18,25 +18,21 @@ const defaults = {
     zoom: Number(pageData.mapDefaults?.zoom) || 9
 };
 const config = {
-    engine: 'leaflet',
-    street: {},
-    satellite: {},
-    routing: {},
+    streetUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    satelliteUrl: '',
+    apiKey: '',
     ...pageData.mapConfig
 };
 const mapElement = document.getElementById('map');
 let map;
 let clusters;
 let streetLayer;
-let imageryLayer;
-let labelsLayer;
-let locationLayer;
-let routeLayers;
-let selectedId = '';
+let satelliteLayer;
+let selectedMosqueId = '';
 let currentMode = 'street';
-let routeMode = 'driving';
 let filtered = [];
 const markers = new Map();
+let tileErrorShown = false;
 const filters = { search: '', community: '', status: '', friday: '' };
 
 function validMosques(geoJson) {
@@ -79,92 +75,98 @@ function statusTone(status) {
     return 'secondary';
 }
 
-function notify(message, duration = 6000) {
+function notify(message, duration = 6000, retry = false) {
     const notice = document.getElementById('mapNotice');
     if (!notice) return;
-    notice.textContent = message;
+    const text = notice.querySelector('[data-map-notice-text]');
+    if (text) text.textContent = message;
+    const button = document.getElementById('retryMapTiles');
+    if (button) button.hidden = !retry;
     notice.hidden = false;
     window.clearTimeout(notice._timer);
-    notice._timer = window.setTimeout(() => { notice.hidden = true; }, duration);
+    if (duration > 0) notice._timer = window.setTimeout(() => { notice.hidden = true; }, duration);
 }
 
-function tileLayer(settings, url, kind) {
-    const layer = L.tileLayer(url, {
-        attribution: String(settings.attribution || ''),
-        minZoom: 0,
-        maxZoom: Number(settings.max_zoom) || 22,
-        maxNativeZoom: Number(settings.max_native_zoom) || 22,
-        tileSize: Number(settings.tile_size) || 256,
-        zoomOffset: 0,
-        updateWhenIdle: true,
-        keepBuffer: 3
-    });
-    let failures = 0;
-    layer.on('tileerror', () => {
-        failures += 1;
-        mapElement.dataset.tileErrors = String((Number(mapElement.dataset.tileErrors) || 0) + 1);
-        if (failures === 1) notify('تعذر تحميل بعض بلاطات الخريطة. تحقق من مفتاح ArcGIS واتصال الشبكة.');
-        if (kind !== 'street' && failures === 4 && currentMode !== 'street') switchBasemap('street');
-    });
+function isCancellation(error) {
+    return /abort|cancel/i.test(`${error?.name || ''} ${error?.message || ''} ${error?.error?.message || ''}`);
+}
+
+function recordLayerFailure(kind, error = {}) {
+    if (isCancellation(error)) return;
+    mapElement.dataset.tileErrors = String((Number(mapElement.dataset.tileErrors) || 0) + 1);
+    if (tileErrorShown) return;
+    tileErrorShown = true;
+    notify(
+        kind === 'satellite'
+            ? 'تعذر تحميل جزء من صور القمر الصناعي. حاول مرة أخرى.'
+            : 'تعذر تحميل جزء من الخريطة. حاول مرة أخرى.',
+        0,
+        true
+    );
+}
+
+function tileLayer(url, options, kind) {
+    const layer = L.tileLayer(url, { crossOrigin: true, ...options });
+    layer.on('tileerror', event => recordLayerFailure(kind, event));
+    layer.on('load', syncSelection);
     return layer;
 }
 
 function ensureStreet() {
-    if (!streetLayer && config.street?.url) {
-        streetLayer = tileLayer(config.street, config.street.url, 'street');
+    if (!streetLayer) {
+        streetLayer = tileLayer(String(config.streetUrl), {
+            maxNativeZoom: 19,
+            maxZoom: 22,
+            attribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">&copy; OpenStreetMap contributors</a>'
+        }, 'street');
     }
     return streetLayer;
 }
 
-function ensureImagery() {
-    if (!imageryLayer && config.satellite?.url) {
-        imageryLayer = tileLayer(config.satellite, config.satellite.url, 'imagery');
+function ensureSatellite() {
+    if (!satelliteLayer && config.apiKey && config.satelliteUrl) {
+        const url = String(config.satelliteUrl).replace('{key}', encodeURIComponent(String(config.apiKey)));
+        satelliteLayer = tileLayer(url, {
+            maxNativeZoom: 22,
+            maxZoom: 22,
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener noreferrer">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">&copy; OpenStreetMap contributors</a>'
+        }, 'satellite');
     }
-    if (!labelsLayer && config.satellite?.labels_url) {
-        labelsLayer = tileLayer(config.satellite, config.satellite.labels_url, 'labels');
-    }
+    return satelliteLayer;
 }
 
 function savedMode() {
     try {
         const value = localStorage.getItem(MODE_KEY);
-        return ['street', 'satellite', 'hybrid'].includes(value) ? value : 'street';
+        return value === 'hybrid' ? 'satellite' : ['street', 'satellite'].includes(value) ? value : 'street';
     } catch (_) {
         return 'street';
     }
 }
 
 function switchBasemap(mode) {
-    if (!map || !['street', 'satellite', 'hybrid'].includes(mode)) return;
-    [streetLayer, imageryLayer, labelsLayer].forEach(layer => layer && map.removeLayer(layer));
-    if (mode === 'street') {
-        ensureStreet()?.addTo(map);
-    } else {
-        ensureImagery();
-        if (!imageryLayer) {
-            notify('صور القمر الصناعي غير متاحة قبل إعداد مفتاح ArcGIS.');
-            mode = 'street';
-            ensureStreet()?.addTo(map);
-        } else {
-            imageryLayer.addTo(map);
-            if (mode === 'hybrid') labelsLayer?.addTo(map);
-        }
-    }
+    if (!map || !['street', 'satellite'].includes(mode)) return;
+    [streetLayer, satelliteLayer].forEach(layer => layer && map.removeLayer(layer));
+    const activeLayer = mode === 'street' ? ensureStreet() : ensureSatellite();
+    if (activeLayer) activeLayer.addTo(map);
+    else notify('أضف MAPTILER_API_KEY لعرض صور القمر الصناعي.', 0);
     currentMode = mode;
+    mapElement.closest('.map-canvas-shell')?.setAttribute('data-map-mode', mode);
     mapElement.dataset.mapMode = mode;
     document.querySelectorAll('[data-basemap-mode]').forEach(button => {
         button.setAttribute('aria-pressed', String(button.dataset.basemapMode === mode));
     });
     try { localStorage.setItem(MODE_KEY, mode); } catch (_) {}
+    syncSelection();
 }
 
 function markerIcon(mosque, selected = false) {
     return L.divIcon({
         className: 'mosque-marker-shell',
         html: `<span class="mosque-marker mosque-marker--${statusTone(mosque.status)}${selected ? ' is-selected' : ''}" aria-hidden="true"><i class="fas fa-mosque"></i></span>`,
-        iconSize: [36, 44],
-        iconAnchor: [18, 42],
-        tooltipAnchor: [0, -38]
+        iconSize: [32, 38],
+        iconAnchor: [16, 37],
+        tooltipAnchor: [0, -33]
     });
 }
 
@@ -188,12 +190,14 @@ function createMarkers() {
         zoomToBoundsOnClick: true,
         removeOutsideVisibleBounds: true,
         disableClusteringAtZoom: 18,
+        clusterPane: 'mosqueMarkers',
         maxClusterRadius: zoom => zoom < 10 ? 55 : zoom < 14 ? 45 : 34,
         iconCreateFunction: clusterIcon
     });
     mosques.forEach(mosque => {
         const marker = L.marker([mosque.latitude, mosque.longitude], {
             icon: markerIcon(mosque),
+            pane: 'mosqueMarkers',
             keyboard: true,
             title: mosque.name,
             riseOnHover: true
@@ -216,12 +220,13 @@ function initializeMap() {
         zoom: defaults.zoom,
         minZoom: 2,
         maxZoom: 22,
-        zoomControl: false,
+        zoomControl: true,
         attributionControl: true,
         zoomSnap: 1,
         zoomDelta: 1,
         wheelPxPerZoomLevel: 80
     });
+    map.createPane('mosqueMarkers').style.zIndex = '650';
     map.attributionControl.setPrefix(false);
     createMarkers();
     switchBasemap(savedMode());
@@ -232,7 +237,13 @@ function initializeMap() {
         mapElement.dataset.mapReady = 'true';
         window.setTimeout(() => map.invalidateSize(), 0);
     });
-    if (!config.street?.url) notify('أضف ARCGIS_ACCESS_TOKEN لعرض خريطة الأساس. علامات المساجد ما زالت متاحة.', 9000);
+    map.on('moveend', syncSelection);
+    map.on('zoomend', () => {
+        syncSelection();
+        if (currentMode === 'satellite' && map.getZoom() === 22) {
+            notify('تم الوصول إلى أقصى دقة متاحة.', 4000);
+        }
+    });
 }
 
 function setText(id, value) {
@@ -241,18 +252,13 @@ function setText(id, value) {
 }
 
 function selectedMosque() {
-    return mosques.find(mosque => mosque.id === selectedId);
+    return mosques.find(mosque => mosque.id === selectedMosqueId);
 }
 
-function selectMosque(id, reveal = true) {
-    const mosque = mosques.find(item => item.id === String(id));
-    const marker = markers.get(String(id));
+function syncSelection() {
+    const mosque = selectedMosque();
+    const marker = mosque && markers.get(mosque.id);
     if (!mosque || !marker || !filtered.some(item => item.id === mosque.id)) return;
-    if (selectedId && markers.has(selectedId)) {
-        const previous = mosques.find(item => item.id === selectedId);
-        if (previous) markers.get(selectedId).setIcon(markerIcon(previous));
-    }
-    selectedId = mosque.id;
     marker.setIcon(markerIcon(mosque, true));
     clusters.refreshClusters(marker);
     const panel = document.getElementById('selectedMosquePanel');
@@ -267,30 +273,44 @@ function selectMosque(id, reveal = true) {
         setText('selectedMosqueCommunity', mosque.community);
         const details = document.getElementById('selectedMosqueDetails');
         if (details) details.href = `mosques.php?national_code=${encodeURIComponent(mosque.nationalCode)}&from_map=${encodeURIComponent(mosque.nationalCode)}`;
-        const external = document.getElementById('externalDirections');
-        if (external) external.href = `https://www.google.com/maps/dir/?api=1&destination=${mosque.latitude},${mosque.longitude}`;
         panel.hidden = false;
         panel.setAttribute('aria-hidden', 'false');
     }
-    document.querySelectorAll('.mosque-list-item').forEach(item => item.classList.toggle('is-selected', item.dataset.mosqueId === mosque.id));
-    if (reveal) {
-        clusters.zoomToShowLayer(marker, () => map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 16), { duration: 0.65 }));
-    }
+    document.querySelectorAll('.mosque-list-item').forEach(item => {
+        const selected = item.dataset.mosqueId === mosque.id;
+        item.classList.toggle('is-selected', selected);
+        if (selected) item.setAttribute('aria-current', 'true');
+        else item.removeAttribute('aria-current');
+    });
     mapElement.dataset.selectedMosque = mosque.id;
 }
 
-function closeSelection({ focus = false } = {}) {
-    if (selectedId && markers.has(selectedId)) {
-        const mosque = mosques.find(item => item.id === selectedId);
-        if (mosque) markers.get(selectedId).setIcon(markerIcon(mosque));
+function selectMosque(id, reveal = true) {
+    const mosque = mosques.find(item => item.id === String(id));
+    const marker = markers.get(String(id));
+    if (!mosque || !marker || !filtered.some(item => item.id === mosque.id)) return;
+    if (selectedMosqueId && markers.has(selectedMosqueId)) {
+        const previous = mosques.find(item => item.id === selectedMosqueId);
+        if (previous) markers.get(selectedMosqueId).setIcon(markerIcon(previous));
     }
-    selectedId = '';
+    selectedMosqueId = mosque.id;
+    syncSelection();
+    if (reveal) {
+        clusters.zoomToShowLayer(marker, () => map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 16), { duration: 0.65 }));
+    }
+}
+
+function closeSelection({ focus = false } = {}) {
+    if (selectedMosqueId && markers.has(selectedMosqueId)) {
+        const mosque = mosques.find(item => item.id === selectedMosqueId);
+        if (mosque) markers.get(selectedMosqueId).setIcon(markerIcon(mosque));
+    }
+    selectedMosqueId = '';
     document.getElementById('selectedMosquePanel')?.setAttribute('aria-hidden', 'true');
     const panel = document.getElementById('selectedMosquePanel');
     if (panel) panel.hidden = true;
     document.querySelectorAll('.mosque-list-item').forEach(item => item.classList.remove('is-selected'));
     delete mapElement.dataset.selectedMosque;
-    clearRoute();
     if (focus) document.getElementById('map')?.focus();
 }
 
@@ -312,7 +332,7 @@ function updateList() {
         : '<div class="map-empty-state"><i class="fas fa-map-marker-alt"></i><p>لا توجد مساجد مطابقة للتصفية</p></div>';
     ['toolbarMosqueCount', 'sidebarMosqueCount'].forEach(id => setText(id, new Intl.NumberFormat('ar-MA').format(filtered.length)));
     setText('resultsSummary', `عرض ${filtered.length} مسجد`);
-    if (selectedId) list.querySelector(`[data-mosque-id="${CSS.escape(selectedId)}"]`)?.classList.add('is-selected');
+    if (selectedMosqueId) list.querySelector(`[data-mosque-id="${CSS.escape(selectedMosqueId)}"]`)?.classList.add('is-selected');
 }
 
 function updateActiveFilters() {
@@ -342,7 +362,8 @@ function applyFilters({ fit = true } = {}) {
     mapElement.dataset.visibleCount = String(filtered.length);
     updateList();
     updateActiveFilters();
-    if (selectedId && !filtered.some(mosque => mosque.id === selectedId)) closeSelection();
+    if (selectedMosqueId && !filtered.some(mosque => mosque.id === selectedMosqueId)) closeSelection();
+    else syncSelection();
     if (fit) fitMarkers(true);
 }
 
@@ -354,10 +375,6 @@ function fitMarkers(animate = true) {
     }
     const bounds = L.latLngBounds(filtered.map(mosque => [mosque.latitude, mosque.longitude]));
     map.fitBounds(bounds, { padding: [48, 48], maxZoom: 15, animate, duration: 0.65 });
-}
-
-function resetMap() {
-    map?.flyTo([defaults.latitude, defaults.longitude], defaults.zoom, { duration: 0.65 });
 }
 
 function setupFilters() {
@@ -392,127 +409,20 @@ function setupFilters() {
     });
 }
 
-function currentPosition() {
-    return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-            reject(new Error('unsupported'));
-            return;
-        }
-        navigator.geolocation.getCurrentPosition(
-            position => resolve({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy
-            }),
-            reject,
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
-        );
-    });
-}
-
-function showLocation(position, fit = true) {
-    if (locationLayer) map.removeLayer(locationLayer);
-    const point = [position.latitude, position.longitude];
-    locationLayer = L.layerGroup([
-        L.circle(point, { radius: Math.max(10, position.accuracy || 0), color: '#176b57', fillColor: '#74c5ad', fillOpacity: 0.14, weight: 1 }),
-        L.circleMarker(point, { radius: 7, color: '#fff', weight: 3, fillColor: '#176b57', fillOpacity: 1 })
-    ]).addTo(map);
-    if (fit) map.flyTo(point, Math.max(map.getZoom(), 16), { duration: 0.55 });
-}
-
-async function locateUser() {
-    const button = document.getElementById('locateMe');
-    button?.classList.add('is-loading');
-    try {
-        showLocation(await currentPosition());
-    } catch (_) {
-        notify('تعذر تحديد موقعك. تحقق من إذن الموقع في المتصفح.');
-    } finally {
-        button?.classList.remove('is-loading');
-    }
-}
-
-function clearRoute() {
-    if (routeLayers && map) map.removeLayer(routeLayers);
-    routeLayers = null;
-    const panel = document.getElementById('routePanel');
-    if (panel) panel.hidden = true;
-    const steps = document.getElementById('routeSteps');
-    if (steps) steps.innerHTML = '';
-    const summary = document.getElementById('routeSummary');
-    if (summary) summary.hidden = true;
-}
-
-function renderRoute(route, origin) {
-    if (!Array.isArray(route?.geometry) || route.geometry.length < 2) throw new Error('invalid-route');
-    if (routeLayers) map.removeLayer(routeLayers);
-    const line = route.geometry.map(point => [Number(point[0]), Number(point[1])]);
-    routeLayers = L.layerGroup([
-        L.polyline(line, { color: '#fff', weight: 9, opacity: 0.9, lineJoin: 'round' }),
-        L.polyline(line, { color: '#176b57', weight: 5, opacity: 0.98, lineJoin: 'round' }),
-        L.circleMarker([origin.latitude, origin.longitude], { radius: 7, color: '#fff', weight: 3, fillColor: '#176b57', fillOpacity: 1 })
-    ]).addTo(map);
-    map.fitBounds(L.latLngBounds(line), { padding: [70, 70], maxZoom: 17, duration: 0.7 });
-    setText('routeDistance', `${Number(route.distance_km || 0).toLocaleString('ar-MA', { maximumFractionDigits: 2 })} كم`);
-    setText('routeDuration', `${Number(route.duration_minutes || 0).toLocaleString('ar-MA')} دقيقة`);
-    const summary = document.getElementById('routeSummary');
-    if (summary) summary.hidden = false;
-    const steps = document.getElementById('routeSteps');
-    if (steps) steps.innerHTML = (route.steps || []).map(step => `<li><span>${escapeHtml(step.text)}</span><small>${Number(step.distance_km || 0).toLocaleString('ar-MA')} كم</small></li>`).join('');
-    setText('routeStatus', '');
-    mapElement.dataset.routeReady = 'true';
-}
-
-function routeErrorMessage(code) {
-    return {
-        route_rate_limit: 'تم تجاوز الحد المؤقت لطلبات الاتجاهات. حاول بعد دقيقة.',
-        route_quota: 'حصة خدمة الاتجاهات غير متاحة حالياً.',
-        route_not_found: 'لم يتم العثور على مسار مناسب.',
-        route_unavailable: 'خدمة الاتجاهات غير مهيأة أو غير متاحة.',
-        csrf_failed: 'انتهت صلاحية الجلسة. حدّث الصفحة وحاول مجدداً.'
-    }[code] || 'تعذر حساب المسار حالياً.';
-}
-
-async function requestRoute() {
-    const mosque = selectedMosque();
-    const panel = document.getElementById('routePanel');
-    if (!mosque || !panel) return;
-    panel.hidden = false;
-    setText('routeStatus', 'جاري تحديد موقعك وحساب المسار...');
-    document.getElementById('routeSummary')?.setAttribute('hidden', '');
-    try {
-        if (!config.routing?.enabled) throw new Error('route_unavailable');
-        const origin = await currentPosition();
-        const body = new URLSearchParams({
-            csrf_token: String(pageData.csrfToken || ''),
-            origin_latitude: String(origin.latitude),
-            origin_longitude: String(origin.longitude),
-            destination_latitude: String(mosque.latitude),
-            destination_longitude: String(mosque.longitude),
-            mode: routeMode
-        });
-        const response = await fetch(String(config.routing.endpoint || 'ajax/map_route.php'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'Accept': 'application/json' },
-            body,
-            credentials: 'same-origin'
-        });
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok || !payload.data) throw new Error(payload.error?.code || 'route_failed');
-        renderRoute(payload.data, origin);
-    } catch (error) {
-        setText('routeStatus', routeErrorMessage(error.message));
-        delete mapElement.dataset.routeReady;
-    }
+function retryBasemap() {
+    const failedLayer = currentMode === 'street' ? streetLayer : satelliteLayer;
+    if (failedLayer) map.removeLayer(failedLayer);
+    if (currentMode === 'street') streetLayer = null;
+    else satelliteLayer = null;
+    tileErrorShown = false;
+    switchBasemap(currentMode);
+    notify('جاري إعادة تحميل خريطة الأساس...', 4000);
 }
 
 function setupControls() {
     document.querySelectorAll('[data-basemap-mode]').forEach(button => button.addEventListener('click', () => switchBasemap(button.dataset.basemapMode)));
-    document.getElementById('mapZoomIn')?.addEventListener('click', () => map.zoomIn());
-    document.getElementById('mapZoomOut')?.addEventListener('click', () => map.zoomOut());
     document.getElementById('fitToMarkers')?.addEventListener('click', () => fitMarkers(true));
-    document.getElementById('resetMapView')?.addEventListener('click', resetMap);
-    document.getElementById('locateMe')?.addEventListener('click', locateUser);
+    document.getElementById('refreshMap')?.addEventListener('click', () => window.location.reload());
     document.getElementById('mapFullscreen')?.addEventListener('click', () => {
         const container = document.querySelector('.map-canvas-card');
         if (!document.fullscreenElement) container?.requestFullscreen?.();
@@ -531,13 +441,6 @@ function setupControls() {
             notify(value);
         }
     });
-    document.getElementById('routeToMosque')?.addEventListener('click', requestRoute);
-    document.getElementById('clearRoute')?.addEventListener('click', clearRoute);
-    document.querySelectorAll('[data-route-mode]').forEach(button => button.addEventListener('click', () => {
-        routeMode = button.dataset.routeMode;
-        document.querySelectorAll('[data-route-mode]').forEach(item => item.setAttribute('aria-checked', String(item === button)));
-        if (!document.getElementById('routePanel')?.hidden) requestRoute();
-    }));
     document.getElementById('mosquesList')?.addEventListener('click', event => {
         const item = event.target.closest('[data-mosque-id]');
         if (item) selectMosque(item.dataset.mosqueId, true);
@@ -564,8 +467,10 @@ function setupControls() {
         document.querySelectorAll('[data-map-view]').forEach(item => item.setAttribute('aria-selected', String(item === button)));
         document.getElementById('mapMainRow')?.setAttribute('data-active-view', button.dataset.mapView);
         if (button.dataset.mapView === 'map') window.setTimeout(() => map.invalidateSize(), 50);
+        syncSelection();
     }));
     document.getElementById('retryMap')?.addEventListener('click', () => window.location.reload());
+    document.getElementById('retryMapTiles')?.addEventListener('click', retryBasemap);
 }
 
 function start() {
@@ -580,9 +485,24 @@ function start() {
             clusters,
             get mode() { return currentMode; },
             get visibleCount() { return filtered.length; },
+            get selectedMarkerHighlighted() {
+                return Boolean(markers.get(selectedMosqueId)?.options.icon?.options.html?.includes('is-selected'));
+            },
             switchBasemap,
+            recordLayerFailure,
             selectFirst: () => filtered[0] && selectMosque(filtered[0].id, true),
-            renderRoute: route => renderRoute(route, { latitude: defaults.latitude, longitude: defaults.longitude })
+            clickFirstMarker: () => {
+                const marker = filtered[0] && markers.get(filtered[0].id);
+                if (!marker) return false;
+                marker.fire('click');
+                return true;
+            },
+            spiderfyFirstCluster: () => {
+                const cluster = clusters?._featureGroup?.getLayers?.().find(layer => typeof layer.spiderfy === 'function');
+                if (!cluster) return false;
+                cluster.spiderfy();
+                return true;
+            }
         };
     } catch (_) {
         document.getElementById('mapLoading')?.classList.add('d-none');

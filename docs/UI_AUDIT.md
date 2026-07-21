@@ -38,7 +38,7 @@ The redesign moves visual rules to `resources/css`, behavior to `resources/js` o
 | Select2 | Keep, restyle | Mosque and Quran selectors rely on it. A replacement would expand scope and regression risk. |
 | SweetAlert2 | Keep, restyle | Used for destructive and logout confirmation; it receives institutional tokens. |
 | Chart.js | Keep conditionally | Used by the mosque quick-statistics modal and loaded only where needed. |
-| Leaflet + Leaflet.markercluster | Keep conditionally | Both are bundled locally for the map workspace and coordinate picker; ArcGIS supplies the configured raster basemaps. |
+| Leaflet + Leaflet.markercluster | Keep conditionally | Both are bundled locally; OpenStreetMap supplies the legacy street raster and MapTiler supplies the satellite raster. |
 | Animate.css | Remove from runtime | Replaced by a small internal transform/opacity motion layer with reduced-motion support. |
 | Hover.css | Remove from runtime | Replaced by component focus/hover states in the design system. |
 
